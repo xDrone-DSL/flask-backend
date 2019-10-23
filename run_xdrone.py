@@ -1,19 +1,15 @@
 #!/usr/bin/env python
 
 import logging
-from xdrone_parser import xdrone_parser
-from fly_visitor import Fly
-
-def fly_drone(program):
-    parse_tree = xdrone_parser.parse(program)
-    Fly().visit(parse_tree)
+from xdrone import fly
 
 def main():
     logging.basicConfig(level=logging.INFO)
     while True:
         code = input('> ')
         try:
-            fly_drone(code)
+            mambo_addr = "d0:3a:86:9d:e6:5a"
+            fly(code, mambo_addr)
         except Exception as e:
             logging.error(e)
 

@@ -3,9 +3,8 @@ from lark import Visitor
 from pyparrot.Minidrone import Mambo
 
 class Fly(Visitor):
-    def __init__(self):
-        mamboAddr = "d0:3a:86:9d:e6:5a"
-        self.mambo = Mambo(mamboAddr, use_wifi=False)
+    def __init__(self, mac_addr):
+        self.mambo = Mambo(mac_addr, use_wifi=False)
 
         info("Trying to connect")
         success = self.mambo.connect(num_retries=3)
