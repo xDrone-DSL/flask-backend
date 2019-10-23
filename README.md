@@ -12,13 +12,11 @@
 
 ### alias pip=pip3
 
-### After saving, run:
+## After saving, run:
 
 ### source ~/.bashrc
 
-## If 3, you're good to go.
-
-## venv module comes installed with Python3
+## If python version = 3, you're good to go.
 
 ## Create your virtual environment
 
