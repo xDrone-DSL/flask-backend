@@ -17,72 +17,81 @@ class Fly(Visitor):
     def takeoff(self, tree):
         info('Taking off')
         self.mambo.safe_takeoff(5)
+        self.mambo.smart_sleep(1)
 
     def land(self, tree):
         info('Landing')
         self.mambo.safe_land(5)
 
     def up(self, tree):
+        self.mambo.smart_sleep(1)
         pass
 
     def down(self, tree):
+        self.mambo.smart_sleep(1)
         pass
 
     def left(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
-        mambo.fly_direct(roll=-10,
+        self.mambo.fly_direct(roll=-10,
                          pitch=0,
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
+        self.mambo.smart_sleep(1)
 
     def right(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
-        mambo.fly_direct(roll=10,
+        self.mambo.fly_direct(roll=10,
                          pitch=0,
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
+        self.mambo.smart_sleep(1)
 
     def forward(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
-        mambo.fly_direct(roll=0,
+        self.mambo.fly_direct(roll=0,
                          pitch=10,
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
+        self.mambo.smart_sleep(1)
 
     def backward(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
-        mambo.fly_direct(roll=0,
+        self.mambo.fly_direct(roll=0,
                          pitch=-10,
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
+        self.mambo.smart_sleep(1)
 
     def rotatel(self, tree):
         degrees, = tree.children
-        degrees = int(degrees)
+        degrees = float(degrees)
 
-        mambo.turn_degrees(-degrees)
+        self.mambo.turn_degrees(-degrees)
+        self.mambo.smart_sleep(1)
 
     def rotater(self, tree):
         degrees, = tree.children
-        degrees = int(degrees)
+        degrees = float(degrees)
 
-        mambo.turn_degrees(degrees)
+        self.mambo.turn_degrees(degrees)
+        self.mambo.smart_sleep(1)
 
     def wait(self, tree):
         seconds, = tree.children
-        seconds = int(seconds)
+        seconds = float(seconds)
 
         info('Waiting {} seconds'.format(seconds))
         self.mambo.smart_sleep(seconds)
