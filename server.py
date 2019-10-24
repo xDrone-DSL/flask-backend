@@ -17,8 +17,9 @@ def root():
 @app.route('/fly', methods=['POST'])
 def fly():
     data = request.get_json()
-    program = data['program']
+    program = data['body']['body']['program']
     xdrone.fly(program)
+    return "Flight success"
 
 if __name__ =="__main__":
-    app.run(debug=True,port=65535)
+    app.run(host='0.0.0.0',debug=True,port=8081)

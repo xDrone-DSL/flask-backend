@@ -28,6 +28,7 @@ wait: "WAIT" "(" seconds ")"
 
 ?number : INT
        | DECIMAL
+       | FLOAT
 
 ?distance : number
 ?seconds  : number
@@ -35,6 +36,7 @@ wait: "WAIT" "(" seconds ")"
 
 %import common.DECIMAL
 %import common.INT
+%import common.FLOAT
 
 %import common.WS
 %ignore WS
