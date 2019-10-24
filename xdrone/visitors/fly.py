@@ -36,7 +36,7 @@ class Fly(Visitor):
                          pitch=0,
                          yaw=0,
                          vertical_movement=0,
-                         duration)
+                         duration=duration)
 
     def right(self, tree):
         duration, = tree.children
@@ -46,7 +46,7 @@ class Fly(Visitor):
                          pitch=0,
                          yaw=0,
                          vertical_movement=0,
-                         duration)
+                         duration=duration)
 
     def forward(self, tree):
         duration, = tree.children
@@ -56,7 +56,7 @@ class Fly(Visitor):
                          pitch=10,
                          yaw=0,
                          vertical_movement=0,
-                         duration)
+                         duration=duration)
 
     def backward(self, tree):
         duration, = tree.children
@@ -66,7 +66,7 @@ class Fly(Visitor):
                          pitch=-10,
                          yaw=0,
                          vertical_movement=0,
-                         duration)
+                         duration=duration)
 
     def rotatel(self, tree):
         degrees, = tree.children
