@@ -22,6 +22,64 @@ class Fly(Visitor):
         info('Landing')
         self.mambo.safe_land(5)
 
+    def up(self, tree):
+        pass
+
+    def down(self, tree):
+        pass
+
+    def left(self, tree):
+        duration, = tree.children
+        duration = int(duration)
+
+        mambo.fly_direct(roll=-10,
+                         pitch=0,
+                         yaw=0,
+                         vertical_movement=0,
+                         duration)
+
+    def right(self, tree):
+        duration, = tree.children
+        duration = int(duration)
+
+        mambo.fly_direct(roll=10,
+                         pitch=0,
+                         yaw=0,
+                         vertical_movement=0,
+                         duration)
+
+    def forward(self, tree):
+        duration, = tree.children
+        duration = int(duration)
+
+        mambo.fly_direct(roll=0,
+                         pitch=10,
+                         yaw=0,
+                         vertical_movement=0,
+                         duration)
+
+    def backward(self, tree):
+        duration, = tree.children
+        duration = int(duration)
+
+        mambo.fly_direct(roll=0,
+                         pitch=-10,
+                         yaw=0,
+                         vertical_movement=0,
+                         duration)
+
+    def rotatel(self, tree):
+        degrees, = tree.children
+        degrees = int(degrees)
+
+        mambo.turn_degrees(-degrees)
+
+    def rotater(self, tree):
+        degrees, = tree.children
+        degrees = int(degrees)
+
+        mambo.turn_degrees(degrees)
+
     def wait(self, tree):
         seconds, = tree.children
         seconds = int(seconds)
