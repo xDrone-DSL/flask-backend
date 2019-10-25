@@ -1,33 +1,13 @@
-# Steps:
+# Setup
 
-# 1. Make Python virtual environment (for your own good)
+1. Make sure you're using python 3
+If `pip --version` mentions python 2, then use `pip3` instead of `pip` and `python3` instead of `python` in the commands below.
 
-## Make sure you're using Python3
+2. Install pipenv
+`pip install --user pipenv`
 
-### `python --version
+3. Enter the pipenv environment
+In this directory run:
+`pipenv shell`
 
-### If 2.7, add this to ~/.bashrc:
-
-### alias python=python3
-
-### alias pip=pip3
-
-## After saving, run:
-
-### source ~/.bashrc
-
-## If python version = 3, you're good to go.
-
-## Create your virtual environment
-
-### python -m venv /path/to/virtual_env
-
-### or
-
-### python3 -m venv /path/to/virtual_env
-
-# 2. Activate python virtual enviroment
-
-## Run: `source /path/to/virtual_env/bin/activate
-
-# 3. Run: `pip install -r requirements.txt
+4. To run the server run `python server.py`
