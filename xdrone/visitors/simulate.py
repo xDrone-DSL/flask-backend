@@ -23,63 +23,63 @@ class Simulate(Visitor):
 
     def up(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("up", duration)
 
 
     def down(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("down", duration)
 
 
     def left(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("left", duration)
 
 
     def right(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("right", duration)
 
 
     def forward(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("forward", duration)
 
 
     def backward(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("backwards", duration)
 
 
     def rotatel(self, tree):
         degrees, = tree.children
-        degrees = int(degrees)
+        degrees = float(degrees)
 
         self.add_command("rotateL", radians(degrees))
 
 
     def rotater(self, tree):
         degrees, = tree.children
-        degrees = int(degrees)
+        degrees = float(degrees)
 
         self.add_command("rotateR", radians(degrees))
 
 
     def wait(self, tree):
         duration, = tree.children
-        duration = int(duration)
+        duration = float(duration)
 
         self.add_command("wait", duration)
 
