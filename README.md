@@ -2,9 +2,9 @@
 
 To run it in Docker:
 
-1. `docker build -t xdrone-backend .` 
+1. `docker build -t xdronedsl/backend .` 
 
-2. `docker run -it xdrone-backend`  
+2. `docker run -it xdronedsl/backend`  
 
 To run it without Docker:  
 1. Make sure you're using python 3

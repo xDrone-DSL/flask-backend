@@ -1,0 +1,21 @@
+language: python
+python:
+  - "3.7"
+
+services:
+  - docker
+
+jobs:
+  include:
+    # - stage: test 
+    #   skip_cleanup: true
+    #   script: python test.py
+    - stage: deploy
+      script: docker build -t xdronedsl/backend:latest .
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script: bash docker_push.sh
+        on:
+          branch: master
+
