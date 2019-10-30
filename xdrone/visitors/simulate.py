@@ -60,7 +60,7 @@ class Simulate(Visitor):
         duration, = tree.children
         duration = float(duration)
 
-        self.add_command("backwards", duration)
+        self.add_command("backward", duration)
 
 
     def rotatel(self, tree):
