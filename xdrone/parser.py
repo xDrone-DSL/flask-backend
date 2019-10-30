@@ -26,9 +26,8 @@ rotatel: "ROTATELEFT" "(" angle ")"
 rotater: "ROTATERIGHT" "(" angle ")"
 wait: "WAIT" "(" seconds ")"
 
-?number : INT
-       | DECIMAL
-       | FLOAT
+?number : DECIMAL
+        | INT
 
 ?distance : number
 ?seconds  : number
@@ -36,7 +35,6 @@ wait: "WAIT" "(" seconds ")"
 
 %import common.DECIMAL
 %import common.INT
-%import common.FLOAT
 
 %import common.WS
 %ignore WS
