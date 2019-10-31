@@ -17,4 +17,6 @@ If `pip --version` mentions python 2, then use `pip3` instead of `pip` and `pyth
 In this directory run:
 `pipenv shell`
 
-4. To run the server run `python server.py`
+4. Install the env dependencies `pipenv install --dev`
+
+5. To run the server run `python server.py`
