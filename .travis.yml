@@ -5,11 +5,15 @@ python:
 services:
   - docker
 
+install:
+  - pip install pipenv
+  - pipenv install
+
 jobs:
   include:
     - stage: test 
       skip_cleanup: true
-      script: pytest
+      script: pipenv run; pytest
     - stage: deploy
       script: docker build -t xdronedsl/backend:latest .
       deploy:
