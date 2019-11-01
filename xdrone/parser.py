@@ -1,42 +1,5 @@
 from lark import Lark
+from os import path
 
-xdrone_parser = Lark(r"""
-fly: "fly" "(" ")" "{" takeoff command* land "}"
-
-takeoff: "TAKEOFF" "(" ")"
-land:    "LAND"    "(" ")"
-
-?command: up
-       | down
-       | left
-       | right
-       | forward
-       | backward
-       | rotatel
-       | rotater
-       | wait
-
-up: "UP" "(" distance ")"
-down: "DOWN" "(" distance ")"
-left: "LEFT" "(" distance ")"
-right: "RIGHT" "(" distance ")"
-forward: "FORWARD" "(" distance ")"
-backward: "BACKWARD" "(" distance ")"
-rotatel: "ROTATELEFT" "(" angle ")"
-rotater: "ROTATERIGHT" "(" angle ")"
-wait: "WAIT" "(" seconds ")"
-
-?number : DECIMAL
-        | INT
-
-?distance : number
-?seconds  : number
-?angle    : number
-
-%import common.DECIMAL
-%import common.INT
-
-%import common.WS
-%ignore WS
-
-""", start='fly')
+grammar_path = path.join(path.dirname(__file__), "xdrone.lark")
+xdrone_parser = Lark(open(grammar_path), start='fly')
