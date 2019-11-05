@@ -14,11 +14,11 @@ class Simulate(Visitor):
 
 
     def takeoff(self, tree):
-        self.add_command("up", 2.5)
+        pass
 
 
     def land(self, tree):
-        self.add_command("down", 2.5)
+        pass
 
 
     def up(self, tree):
