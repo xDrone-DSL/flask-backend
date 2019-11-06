@@ -21,7 +21,8 @@ def root():
 def fly():
     data = request.get_json()
     program = data['body']['body']['program']
-    xdrone.fly(program)
+    address = data['body']['body']['address']
+    xdrone.fly(program, address)
     return "Flight success"
 
 
