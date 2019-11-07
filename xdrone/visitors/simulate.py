@@ -8,7 +8,7 @@ class Simulate(Visitor):
     def __init__(self):
         self.commands = []
 
-  
+
     def add_command(self, command, val):
         self.commands.append({"action": command, "value": val})
 

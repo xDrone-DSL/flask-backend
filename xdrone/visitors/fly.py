@@ -10,7 +10,7 @@ class Fly(Visitor):
         success = self.mambo.connect(num_retries=3)
         info("Connected: %s" % success)
 
-    def __del(self):
+    def __del__ (self):
         info("Disconnecting")
         self.mambo.disconnect()
 
