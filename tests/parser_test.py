@@ -7,13 +7,13 @@ def test_missing_brackets():
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)
     
+    #assert excinfo.value.args[0] == ''   <--- This should tell us what the exception message exactly is 
+    #test will fail if you assert the exception to be a null string
+    
 def test_missing_takeoff(): 
     sample_program = "fly() { LAND() }"
     with pytest.raises(LarkError) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)   
-    
-    #assert excinfo.value.args[0] == ''   <--- This should tell us what the exception message exactly is 
-
 
 def test_missing_land(): 
     sample_program = "fly(){ TAKEOFF() }"
