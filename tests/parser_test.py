@@ -12,7 +12,7 @@ def test_missing_brackets():
     
 def test_missing_takeoff(): 
     sample_program = "fly() { LAND() }"
-    with pytest.raises(LarkError) as excinfo:
+    with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)   
 
 def test_missing_land(): 
