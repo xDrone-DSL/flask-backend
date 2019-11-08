@@ -13,6 +13,4 @@ def validate(program):
 
 def gen_simulate_commands(program):
     parse_tree = xdrone_parser.parse(program)
-    simulator = Simulate()
-    simulator.visit(parse_tree)
-    return simulator.commands
+    return Simulate().transform(parse_tree)

@@ -23,7 +23,7 @@ rotatel: "ROTATELEFT" "(" angle ")"
 rotater: "ROTATERIGHT" "(" angle ")"
 wait: "WAIT" "(" seconds ")"
 
-?number : DECIMAL
+number : DECIMAL
         | INT
 
 ?distance : number
