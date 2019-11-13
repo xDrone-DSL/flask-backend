@@ -34,5 +34,14 @@ def simulate():
     return jsonify({'commands': commands})
 
 
-if __name__ =="__main__":
-    app.run(host='0.0.0.0',debug=True,port=8081)
+@app.route('/validate', methods=['POST'])
+def validate():
+    data = request.get_json()
+    program = data['body']['body']['program']
+    bounds = data['body']['body']['bounds']
+    result = xdrone.validate(program, bounds)
+    return jsonify(result)
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', debug=True, port=8081)
