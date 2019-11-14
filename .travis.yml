@@ -1,4 +1,8 @@
 language: python
+
+arch:
+  - arm32
+
 python:
   - "3.7"
 
@@ -11,7 +15,7 @@ install:
 
 jobs:
   include:
-    - stage: test 
+    - stage: test
       skip_cleanup: true
       script: pipenv run; pytest
     - stage: deploy
@@ -22,4 +26,3 @@ jobs:
         script: bash docker_push.sh
         on:
           branch: master
-
