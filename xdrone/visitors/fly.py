@@ -40,7 +40,7 @@ class Fly(Visitor):
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
-        self.mambo.smart_sleep(1)
+        self.mambo.smart_sleep(2)
 
     def right(self, tree):
         duration, = tree.children
@@ -51,7 +51,7 @@ class Fly(Visitor):
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
-        self.mambo.smart_sleep(1)
+        self.mambo.smart_sleep(2)
 
     def forward(self, tree):
         duration, = tree.children
@@ -62,7 +62,7 @@ class Fly(Visitor):
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
-        self.mambo.smart_sleep(1)
+        self.mambo.smart_sleep(2)
 
     def backward(self, tree):
         duration, = tree.children
@@ -73,21 +73,21 @@ class Fly(Visitor):
                          yaw=0,
                          vertical_movement=0,
                          duration=duration)
-        self.mambo.smart_sleep(1)
+        self.mambo.smart_sleep(2)
 
     def rotatel(self, tree):
         degrees, = tree.children
         degrees = float(degrees)
 
         self.mambo.turn_degrees(-degrees)
-        self.mambo.smart_sleep(1)
+        self.mambo.smart_sleep(3)
 
     def rotater(self, tree):
         degrees, = tree.children
         degrees = float(degrees)
 
         self.mambo.turn_degrees(degrees)
-        self.mambo.smart_sleep(1)
+        self.mambo.smart_sleep(3)
 
     def wait(self, tree):
         seconds, = tree.children
