@@ -1,87 +1,37 @@
 from logging import info
-from lark import Visitor
+from lark import Transformer, Discard
 from math import radians
 
-class Simulate(Visitor):
+
+def wrap_command(command, val):
+    return {"action": command, "value": val}
 
 
-    def __init__(self):
-        self.commands = []
+class Simulate(Transformer):
 
+    def __default__(self, command, children, meta):
+        value = children[0]
+        return wrap_command(command, value)
 
-    def add_command(self, command, val):
-        self.commands.append({"action": command, "value": val})
+    def fly(self, children):
+        return children
 
+    def ignore_command(self, _):
+        raise Discard()
 
-    def takeoff(self, tree):
-        pass
+    takeoff = land = ignore_command
 
+    def number(self, value):
+        # value is a singleton list containing the a token containing the
+        # actual value
+        return float(value[0])
 
-    def land(self, tree):
-        pass
+    def rotatel(self, children):
+        degrees, = children
 
+        return wrap_command("rotateL", radians(degrees))
 
-    def up(self, tree):
-        duration, = tree.children
-        duration = float(duration)
+    def rotater(self, children):
+        degrees, = children
 
-        self.add_command("up", duration)
-
-
-    def down(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.add_command("down", duration)
-
-
-    def left(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.add_command("left", duration)
-
-
-    def right(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.add_command("right", duration)
-
-
-    def forward(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.add_command("forward", duration)
-
-
-    def backward(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.add_command("backward", duration)
-
-
-    def rotatel(self, tree):
-        degrees, = tree.children
-        degrees = float(degrees)
-
-        self.add_command("rotateL", radians(degrees))
-
-
-    def rotater(self, tree):
-        degrees, = tree.children
-        degrees = float(degrees)
-
-        self.add_command("rotateR", radians(degrees))
-
-
-    def wait(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.add_command("wait", duration)
-
-
-
+        return wrap_command("rotateR", radians(degrees))
