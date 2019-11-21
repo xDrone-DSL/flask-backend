@@ -26,16 +26,17 @@ class Fly(Visitor):
 
     def up(self, tree):
         duration, = tree.children
-        duration = float(duration)
+        print(duration)
+        #duration = float(duration)
         
-        self.mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=10, duration)
+        #self.mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=10, duration=duration)
         self.mambo.smart_sleep(2)
 
     def down(self, tree):
         duration, = tree.children
-        duration = float(duration)
+        #duration = float(duration)
         
-        self.mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-10, duration)
+        #self.mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-10, duration=duration)
         self.mambo.smart_sleep(2)
 
     def move_in_steps(roll, pitch, yaw, v_m, duration):
@@ -70,6 +71,7 @@ class Fly(Visitor):
 
     def forward(self, tree):
         duration, = tree.children
+        print(duration)
         duration = float(duration)
 
         self.move_in_steps(roll=0,
