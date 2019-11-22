@@ -1,6 +1,10 @@
 from logging import info
 from lark import Visitor
 from pyparrot.Minidrone import Mambo
+from math import floor
+
+def toFloat(tree):
+    return float(tree.children[0].children[0])
 
 class Fly(Visitor):
     def __init__(self, mac_addr):
@@ -12,6 +16,7 @@ class Fly(Visitor):
 
     def __del__ (self):
         info("Disconnecting")
+        self.mambo.safe_land(5)
         self.mambo.disconnect()
 
     def takeoff(self, tree):
@@ -24,75 +29,88 @@ class Fly(Visitor):
         self.mambo.safe_land(5)
 
     def up(self, tree):
-        self.mambo.smart_sleep(1)
-        pass
+        duration = toFloat(tree)
+        
+        self.mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=10, duration=duration)
+        self.mambo.smart_sleep(2)
 
     def down(self, tree):
-        self.mambo.smart_sleep(1)
-        pass
+        duration = toFloat(tree)
 
-    def left(self, tree):
-        duration, = tree.children
-        duration = float(duration)
-
-        self.mambo.fly_direct(roll=-10,
-                         pitch=0,
-                         yaw=0,
-                         vertical_movement=0,
-                         duration=duration)
+        
+        self.mambo.fly_direct(roll=0, pitch=0, yaw=0, vertical_movement=-10, duration=duration)
         self.mambo.smart_sleep(2)
+
+    def move_in_steps(self, roll, pitch, yaw, v_m, duration):
+        for _ in range(floor(duration)):
+            self.mambo.fly_direct(roll, pitch, yaw, v_m, 1)
+            self.mambo.smart_sleep(2)
+
+        if floor(duration) is not duration:
+            self.mambo.fly_direct(roll, pitch, yaw, v_m, duration - floor(duration))
+            self.mambo.smart_sleep(2)
+
+    
+    def left(self, tree):
+        duration = toFloat(tree)
+
+
+        self.move_in_steps(roll=-10,
+                           pitch=0,
+                           yaw=0,
+                           v_m=0,
+                           duration=duration)
 
     def right(self, tree):
-        duration, = tree.children
-        duration = float(duration)
+        duration = toFloat(tree)
 
-        self.mambo.fly_direct(roll=10,
-                         pitch=0,
-                         yaw=0,
-                         vertical_movement=0,
-                         duration=duration)
-        self.mambo.smart_sleep(2)
+
+        self.move_in_steps(roll=10,
+                           pitch=0,
+                           yaw=0,
+                           v_m=0,
+                           duration=duration)
 
     def forward(self, tree):
-        duration, = tree.children
-        duration = float(duration)
+        duration = toFloat(tree)
 
-        self.mambo.fly_direct(roll=0,
-                         pitch=10,
-                         yaw=0,
-                         vertical_movement=0,
-                         duration=duration)
-        self.mambo.smart_sleep(2)
+
+        self.move_in_steps(roll=0,
+                           pitch=10,
+                           yaw=0,
+                           v_m=0,
+                           duration=duration)
 
     def backward(self, tree):
-        duration, = tree.children
-        duration = float(duration)
+        duration = toFloat(tree)
 
-        self.mambo.fly_direct(roll=0,
-                         pitch=-10,
-                         yaw=0,
-                         vertical_movement=0,
-                         duration=duration)
-        self.mambo.smart_sleep(2)
+
+        self.move_in_steps(roll=0,
+                           pitch=-10,
+                           yaw=0,
+                           v_m=0,
+                           duration=duration)
 
     def rotatel(self, tree):
-        degrees, = tree.children
-        degrees = float(degrees)
+        degrees = toFloat(tree)
+
 
         self.mambo.turn_degrees(-degrees)
         self.mambo.smart_sleep(3)
 
     def rotater(self, tree):
-        degrees, = tree.children
-        degrees = float(degrees)
+        degrees = toFloat(tree)
+
 
         self.mambo.turn_degrees(degrees)
         self.mambo.smart_sleep(3)
 
     def wait(self, tree):
-        seconds, = tree.children
-        seconds = float(seconds)
+        duration = toFloat(tree)
 
-        info('Waiting {} seconds'.format(seconds))
-        self.mambo.smart_sleep(seconds)
-        info('Waited')
+
+        info('Waiting {} seconds'.format(duration))
+        self.mambo.smart_sleep(duration)
+    
+    def abort(self):
+        self.mambo.safe_land(5)
