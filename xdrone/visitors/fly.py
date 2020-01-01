@@ -17,7 +17,8 @@ class Fly(Visitor):
         self.mambo = Mambo(mac_addr, use_wifi=False)
         self.x = 0
         self.y = 0
-        self.z = 0
+        self.z = 90
+        # Angle of drone from the x axis (east)
         self.theta = 0
 
         info("Trying to connect")
