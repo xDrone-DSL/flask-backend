@@ -77,8 +77,8 @@ class Fly(Visitor):
                            yaw=0,
                            v_m=0,
                            duration=duration)
-        self.x += duration * cos(radians(self.theta) + pi/2)
-        self.z -= duration * sin(radians(self.theta) + pi/2)
+        self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta) + pi/2)
+        self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta) + pi/2)
 
     def right(self, tree):
         duration = toFloat(tree)
@@ -87,8 +87,8 @@ class Fly(Visitor):
                            yaw=0,
                            v_m=0,
                            duration=duration)
-        self.x += duration * cos(radians(self.theta) - pi/2)
-        self.z -= duration * sin(radians(self.theta) - pi/2)
+        self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta) - pi/2)
+        self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta) - pi/2)
 
     def forward(self, tree):
         duration = toFloat(tree)
@@ -97,8 +97,8 @@ class Fly(Visitor):
                            yaw=0,
                            v_m=0,
                            duration=duration)
-        self.x += duration * cos(radians(self.theta))
-        self.z -= duration * sin(radians(self.theta))
+        self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta))
+        self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta))
 
     def backward(self, tree):
         duration = toFloat(tree)
@@ -107,8 +107,8 @@ class Fly(Visitor):
                            yaw=0,
                            v_m=0,
                            duration=duration)
-        self.x += duration * cos(radians(self.theta) + pi)
-        self.z -= duration * sin(radians(self.theta) + pi)
+        self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta) + pi)
+        self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta) + pi)
 
     def rotatel(self, tree):
         degrees = toFloat(tree)
