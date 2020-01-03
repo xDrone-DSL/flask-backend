@@ -40,11 +40,12 @@ class Fly(Visitor):
         self.mambo.safe_takeoff(5)
         self.mambo.smart_sleep(1)
 
-        self.z = TAKE_OFF_HEIGHT
+        self.y = TAKE_OFF_HEIGHT
 
     def land(self, tree):
         info('Landing')
         self.mambo.safe_land(5)
+        self.y = 0
 
         for r in self.requirements:
             r.update_on_land(self.x, self.y, self.z)
