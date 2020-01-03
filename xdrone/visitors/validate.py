@@ -30,7 +30,6 @@ class Validate(Visitor):
         self.min_z = min(self.min_z, self.z)
         self.max_z = max(self.max_z, self.z)
 
-
     def down(self, tree):
         duration = toFloat(tree)
 
@@ -59,11 +58,11 @@ class Validate(Visitor):
         self.travel(self.direction - pi, duration)
 
     def rotatel(self, tree):
-        rads = radians(toFloat(degrees))
+        rads = radians(toFloat(tree))
 
         self.direction += rads
 
     def rotater(self, tree):
-        rads = radians(toFloat(degrees))
+        rads = radians(toFloat(tree))
 
         self.direction -= rads
