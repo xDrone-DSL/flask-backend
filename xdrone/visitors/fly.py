@@ -13,8 +13,9 @@ def toFloat(tree):
 
 
 class Fly(Visitor):
-    def __init__(self, mac_addr):
+    def __init__(self, mac_addr, rs):
         self.mambo = Mambo(mac_addr, use_wifi=False)
+        self.requirements = rs
 
         # positive is east
         self.x = 0
@@ -44,6 +45,9 @@ class Fly(Visitor):
     def land(self, tree):
         info('Landing')
         self.mambo.safe_land(5)
+
+        for r in self.requirements:
+            r.update_on_land(self.x, self.y, self.z)
 
     def up(self, tree):
         duration = toFloat(tree)
@@ -80,6 +84,9 @@ class Fly(Visitor):
         self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta) + pi/2)
         self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta) + pi/2)
 
+        for r in self.requirements:
+            r.update_on_move(self.x, self.y, self.z)
+
     def right(self, tree):
         duration = toFloat(tree)
         self.move_in_steps(roll=10,
@@ -89,6 +96,9 @@ class Fly(Visitor):
                            duration=duration)
         self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta) - pi/2)
         self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta) - pi/2)
+
+        for r in self.requirements:
+            r.update_on_move(self.x, self.y, self.z)
 
     def forward(self, tree):
         duration = toFloat(tree)
@@ -100,6 +110,9 @@ class Fly(Visitor):
         self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta))
         self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta))
 
+        for r in self.requirements:
+            r.update_on_move(self.x, self.y, self.z)
+
     def backward(self, tree):
         duration = toFloat(tree)
         self.move_in_steps(roll=0,
@@ -109,6 +122,9 @@ class Fly(Visitor):
                            duration=duration)
         self.x += HORIZONTAL_CALIBRATION * duration * cos(radians(self.theta) + pi)
         self.z -= HORIZONTAL_CALIBRATION * duration * sin(radians(self.theta) + pi)
+
+        for r in self.requirements:
+            r.update_on_move(self.x, self.y, self.z)
 
     def rotatel(self, tree):
         degrees = toFloat(tree)

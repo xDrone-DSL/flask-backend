@@ -22,8 +22,12 @@ def fly():
     data = request.get_json()
     program = data['body']['body']['program']
     address = data['body']['body']['address']
-    xdrone.fly(program, address)
-    return "Flight success"
+    requirements = data['body']['body'].get('requirements')
+    if requirements is None:
+        requirements = []
+
+    flight_status = xdrone.fly(program=program, rs=requirements, addr=address)
+    return jsonify({'flight_status': flight_status})
 
 
 @app.route('/simulate', methods=['POST'])
