@@ -12,6 +12,7 @@ land:    "LAND"    "(" ")"
        | rotatel
        | rotater
        | wait
+       | action
 
 up: "UP" "(" distance ")"
 down: "DOWN" "(" distance ")"
@@ -22,6 +23,7 @@ backward: "BACKWARD" "(" distance ")"
 rotatel: "ROTATELEFT" "(" angle ")"
 rotater: "ROTATERIGHT" "(" angle ")"
 wait: "WAIT" "(" seconds ")"
+action: "ACTION" "(" ")"
 
 number : DECIMAL
         | INT

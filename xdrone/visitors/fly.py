@@ -143,6 +143,12 @@ class Fly(Visitor):
         duration = toFloat(tree)
         info('Waiting {} seconds'.format(duration))
         self.mambo.smart_sleep(duration)
-    
+
+    def action(self, tree):
+        self.mambo.smart_sleep(2)
+        info('Performed action at ({}, {}, {})'.format(self.x, self.y, self.z))
+        for r in self.requirements:
+            r.update_on_action(self.x, self.y, self.z)
+
     def abort(self):
         self.mambo.safe_land(5)

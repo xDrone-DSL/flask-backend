@@ -19,7 +19,7 @@ class Simulate(Transformer):
     def ignore_command(self, _):
         raise Discard()
 
-    takeoff = land = ignore_command
+    takeoff = land = action = ignore_command
 
     def number(self, value):
         # value is a singleton list containing the a token containing the
