@@ -5,7 +5,6 @@ from requirements.landing import Landing
 
 
 def generate_requirements(reqs):
-
     requirements = []
 
     for r in reqs:

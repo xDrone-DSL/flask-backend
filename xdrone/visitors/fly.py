@@ -5,7 +5,7 @@ from math import floor, pi, sin, cos, radians
 
 TAKE_OFF_HEIGHT = 83
 HORIZONTAL_CALIBRATION = 35
-VERTICAl_CALIBRATION = 10
+VERTICAL_CALIBRATION = 10
 
 
 def toFloat(tree):
@@ -43,8 +43,9 @@ class Fly(Visitor):
         self.y = TAKE_OFF_HEIGHT
 
     def land(self, tree):
-        info('Landing')
+        info('Landing at x={}, y={}, ={}'.format(self.x, self.y, self.z))
         self.mambo.safe_land(5)
+
         self.y = 0
 
         for r in self.requirements:
