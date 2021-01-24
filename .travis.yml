@@ -26,3 +26,6 @@ jobs:
         script: bash docker_push.sh
         on:
           branch: master
+
+notifications:
+  email: false
