@@ -13,6 +13,7 @@ land:    "LAND"    "(" ")"
        | rotater
        | wait
        | action
+       | repeat
 
 up: "UP" "(" distance ")"
 down: "DOWN" "(" distance ")"
@@ -24,6 +25,8 @@ rotatel: "ROTATELEFT" "(" angle ")"
 rotater: "ROTATERIGHT" "(" angle ")"
 wait: "WAIT" "(" seconds ")"
 action: "ACTION" "(" ")"
+
+repeat: "REPEAT" number "TIMES" "{" command* "}"
 
 number : DECIMAL
         | INT

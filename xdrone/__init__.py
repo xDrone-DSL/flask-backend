@@ -31,6 +31,12 @@ def validate(program, bounds):
     return {"success": True}
 
 
+def flatten(x):
+    if isinstance(x, list):
+        return [a for i in x for a in flatten(i)]
+    else:
+        return [x]
+
 def gen_simulate_commands(program):
     parse_tree = xdrone_parser.parse(program)
-    return Simulate().transform(parse_tree)
+    return flatten(Simulate().transform(parse_tree))

@@ -13,7 +13,6 @@ lark-parser = "*"
 pyparrot = "*"
 zeroconf = "*"
 untangle = "*"
-bluepy = "*"
 flask = "*"
 flask-cors = "*"
 
