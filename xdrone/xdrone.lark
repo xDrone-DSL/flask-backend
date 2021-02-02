@@ -1,7 +1,7 @@
-fly: "fly" "(" ")" "{" takeoff command* land "}"
+main: "main" "(" ")" "{" takeoff command* land "}"
 
-takeoff: "TAKEOFF" "(" ")"
-land:    "LAND"    "(" ")"
+takeoff: "takeoff" "(" ")"
+land:    "land"    "(" ")"
 
 ?command: up
        | down
@@ -15,18 +15,18 @@ land:    "LAND"    "(" ")"
        | action
        | repeat
 
-up: "UP" "(" distance ")"
-down: "DOWN" "(" distance ")"
-left: "LEFT" "(" distance ")"
-right: "RIGHT" "(" distance ")"
-forward: "FORWARD" "(" distance ")"
-backward: "BACKWARD" "(" distance ")"
-rotatel: "ROTATELEFT" "(" angle ")"
-rotater: "ROTATERIGHT" "(" angle ")"
-wait: "WAIT" "(" seconds ")"
-action: "ACTION" "(" ")"
+up: "up" "(" distance ")"
+down: "down" "(" distance ")"
+left: "left" "(" distance ")"
+right: "right" "(" distance ")"
+forward: "forward" "(" distance ")"
+backward: "backward" "(" distance ")"
+rotatel: "rotate_left" "(" angle ")"
+rotater: "rotate_right" "(" angle ")"
+wait: "wait" "(" seconds ")"
+action: "action" "(" ")"
 
-repeat: "REPEAT" number "TIMES" "{" command* "}"
+repeat: "repeat" number "times" "{" command* "}"
 
 number : DECIMAL
         | INT

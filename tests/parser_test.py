@@ -3,7 +3,7 @@ from xdrone.parser import xdrone_parser
 import logging 
 
 def test_missing_brackets(): 
-    sample_program = "fly() TAKEOFF() LAND() }"
+    sample_program = "main() takeoff() land() }"
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)
     
@@ -11,27 +11,27 @@ def test_missing_brackets():
     #test will fail if you assert the exception to be a null string
     
 def test_missing_takeoff(): 
-    sample_program = "fly() { LAND() }"
+    sample_program = "main() { land() }"
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)   
 
 def test_missing_land(): 
-    sample_program = "fly(){ TAKEOFF() }"
+    sample_program = "main(){ takeoff() }"
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)
 
 def test_land_before_takeoff(): 
-    sample_program = "fly() { LAND() TAKEOFF() }"
+    sample_program = "main() { land() takeoff() }"
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)
     
 def test_blank():
-    sample_program = "fly() { }"
+    sample_program = "main() { }"
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)
     
 def test_missing_fly(): 
-    sample_program = "{ TAKEOFF() LAND() }"
+    sample_program = "{ takeoff() land() }"
     with pytest.raises(Exception) as excinfo:
         parse_tree = xdrone_parser.parse(sample_program)
     
