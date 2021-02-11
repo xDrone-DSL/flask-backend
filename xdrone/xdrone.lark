@@ -1,42 +1,113 @@
-main: "main" "(" ")" "{" takeoff command* land "}"
+//https://github.com/adamhosier/WACC-compiler/blob/master/antlr/WaccParser.g4
 
-takeoff: "takeoff" "(" ")"
-land:    "land"    "(" ")"
+prog: func* "main" "(" ")" "{" commands "}"
 
-?command: up
-       | down
-       | left
-       | right
-       | forward
-       | backward
-       | rotatel
-       | rotater
-       | wait
-       | action
-       | repeat
+commands: (command ";")*
 
-up: "up" "(" distance ")"
-down: "down" "(" distance ")"
-left: "left" "(" distance ")"
-right: "right" "(" distance ")"
-forward: "forward" "(" distance ")"
-backward: "backward" "(" distance ")"
-rotatel: "rotate_left" "(" angle ")"
-rotater: "rotate_right" "(" angle ")"
-wait: "wait" "(" seconds ")"
-action: "action" "(" ")"
+?command: "takeoff" "(" ")"                                        -> takeoff
+       | "land" "(" ")"                                           -> land
+       | "up" "(" expr ")"                                        -> up
+       | "down" "(" expr ")"                                      -> down
+       | "left" "(" expr ")"                                      -> left
+       | "right" "(" expr ")"                                     -> right
+       | "forward" "(" expr ")"                                   -> forward
+       | "backward" "(" expr ")"                                  -> backward
+       | "rotate_left" "(" expr ")"                               -> rotatel
+       | "rotate_right" "(" expr ")"                              -> rotater
+       | "wait" "(" expr ")"                                      -> wait
+       | type_declare ident                                        -> declare
+       | type_declare_assign ident "<-" assign_rhs                   -> declare_assign
+       | assign_lhs "<-" assign_rhs                                 -> assign
+       | func_call
+       | "repeat" expr "times" "{" commands "}"                    -> repeat
+       | "if" expr "{" commands "}" ["else" "{" commands "}"]     -> if
+       | "for" ident "from" expr "to" expr "{" commands "}"       -> for
+       | "while" expr "{" commands "}"                            -> while
 
-repeat: "repeat" number "times" "{" command* "}"
+func: "function" ident "(" [param_list] ")" "return" type "{" (func_command ";")* "}"  -> func_return
+       | "function" ident "(" [param_list] ")" "{" commands "}"                  -> func_no_return
 
-number : DECIMAL
-        | INT
+func_command: command
+       | "return" ident       -> return
 
-?distance : number
-?seconds  : number
-?angle    : number
+param_list: type ident ("," type ident)*
+
+func_call: ident "(" [arg_list] ")"
+arg_list: expr ("," expr)*
+
+ident: /\w/+
+
+assign_lhs: ident
+        | array_elem
+        | vector_elem
+
+?assign_rhs: expr
+        | array
+        | vector
+
+array_elem: ident ("[" expr "]")+
+
+vector_elem: expr "[" "x" "]"    -> vector_x
+        | expr "[" "y" "]"      -> vector_y
+        | expr "[" "z" "]"      -> vector_z
+
+array: "[" [expr ("," expr)*] "]"
+
+vector: "(" expr "," expr "," expr ")"
+
+type: base_type
+        | array_type
+
+?type_declare: base_type
+        | array_declare_type
+
+?type_declare_assign: base_type
+        | array_type
+        | array_declare_type
+
+?base_type: "int"            -> int_type
+        | "decimal"          -> decimal_type
+        | "string"          -> string_type
+        | "boolean"         -> boolean_type
+        | "vector"          -> vector_type
+
+array_type: type "[" "]"
+
+array_declare_type: type "[" expr "]"
+
+
+expr: SIGNED_INT                    -> int_expr
+        | DECIMAL                   -> decimal_expr
+        | ESCAPED_STRING            -> string_expr
+        | "true"                    -> true_expr
+        | "false"                   -> false_expr
+        | ident
+        | array_elem
+        | vector_elem
+        | func_call
+        | "not" expr                -> not
+        | "-" expr                  -> negative
+        | "size" "(" expr ")"       -> size
+        | expr "*" expr             -> multi
+        | expr "/" expr             -> divide
+        | expr "+" expr             -> plus
+        | expr "-" expr             -> minus
+        | expr ">" expr             -> greater
+        | expr ">=" expr            -> greater_equal
+        | expr "<" expr             -> less
+        | expr "<=" expr            -> less_equal
+        | expr "==" expr            -> equal
+        | expr "=/=" expr           -> not_equal
+        | expr "&" expr             -> concat
+        | expr "and" expr           -> and
+        | expr "or" expr            -> or
+        | "(" expr ")"              -> parentheses
+
 
 %import common.DECIMAL
 %import common.INT
+%import common.ESCAPED_STRING
+%import common.SIGNED_INT
 
 %import common.WS
 %ignore WS
