@@ -27,19 +27,8 @@ class Type:
         return Type("vector", (0, 0, 0))
 
     @staticmethod
-    def array_of(elem_type: Type, length: int) -> ArrayType:
-        if isinstance(elem_type, ArrayType):
-            new_size = (length,) + elem_type.size
-            base_type = elem_type.base_type
-        else:
-            new_size = (length,)
-            base_type = elem_type
-
-        type_name = base_type.type_name + "".join(map(lambda i: "[{}]".format(i), new_size))
-        default_value = [elem_type.default_value for _ in range(length)]
-        base_type = base_type
-        size = new_size
-        return ArrayType(type_name, default_value, base_type, size)
+    def list_of(elem_type: Type) -> ListType:
+        return ListType(elem_type)
 
     def __str__(self):
         return self.type_name
@@ -50,14 +39,14 @@ class Type:
         return False
 
 
-class ArrayType(Type):
-    def __init__(self, type_name: str, default_value: object, base_type: Type, size: tuple):
-        super().__init__(type_name, default_value)
-        self.base_type = base_type
-        self.size = size
+class ListType(Type):
+    def __init__(self, elem_type: Type):
+        type_name = "list[" + elem_type.type_name + "]"
+        super().__init__(type_name, [])
+        self.elem_type = elem_type
 
     def __eq__(self, other):
-        if isinstance(other, ArrayType):
+        if isinstance(other, ListType):
             return other.type_name == self.type_name and other.default_value == self.default_value \
-                    and other.base_type == self.base_type and other.size == self.size
+                    and other.elem_type == self.elem_type
         return False

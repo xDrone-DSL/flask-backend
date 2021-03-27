@@ -2,7 +2,7 @@ from xdrone.visitors.compiler_utils.type import Type
 
 
 class Variable:
-    def __init__(self, type, value):
+    def __init__(self, type: Type, value: object):
         self.type = type
         self.value = value
 
@@ -22,11 +22,11 @@ class SymbolTable:
     def __contains__(self, ident: str) -> bool:
         return ident in self.__symbol_table
 
-    def store(self, ident: str, type: Type, value: object):
+    def store(self, ident: str, type: Type, value: object) -> None:
         assert not self.__contains__(ident), "Variable already in symbol table, please use update() to update it"
         self.__symbol_table[ident] = Variable(type, value)
 
-    def update(self, ident: str, value: object):
+    def update(self, ident: str, value: object) -> None:
         assert self.__contains__(ident), "Variable not in symbol table, please use store() to store it first"
         self.__symbol_table[ident].value = value
 

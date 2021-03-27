@@ -1,6 +1,6 @@
 import unittest
 
-from xdrone.visitors.compiler_utils.type import Type, ArrayType
+from xdrone.visitors.compiler_utils.type import Type, ListType
 
 
 class TestTypes(unittest.TestCase):
@@ -34,45 +34,47 @@ class TestTypes(unittest.TestCase):
         self.assertEqual((0, 0, 0), Type.vector().default_value)
         self.assertEqual("vector", str(Type.vector()))
 
-    def test_array_of(self):
-        array_type = Type.array_of(Type.int(), 5)
-        self.assertEqual(Type.array_of(Type.int(), 5), array_type)
-        self.assertNotEqual(Type.array_of(Type.int(), 4), array_type)
-        self.assertNotEqual(Type.array_of(Type.decimal(), 5), array_type)
-        self.assertEqual(Type("int[5]", [0 for _ in range(5)]), array_type)
-        self.assertEqual("int[5]", array_type.type_name)
-        self.assertEqual([0 for _ in range(5)], array_type.default_value)
-        self.assertEqual(Type.int(), array_type.base_type)
-        self.assertEqual((5,), array_type.size)
-        self.assertEqual("int[5]", str(array_type))
+    def test_list(self):
+        list_type = Type.list_of(Type.int())
+        self.assertEqual(Type.list_of(Type.int()), list_type)
+        self.assertEqual(ListType(Type.int()), list_type)
+        self.assertEqual("list[int]", list_type.type_name)
+        self.assertEqual([], list_type.default_value)
+        self.assertEqual(Type.int(), list_type.elem_type)
+        self.assertEqual("list[int]", str(list_type))
 
     def test_nested_array(self):
-        inner = Type.array_of(Type.int(), 5)
-        outer = Type.array_of(inner, 3)
-        self.assertEqual(ArrayType("int[3][5]", [[0 for _ in range(5)] for _ in range(3)], Type.int(), (3, 5)), outer)
-        self.assertEqual("int[3][5]", outer.type_name)
-        self.assertEqual([[0 for _ in range(5)] for _ in range(3)], outer.default_value)
-        self.assertEqual(Type.int(), outer.base_type)
-        self.assertEqual((3, 5), outer.size)
-        self.assertEqual("int[3][5]", str(outer))
+        inner = Type.list_of(Type.int())
+        outer = Type.list_of(inner)
+        self.assertEqual(ListType(Type.list_of(Type.int())), outer)
+        self.assertEqual("list[list[int]]", outer.type_name)
+        self.assertEqual([], outer.default_value)
+        self.assertEqual(Type.list_of(Type.int()), outer.elem_type)
+        self.assertEqual("list[list[int]]", str(outer))
 
     def test_eq(self):
         types1 = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
-                  Type.array_of(Type.int(), 5), Type.array_of(Type.decimal(), 5),
-                  Type.array_of(Type.array_of(Type.int(), 2), 3), Type.array_of(Type.array_of(Type.int(), 5), 3)]
+                  Type.list_of(Type.int()), Type.list_of(Type.decimal()),
+                  Type.list_of(Type.list_of(Type.int())), Type.list_of(Type.list_of(Type.decimal()))]
         types2 = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
-                  Type.array_of(Type.int(), 5), Type.array_of(Type.decimal(), 5),
-                  Type.array_of(Type.array_of(Type.int(), 2), 3), Type.array_of(Type.array_of(Type.int(), 5), 3)]
+                  Type.list_of(Type.int()), Type.list_of(Type.decimal()),
+                  Type.list_of(Type.list_of(Type.int())), Type.list_of(Type.list_of(Type.decimal()))]
         for i, j in zip(range(len(types1)), range(len(types2))):
             if i == j:
                 self.assertEqual(types1[i], types2[j])
             else:
                 self.assertNotEqual(types1[i], types2[j])
 
-    def test_corrupted_type(self):
+    def test_corrupted_type_not_equal_to_list_type(self):
+        self.assertNotEqual(Type("list[int]", []), Type.list_of(Type.int()))
+        self.assertNotEqual(Type("list[int]", []), ListType(Type.int()))
+
+    def test_corrupted_type_not_affect_correct_type(self):
         int_type = Type.int()
         corrupted_type = Type.int()
         corrupted_type.type_name = "corrupted"
         self.assertNotEqual(int_type, corrupted_type)
         self.assertEqual("int", str(Type.int()))
         self.assertEqual(0, Type.int().default_value)
+        self.assertEqual("corrupted", str(corrupted_type))
+        self.assertEqual(0, corrupted_type.default_value)

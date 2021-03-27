@@ -1,3 +1,5 @@
+from lark.exceptions import VisitError
+
 from requirements import generate_requirements
 from xdrone.parser import xdrone_parser
 from xdrone.visitors.fly import Fly
@@ -39,4 +41,7 @@ def flatten(x):
 
 def gen_simulate_commands(program):
     parse_tree = xdrone_parser.parse(program)
-    return flatten(Simulate().transform(parse_tree))
+    try:
+        return flatten(Simulate().transform(parse_tree))
+    except VisitError as e:
+        raise e.orig_exc

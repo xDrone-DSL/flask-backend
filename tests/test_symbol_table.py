@@ -7,13 +7,13 @@ from xdrone.visitors.compiler_utils.type import Type
 class TestVariable(unittest.TestCase):
     def test_eq(self):
         variables1 = [Variable(Type.int(), 1), Variable(Type.decimal(), 1.1), Variable(Type.boolean(), False),
-                      Variable(Type.vector(), (1.1, 2.2, -1.1)), Variable(Type.array_of(Type.int(), 4), [1, 2, 3, 4]),
-                      Variable(Type.array_of(Type.int(), 0), []), (Type.array_of(Type.decimal(), 4), [1.0, 2.0, 3.0, 4.0]),
-                      Variable(Type.array_of(Type.array_of(Type.vector(), 2), 1), [[(1.1, 2.2, -1.1), (1, 2, -1)]])]
+                      Variable(Type.vector(), (1.1, 2.2, -1.1)), Variable(Type.list_of(Type.int()), [1, 2, 3, 4]),
+                      Variable(Type.list_of(Type.int()), []), (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0]),
+                      Variable(Type.list_of(Type.list_of(Type.vector())), [[(1.1, 2.2, -1.1), (1, 2, -1)]])]
         variables2 = [Variable(Type.int(), 1), Variable(Type.decimal(), 1.1), Variable(Type.boolean(), False),
-                      Variable(Type.vector(), (1.1, 2.2, -1.1)), Variable(Type.array_of(Type.int(), 4), [1, 2, 3, 4]),
-                      Variable(Type.array_of(Type.int(), 0), []), (Type.array_of(Type.decimal(), 4), [1.0, 2.0, 3.0, 4.0]),
-                      Variable(Type.array_of(Type.array_of(Type.vector(), 2), 1), [[(1.1, 2.2, -1.1), (1, 2, -1)]])]
+                      Variable(Type.vector(), (1.1, 2.2, -1.1)), Variable(Type.list_of(Type.int()), [1, 2, 3, 4]),
+                      Variable(Type.list_of(Type.int()), []), (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0]),
+                      Variable(Type.list_of(Type.list_of(Type.vector())), [[(1.1, 2.2, -1.1), (1, 2, -1)]])]
         for i, j in zip(range(len(variables1)), range(len(variables2))):
             if i == j:
                 self.assertEqual(variables1[i], variables2[j])
@@ -25,10 +25,10 @@ class TestVariable(unittest.TestCase):
         self.assertEqual("Variable: { type: decimal, value: 1.1 }", str(Variable(Type.decimal(), 1.1)))
         self.assertEqual("Variable: { type: boolean, value: False }", str(Variable(Type.boolean(), False)))
         self.assertEqual("Variable: { type: vector, value: (1.1, 2.2, -1.1) }", str(Variable(Type.vector(), (1.1, 2.2, -1.1))))
-        self.assertEqual("Variable: { type: int[4], value: [1, 2, 3, 4] }",
-                         str(Variable(Type.array_of(Type.int(), 4), [1, 2, 3, 4])))
-        self.assertEqual("Variable: { type: vector[1][2], value: [[(1.1, 2.2, -1.1), (1, 2, -1)]] }",
-                         str(Variable(Type.array_of(Type.array_of(Type.vector(), 2), 1), [[(1.1, 2.2, -1.1), (1, 2, -1)]])))
+        self.assertEqual("Variable: { type: list[int], value: [1, 2, 3, 4] }",
+                         str(Variable(Type.list_of(Type.int()), [1, 2, 3, 4])))
+        self.assertEqual("Variable: { type: list[list[vector]], value: [[(1.1, 2.2, -1.1), (1, 2, -1)]] }",
+                         str(Variable(Type.list_of(Type.list_of(Type.vector())), [[(1.1, 2.2, -1.1), (1, 2, -1)]])))
 
 
 class TestSymbolTable(unittest.TestCase):
@@ -56,10 +56,10 @@ class TestSymbolTable(unittest.TestCase):
 
     def test_get_value(self):
         st = SymbolTable()
-        st.store("a", Type.array_of(Type.int(), 1), [1])
+        st.store("a", Type.list_of(Type.int()), [1])
         self.assertEqual([1], st.get_value("a"))
 
     def test_get_type(self):
         st = SymbolTable()
-        st.store("a", Type.array_of(Type.int(), 1), [1])
-        self.assertEqual(Type.array_of(Type.int(), 1), st.get_type("a"))
+        st.store("a", Type.list_of(Type.int()), [1])
+        self.assertEqual(Type.list_of(Type.int()), st.get_type("a"))

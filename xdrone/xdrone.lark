@@ -4,7 +4,7 @@ prog: func* "main" "(" ")" "{" commands "}"
 
 commands: (command ";")*
 
-?command: "takeoff" "(" ")"                                        -> takeoff
+?command: "takeoff" "(" ")"                                       -> takeoff
        | "land" "(" ")"                                           -> land
        | "up" "(" expr ")"                                        -> up
        | "down" "(" expr ")"                                      -> down
@@ -15,19 +15,19 @@ commands: (command ";")*
        | "rotate_left" "(" expr ")"                               -> rotatel
        | "rotate_right" "(" expr ")"                              -> rotater
        | "wait" "(" expr ")"                                      -> wait
-       | type_declare ident                                        -> declare
-       | type_declare_assign ident "<-" assign_rhs                   -> declare_assign
-       | assign_lhs "<-" assign_rhs                                 -> assign
+       | type ident                                               -> declare
+       | type ident "<-" assign_rhs                               -> declare_assign
+       | assign_lhs "<-" assign_rhs                               -> assign
        | func_call
-       | "repeat" expr "times" "{" commands "}"                    -> repeat
+       | "repeat" expr "times" "{" commands "}"                   -> repeat
        | "if" expr "{" commands "}" ["else" "{" commands "}"]     -> if
        | "for" ident "from" expr "to" expr "{" commands "}"       -> for
        | "while" expr "{" commands "}"                            -> while
 
-func: "function" ident "(" [param_list] ")" "return" type "{" (func_command ";")* "}"  -> func_return
+?func: "function" ident "(" [param_list] ")" "return" type "{" (func_command ";")* "}"  -> func_return
        | "function" ident "(" [param_list] ")" "{" commands "}"                  -> func_no_return
 
-func_command: command
+?func_command: command
        | "return" ident       -> return
 
 param_list: type ident ("," type ident)*
@@ -37,44 +37,30 @@ arg_list: expr ("," expr)*
 
 ident: /\w/+
 
-assign_lhs: ident
-        | array_elem
+?assign_lhs: ident
+        | list_elem
         | vector_elem
 
 ?assign_rhs: expr
-        | array
+        | list
         | vector
 
-array_elem: ident ("[" expr "]")+
+list_elem: ident ("[" expr "]")+
 
-vector_elem: expr "[" "x" "]"    -> vector_x
-        | expr "[" "y" "]"      -> vector_y
-        | expr "[" "z" "]"      -> vector_z
+vector_elem: expr "." "x"     -> vector_x
+        | expr "." "y"        -> vector_y
+        | expr "." "z"        -> vector_z
 
-array: "[" [expr ("," expr)*] "]"
+list: "[" [expr ("," expr)*] "]"
 
 vector: "(" expr "," expr "," expr ")"
 
-type: base_type
-        | array_type
-
-?type_declare: base_type
-        | array_declare_type
-
-?type_declare_assign: base_type
-        | array_type
-        | array_declare_type
-
-?base_type: "int"            -> int_type
-        | "decimal"          -> decimal_type
-        | "string"          -> string_type
-        | "boolean"         -> boolean_type
-        | "vector"          -> vector_type
-
-array_type: type "[" "]"
-
-array_declare_type: type "[" expr "]"
-
+type: "int"                    -> int_type
+        | "decimal"            -> decimal_type
+        | "string"             -> string_type
+        | "boolean"            -> boolean_type
+        | "vector"             -> vector_type
+        | "list" "[" type "]"  -> list_type
 
 expr: SIGNED_INT                    -> int_expr
         | DECIMAL                   -> decimal_expr
@@ -82,7 +68,7 @@ expr: SIGNED_INT                    -> int_expr
         | "true"                    -> true_expr
         | "false"                   -> false_expr
         | ident
-        | array_elem
+        | list_elem
         | vector_elem
         | func_call
         | "not" expr                -> not
