@@ -31,7 +31,7 @@ class TestTypes(unittest.TestCase):
     def test_vector(self):
         self.assertEqual(Type.vector(), Type.vector())
         self.assertEqual("vector", Type.vector().type_name)
-        self.assertEqual((0, 0, 0), Type.vector().default_value)
+        self.assertEqual([0, 0, 0], Type.vector().default_value)
         self.assertEqual("vector", str(Type.vector()))
 
     def test_list(self):

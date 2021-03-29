@@ -24,7 +24,7 @@ class Type:
 
     @staticmethod
     def vector() -> Type:
-        return Type("vector", (0, 0, 0))
+        return Type("vector", [0, 0, 0])
 
     @staticmethod
     def list_of(elem_type: Type) -> ListType:

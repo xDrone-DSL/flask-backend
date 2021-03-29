@@ -16,8 +16,10 @@ commands: (command ";")*
        | "rotate_right" "(" expr ")"                              -> rotater
        | "wait" "(" expr ")"                                      -> wait
        | type ident                                               -> declare
-       | type ident "<-" assign_rhs                               -> declare_assign
-       | assign_lhs "<-" assign_rhs                               -> assign
+       | type ident "<-" expr                               -> declare_assign
+       | vector_elem "<-" expr                              -> assign_vector_elem
+       | list_elem "<-" expr                                -> assign_list_elem
+       | ident "<-" expr                                    -> assign_ident
        | func_call
        | "repeat" expr "times" "{" commands "}"                   -> repeat
        | "if" expr "{" commands "}" ["else" "{" commands "}"]     -> if
@@ -28,7 +30,7 @@ commands: (command ";")*
        | "function" ident "(" [param_list] ")" "{" commands "}"                  -> func_no_return
 
 ?func_command: command
-       | "return" ident       -> return
+       | "return" expr       -> return
 
 param_list: type ident ("," type ident)*
 
@@ -37,23 +39,12 @@ arg_list: expr ("," expr)*
 
 ident: /\w/+
 
-?assign_lhs: ident
-        | list_elem
-        | vector_elem
+list_elem: expr "[" expr "]"
 
-?assign_rhs: expr
-        | list
-        | vector
-
-list_elem: ident ("[" expr "]")+
-
-vector_elem: expr "." "x"     -> vector_x
+?vector_elem: expr "." "x"    -> vector_x
         | expr "." "y"        -> vector_y
         | expr "." "z"        -> vector_z
 
-list: "[" [expr ("," expr)*] "]"
-
-vector: "(" expr "," expr "," expr ")"
 
 type: "int"                    -> int_type
         | "decimal"            -> decimal_type
@@ -70,6 +61,8 @@ expr: SIGNED_INT                    -> int_expr
         | ident
         | list_elem
         | vector_elem
+        | "[" [expr ("," expr)*] "]"       -> list
+        | "(" expr "," expr "," expr ")"   -> vector
         | func_call
         | "not" expr                -> not
         | "-" expr                  -> negative

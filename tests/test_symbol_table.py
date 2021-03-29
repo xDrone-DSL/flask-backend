@@ -35,31 +35,37 @@ class TestSymbolTable(unittest.TestCase):
     def test_contains(self):
         st = SymbolTable()
         self.assertFalse("a" in st)
-        st.store("a", Type.int(), 0)
+        st.store("a", Variable(Type.int(), 0))
         self.assertTrue("a" in st)
+
+    def test_eq(self):
+        st1 = SymbolTable()
+        st2 = SymbolTable()
+        self.assertTrue(st1 == st2)
+        st1.store("a", Variable(Type.int(), 0))
+        self.assertFalse(st1 == st2)
+        st2.store("a", Variable(Type.int(), 0))
+        self.assertTrue(st1 == st2)
 
     def test_store(self):
         st = SymbolTable()
-        st.store("a", Type.int(), 1)
+        st.store("a", Variable(Type.int(), 1))
         self.assertTrue("a" in st)
-        self.assertEqual(Type.int(), st.get_type("a"))
-        self.assertEqual(1, st.get_value("a"))
-        self.assertRaises(AssertionError, st.store, "a", Type.int(), 1)
+        self.assertEqual(Type.int(), st.get_variable("a").type)
+        self.assertEqual(1, st.get_variable("a").value)
+        self.assertRaises(AssertionError, st.store, "a", Variable(Type.int(), 1))
 
     def test_update(self):
         st = SymbolTable()
         self.assertRaises(AssertionError, st.update, "a", 1)
-        st.store("a", Type.int(), 1)
+        st.store("a", Variable(Type.int(), 1))
         st.update("a", 2)
-        self.assertEqual(Type.int(), st.get_type("a"))
-        self.assertEqual(2, st.get_value("a"))
+        self.assertEqual(Type.int(), st.get_variable("a").type)
+        self.assertEqual(2, st.get_variable("a").value)
 
-    def test_get_value(self):
+    def test_get_variable(self):
         st = SymbolTable()
-        st.store("a", Type.list_of(Type.int()), [1])
-        self.assertEqual([1], st.get_value("a"))
-
-    def test_get_type(self):
-        st = SymbolTable()
-        st.store("a", Type.list_of(Type.int()), [1])
-        self.assertEqual(Type.list_of(Type.int()), st.get_type("a"))
+        st.store("a", Variable(Type.list_of(Type.int()), [1]))
+        self.assertEqual([1], st.get_variable("a").value)
+        self.assertEqual(1, st.get_variable("a").value[0])
+        self.assertEqual(Type.list_of(Type.int()), st.get_variable("a").type)
