@@ -1,10 +1,22 @@
 from __future__ import annotations
 
+import copy
+from typing import Union
+
+
 class Type:
 
-    def __init__(self, type_name: str, default_value: object):
-        self.type_name = type_name
-        self.default_value = default_value
+    def __init__(self, type_name: str, default_value: Union[int, float, str, bool, list]):
+        self._type_name = type_name
+        self._default_value = default_value
+
+    @property
+    def type_name(self):
+        return copy.deepcopy(self._type_name)
+
+    @property
+    def default_value(self):
+        return copy.deepcopy(self._default_value)
 
     @staticmethod
     def int() -> Type:

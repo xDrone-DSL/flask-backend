@@ -54,7 +54,7 @@ type: "int"                    -> int_type
         | "list" "[" type "]"  -> list_type
 
 expr: SIGNED_INT                    -> int_expr
-        | DECIMAL                   -> decimal_expr
+        | SIGNED_FLOAT              -> decimal_expr
         | ESCAPED_STRING            -> string_expr
         | "true"                    -> true_expr
         | "false"                   -> false_expr
@@ -83,7 +83,7 @@ expr: SIGNED_INT                    -> int_expr
         | "(" expr ")"              -> parentheses
 
 
-%import common.DECIMAL
+%import common.SIGNED_FLOAT
 %import common.INT
 %import common.ESCAPED_STRING
 %import common.SIGNED_INT

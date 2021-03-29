@@ -39,9 +39,9 @@ def flatten(x):
     else:
         return [x]
 
-def gen_simulate_commands(program):
+def gen_simulate_commands(program, symbol_table=None):
     parse_tree = xdrone_parser.parse(program)
     try:
-        return flatten(Simulate().transform(parse_tree))
+        return flatten(Simulate(symbol_table).transform(parse_tree))
     except VisitError as e:
         raise e.orig_exc

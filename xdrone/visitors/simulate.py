@@ -12,9 +12,9 @@ def wrap_command(command, *val):
 
 class Simulate(Transformer):
 
-    def __init__(self):
+    def __init__(self, symbol_table):
         super().__init__()
-        self.symbol_table = SymbolTable()
+        self.symbol_table = SymbolTable() if symbol_table is None else symbol_table
 
     # def __default__(self, command, children, meta):
     #     logging.error("Ignoring unsupported command %s with children %s" % (command, children))
@@ -49,7 +49,8 @@ class Simulate(Transformer):
         return Variable(Type.decimal(), float(children[0]))
 
     def string_expr(self, children) -> Variable:
-        return Variable(Type.string(), str(children[0]))
+        quotation_removed = str(children[0])[1:-1]
+        return Variable(Type.string(), quotation_removed)
 
     def true_expr(self, children) -> Variable:
         return Variable(Type.boolean(), True)
@@ -164,6 +165,7 @@ class Simulate(Transformer):
         declared_type = list.type.elem_type
         if assigned_type != declared_type:
             raise CompileError("Assigned value {} should have type {}, but is {}".format(expr.value, declared_type, assigned_type))
+        #TODO: not working, need st.update
         list.value[index] = expr.value
         return []
 
@@ -173,6 +175,7 @@ class Simulate(Transformer):
         index = vector_elem.index
         if expr.type != Type.decimal():
             raise CompileError("Assigned value {} should have type decimal, but is {}".format(expr.value, expr.type))
+        #TODO: not working, need st.update
         vector.value[index] = expr.value
         return []
 

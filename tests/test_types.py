@@ -72,7 +72,7 @@ class TestTypes(unittest.TestCase):
     def test_corrupted_type_not_affect_correct_type(self):
         int_type = Type.int()
         corrupted_type = Type.int()
-        corrupted_type.type_name = "corrupted"
+        corrupted_type._type_name = "corrupted"
         self.assertNotEqual(int_type, corrupted_type)
         self.assertEqual("int", str(Type.int()))
         self.assertEqual(0, Type.int().default_value)
