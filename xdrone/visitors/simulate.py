@@ -65,6 +65,11 @@ class Simulate(Transformer):
             raise CompileError("Expression {} has type {} is not a list".format(expr1, expr1.type))
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
+        if expr2.value >= len(expr1.value):
+            print("List {} has length {}, but has been assessed with out-of-range index {}"
+                               .format(expr1.ident, len(expr1.value), expr2.value))
+            raise CompileError("List {} has length {}, but has been assessed with out-of-range index {}"
+                               .format(expr1.ident, len(expr1.value), expr2.value))
         return ListElem(expr1.ident, expr1, expr2.value)
 
     def vector_x(self, children) -> VectorElem:
@@ -88,9 +93,7 @@ class Simulate(Transformer):
     def list(self, children) -> Variable:
         exprs = children
         if len(exprs) == 0:
-            #TODO: empty list
-            pass
-
+            return Variable(Type.empty_list(), [])
         if not all(e.type == exprs[0].type for e in exprs):
             raise CompileError("Elements in list {} should have the same type".format(exprs))
         return Variable(Type.list_of(exprs[0].type), [e.value for e in exprs])

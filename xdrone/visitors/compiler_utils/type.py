@@ -42,6 +42,10 @@ class Type:
     def list_of(elem_type: Type) -> ListType:
         return ListType(elem_type)
 
+    @staticmethod
+    def empty_list():
+        return EmptyList()
+
     def __str__(self):
         return self.type_name
 
@@ -55,10 +59,24 @@ class ListType(Type):
     def __init__(self, elem_type: Type):
         type_name = "list[" + elem_type.type_name + "]"
         super().__init__(type_name, [])
-        self.elem_type = elem_type
+        self._elem_type = elem_type
+
+    @property
+    def elem_type(self):
+        return copy.deepcopy(self._elem_type)
 
     def __eq__(self, other):
         if isinstance(other, ListType):
             return other.type_name == self.type_name and other.default_value == self.default_value \
                     and other.elem_type == self.elem_type
         return False
+
+
+class EmptyList(ListType):
+    def __init__(self):
+        super(EmptyList, self).__init__(Type("all", 0))
+        self._type_name = "list[]"
+
+    def __eq__(self, other):
+        if isinstance(other, ListType):
+            return True

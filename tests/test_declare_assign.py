@@ -178,6 +178,21 @@ class AssignIdentTest(unittest.TestCase):
         expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[1], [-1], [1]], ident="a"))
         self.assertEqual(expected, actual)
 
+    def test_assign_ident_empty_list_should_update_symbol_table(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
+                 Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            actual = SymbolTable()
+            gen_simulate_commands("""
+                main () {{
+                 list[{}] a;
+                 a <- [];
+                }}
+                """.format(type.type_name), actual)
+            expected = SymbolTable()
+            expected.store("a", Variable(Type.list_of(type), [], ident="a"))
+            self.assertEqual(expected, actual)
+
     def test_assign_not_declared_variable_should_give_error(self):
         with self.assertRaises(CompileError) as context:
             gen_simulate_commands("""
@@ -264,7 +279,8 @@ class AssignVectorElemTest(unittest.TestCase):
                     }}
                 """.format(type.type_name))
 
-            self.assertTrue("Assigned value {} should have type decimal, but is {}".format(type.default_value, type.type_name) in str(context.exception))
+            self.assertTrue("Assigned value {} should have type decimal, but is {}"
+                            .format(type.default_value, type.type_name) in str(context.exception))
 
 class AssignListElemTest(unittest.TestCase):
 
@@ -341,7 +357,8 @@ class AssignListElemTest(unittest.TestCase):
         self.assertTrue("Identifier a has not been declared" in str(context.exception))
 
     def test_declare_and_assign_list_elem_with_different_type_should_give_error(self):
-        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
+                 Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
         for t1 in types:
             for t2 in types:
                 if t1 == t2:
@@ -354,10 +371,12 @@ class AssignListElemTest(unittest.TestCase):
                     }}
                     """.format(t1, t2))
 
-                self.assertTrue("Identifier b has been declared as list[{}], but assigned as list[{}]".format(t2, t1) in str(context.exception))
+                self.assertTrue("Identifier b has been declared as list[{}], but assigned as list[{}]"
+                                .format(t2, t1) in str(context.exception))
 
     def test_declare_and_then_assign_list_elem_with_different_type_should_give_error(self):
-        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
+                 Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
         for t1 in types:
             for t2 in types:
                 if t1 == t2:
@@ -372,7 +391,8 @@ class AssignListElemTest(unittest.TestCase):
                     }}
                     """.format(t1, t2, t1))
 
-                self.assertTrue("Assigned value {} should have type {}, but is {}".format(t2.default_value, t1.type_name, t2.type_name) in str(context.exception))
+                self.assertTrue("Assigned value {} should have type {}, but is {}"
+                                .format(t2.default_value, t1.type_name, t2.type_name) in str(context.exception))
 
 
 class CombinedDeclareAssignTest(unittest.TestCase):
@@ -440,6 +460,20 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[1], [2]], ident="a"))
         self.assertEqual(expected, actual)
 
+    def test_declare_and_assign_ident_empty_list_should_update_symbol_table(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
+                 Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            actual = SymbolTable()
+            gen_simulate_commands("""
+                main () {{
+                 list[{}] a <- [];
+                }}
+                """.format(type.type_name), actual)
+            expected = SymbolTable()
+            expected.store("a", Variable(Type.list_of(type), [], ident="a"))
+            self.assertEqual(expected, actual)
+
     def test_repeated_declare_and_assign_should_give_error(self):
         with self.assertRaises(CompileError) as context:
             gen_simulate_commands("""
@@ -452,7 +486,8 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         self.assertTrue("Identifier a already declared" in str(context.exception))
 
     def test_declare_and_assign_with_different_type_should_give_error(self):
-        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.list_of(Type.int()))]
         for t1 in types:
             for t2 in types:
                 if t1 == t2:
@@ -465,7 +500,8 @@ class CombinedDeclareAssignTest(unittest.TestCase):
                     }}
                     """.format(t1, t2))
 
-                self.assertTrue("Identifier b has been declared as {}, but assigned as {}".format(t2.type_name, t1.type_name) in str(context.exception))
+                self.assertTrue("Identifier b has been declared as {}, but assigned as {}"
+                                .format(t2.type_name, t1.type_name) in str(context.exception))
 
 
 

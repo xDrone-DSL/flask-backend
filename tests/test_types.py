@@ -1,6 +1,6 @@
 import unittest
 
-from xdrone.visitors.compiler_utils.type import Type, ListType
+from xdrone.visitors.compiler_utils.type import Type, ListType, EmptyList
 
 
 class TestTypes(unittest.TestCase):
@@ -43,7 +43,7 @@ class TestTypes(unittest.TestCase):
         self.assertEqual(Type.int(), list_type.elem_type)
         self.assertEqual("list[int]", str(list_type))
 
-    def test_nested_array(self):
+    def test_nested_list(self):
         inner = Type.list_of(Type.int())
         outer = Type.list_of(inner)
         self.assertEqual(ListType(Type.list_of(Type.int())), outer)
@@ -51,6 +51,15 @@ class TestTypes(unittest.TestCase):
         self.assertEqual([], outer.default_value)
         self.assertEqual(Type.list_of(Type.int()), outer.elem_type)
         self.assertEqual("list[list[int]]", str(outer))
+
+    def test_empty_list(self):
+        empty_list = Type.empty_list()
+        self.assertEqual(Type.empty_list(), empty_list)
+        self.assertEqual(EmptyList(), empty_list)
+        self.assertEqual("list[]", empty_list.type_name)
+        self.assertEqual([], empty_list.default_value)
+        self.assertEqual(Type("all", 0), empty_list.elem_type)
+        self.assertEqual("list[]", str(empty_list))
 
     def test_eq(self):
         types1 = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
@@ -64,6 +73,16 @@ class TestTypes(unittest.TestCase):
                 self.assertEqual(types1[i], types2[j])
             else:
                 self.assertNotEqual(types1[i], types2[j])
+
+        self.assertEqual(Type.empty_list(), Type.empty_list())
+        for type in types1:
+            print(type)
+            if isinstance(type, ListType):
+                self.assertEqual(Type.empty_list(), type)
+                self.assertEqual(type, Type.empty_list())
+            else:
+                self.assertNotEqual(Type.empty_list(), type)
+                self.assertNotEqual(type, Type.empty_list())
 
     def test_corrupted_type_not_equal_to_list_type(self):
         self.assertNotEqual(Type("list[int]", []), Type.list_of(Type.int()))
