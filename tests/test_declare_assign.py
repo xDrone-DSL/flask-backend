@@ -13,7 +13,7 @@ class DeclareTest(unittest.TestCase):
             main () { int a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.int(), 0))
+        expected.store("a", Variable(Type.int(), 0, ident="a"))
         self.assertEqual(expected, actual)
 
     def test_declare_decimal_should_change_symbol_table(self):
@@ -22,7 +22,7 @@ class DeclareTest(unittest.TestCase):
             main () { decimal a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.decimal(), 0))
+        expected.store("a", Variable(Type.decimal(), 0, ident="a"))
         self.assertEqual(expected, actual)
 
     def test_declare_string_should_change_symbol_table(self):
@@ -31,7 +31,7 @@ class DeclareTest(unittest.TestCase):
             main () { string a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.string(), ""))
+        expected.store("a", Variable(Type.string(), "", ident="a"))
         self.assertEqual(expected, actual)
 
     def test_declare_boolean_should_change_symbol_table(self):
@@ -40,7 +40,7 @@ class DeclareTest(unittest.TestCase):
             main () { boolean a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.boolean(), False))
+        expected.store("a", Variable(Type.boolean(), False, ident="a"))
         self.assertEqual(expected, actual)
 
     def test_declare_vector_should_change_symbol_table(self):
@@ -49,7 +49,7 @@ class DeclareTest(unittest.TestCase):
             main () { vector a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.vector(), [0, 0, 0]))
+        expected.store("a", Variable(Type.vector(), [0, 0, 0], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_declare_list_should_change_symbol_table(self):
@@ -58,7 +58,7 @@ class DeclareTest(unittest.TestCase):
             main () { list[int] a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.list_of(Type.int()), []))
+        expected.store("a", Variable(Type.list_of(Type.int()), [], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_declare_nested_list_should_change_symbol_table(self):
@@ -67,7 +67,7 @@ class DeclareTest(unittest.TestCase):
             main () { list[list[int]] a; }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), []))
+        expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_repeated_declare_should_give_error(self):
@@ -103,7 +103,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.int(), -1))
+        expected.store("a", Variable(Type.int(), -1, ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_ident_decimal_should_update_symbol_table(self):
@@ -115,7 +115,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.decimal(), -1.5e10))
+        expected.store("a", Variable(Type.decimal(), -1.5e10, ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_ident_string_should_update_symbol_table(self):
@@ -127,7 +127,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.string(), "1"))
+        expected.store("a", Variable(Type.string(), "1", ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_ident_boolean_should_update_symbol_table(self):
@@ -139,7 +139,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.boolean(), True))
+        expected.store("a", Variable(Type.boolean(), True, ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_ident_vector_should_update_symbol_table(self):
@@ -151,7 +151,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.vector(), [1, -1, 1]))
+        expected.store("a", Variable(Type.vector(), [1, -1, 1], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_ident_list_should_update_symbol_table(self):
@@ -163,7 +163,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.list_of(Type.int()), [1, -1, 1]))
+        expected.store("a", Variable(Type.list_of(Type.int()), [1, -1, 1], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_ident_nested_list_should_update_symbol_table(self):
@@ -175,7 +175,7 @@ class AssignIdentTest(unittest.TestCase):
             }
             """, actual)
         expected = SymbolTable()
-        expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[1], [-1], [1]]))
+        expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[1], [-1], [1]], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_not_declared_variable_should_give_error(self):
@@ -190,8 +190,10 @@ class AssignIdentTest(unittest.TestCase):
 
     def test_declare_and_then_assign_with_different_type_should_give_error(self):
         types = ["int", "decimal", "string", "boolean", "vector", "list[int]", "list[decimal]", "list[list[int]]"]
-        for t1, t2 in zip(types, types):
-            if t1 != t2:
+        for t1 in types:
+            for t2 in types:
+                if t1 == t2:
+                    continue
                 with self.assertRaises(CompileError) as context:
                     gen_simulate_commands("""
                         main () {{
@@ -225,17 +227,17 @@ class AssignVectorElemTest(unittest.TestCase):
         expected = SymbolTable()
         self.assertEqual(expected, actual)
 
-    def test_assign_vector_elem_to_variable_should_change_symbol_table(self):
-        for index, vector in zip(["x", "y", "z"], [[-1.0, 0, 0], [0, -1.0, 0], [0, 0, -1.0]]):
+    def test_assign_vector_elem_to_variable_should_update_symbol_table(self):
+        for index, vector in zip(["x", "y", "z"], [[-1.0, 0, 0], [0, -2.0, 0], [0, 0, -3.0]]):
             actual = SymbolTable()
             gen_simulate_commands("""
                 main () {{
                  vector a;
-                 a.{} <- -1.0;
+                 a.{} <- (-1.0, -2.0, -3.0).{};
                 }}
-                """.format(index), actual)
+                """.format(index, index), actual)
             expected = SymbolTable()
-            expected.store("a", Variable(Type.vector(), vector))
+            expected.store("a", Variable(Type.vector(), vector, ident="a"))
             print(expected)
             print(actual)
             self.assertEqual(expected, actual)
@@ -266,39 +268,69 @@ class AssignVectorElemTest(unittest.TestCase):
 
 class AssignListElemTest(unittest.TestCase):
 
-    def test_assign_list_elem(self):
-        gen_simulate_commands("""
-            main () {
-             [0.0][0] <- 1.0;
-            }
-            """)
-        gen_simulate_commands("""
-            main () {
-             [0][0] <- 1;
-            }
-            """)
-        gen_simulate_commands("""
-            main () {
-             [["a"]][0] <- ["b"];
-            }
-            """)
-        gen_simulate_commands("""
-            main () {
-             [0.0, 1.0][0] <- 1.0;
-            }
-            """)
+    def test_assign_list_elem_to_temp_vector_should_not_change_symbol_table(self):
+        for code in ["[0.0][0] <- 1.0", "[0][0] <- 1", "[[\"a\"]][0] <- [\"b\"]", "[0.0, 1.0][0] <- 1.0"]:
+            actual = SymbolTable()
+            gen_simulate_commands("""
+                main () {{
+                 {};
+                }}
+                """.format(code), actual)
+            expected = SymbolTable()
+            self.assertEqual(expected, actual)
 
-    #TODO: check symble table
-    def test_assign_list_elem_to_variable(self):
+    def test_assign_list_elem_to_variable_should_update_symbol_table(self):
+        actual = SymbolTable()
         gen_simulate_commands("""
             main () {
              list[int] a <- [0, 1, 2];
              a[0] <- 1;
              a[2] <- a[0];
             }
-            """)
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.list_of(Type.int()), [1, 1, 1], ident="a"))
+        self.assertEqual(expected, actual)
 
-    def test_assign_list_elem_not_declared_variable(self):
+    def test_assign_list_elem_to_variable_nested_should_update_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () {
+             list[list[int]] a <- [[0, 1], [2, 3]];
+             a[0] <- [4, 5];
+             a[1][0] <- 6;
+             a[1][1] <- 7;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[4, 5], [6, 7]], ident="a"))
+        print(actual)
+        print(expected)
+        self.assertEqual(expected, actual)
+
+    def test_assign_list_elem_to_variable_out_of_bound_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            gen_simulate_commands("""
+                main () {
+                 list[int] a <- [];
+                 a[0] <- 1;
+                }
+                """)
+
+        self.assertTrue("List a has length 0, but has been assessed with out-of-range index 0" in str(context.exception))
+
+    def test_assess_list_elem_out_of_bound_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            gen_simulate_commands("""
+                main () {
+                 list[int] a <- [1];
+                 a[0] <- a[1];
+                }
+                """)
+
+        self.assertTrue("List a has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
+
+    def test_assign_list_elem_not_declared_variable_should_give_error(self):
         with self.assertRaises(CompileError) as context:
             gen_simulate_commands("""
             main () {
@@ -308,34 +340,107 @@ class AssignListElemTest(unittest.TestCase):
 
         self.assertTrue("Identifier a has not been declared" in str(context.exception))
 
-    def test_declare_and_assign_list_elem_with_different_type(self):
-        with self.assertRaises(CompileError) as context:
-            gen_simulate_commands("""
-            main () {
-             list[decimal] a <- [1];
-            }
-            """)
+    def test_declare_and_assign_list_elem_with_different_type_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        for t1 in types:
+            for t2 in types:
+                if t1 == t2:
+                    continue
+                with self.assertRaises(CompileError) as context:
+                    gen_simulate_commands("""
+                    main () {{
+                     {} a;
+                     list[{}] b <- [a];
+                    }}
+                    """.format(t1, t2))
 
-        self.assertTrue("Identifier a has been declared as list[decimal], but assigned as list[int]" in str(context.exception))
+                self.assertTrue("Identifier b has been declared as list[{}], but assigned as list[{}]".format(t2, t1) in str(context.exception))
 
-    def test_declare_and_then_assign_list_elem_with_different_type(self):
-        with self.assertRaises(CompileError) as context:
-            gen_simulate_commands("""
-            main () {
-             list[decimal] a <- [1.0];
-             a[0] <- 1;
-            }
-            """)
+    def test_declare_and_then_assign_list_elem_with_different_type_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        for t1 in types:
+            for t2 in types:
+                if t1 == t2:
+                    continue
+                with self.assertRaises(CompileError) as context:
+                    gen_simulate_commands("""
+                    main () {{
+                     {} a;
+                     {} b;
+                     list[{}] c <- [a];
+                     c[0] <- b;
+                    }}
+                    """.format(t1, t2, t1))
 
-        self.assertTrue("Assigned value 1 should have type decimal, but is int" in str(context.exception))
+                self.assertTrue("Assigned value {} should have type {}, but is {}".format(t2.default_value, t1.type_name, t2.type_name) in str(context.exception))
+
 
 class CombinedDeclareAssignTest(unittest.TestCase):
-    def test_declare_and_assign(self):
-        gen_simulate_commands("""
-            main () { int a <- 0; }
-            """)
 
-    def test_repeated_declare_assign(self):
+    def test_declare_and_assign_int_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { int a <- 1; }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.int(), 1, ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_declare_and_assign_decimal_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { decimal a <- 1.0; }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.decimal(), 1.0, ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_declare_and_assign_string_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { string a <- "\0a"; }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.string(), "\0a", ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_declare_and_assign_boolean_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { boolean a <- true; }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.boolean(), True, ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_declare_and_assign_vector_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { vector a <- (1.0, 2.0, -3.0); }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.vector(), [1, 2, -3], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_declare_and_assign_list_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { list[int] a <- [1, 2, -3]; }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.list_of(Type.int()), [1, 2, -3], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_declare_and_assign_nested_list_should_change_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () { list[list[int]] a <- [[1], [2]]; }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[1], [2]], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_repeated_declare_and_assign_should_give_error(self):
         with self.assertRaises(CompileError) as context:
             gen_simulate_commands("""
                 main () {
@@ -346,13 +451,22 @@ class CombinedDeclareAssignTest(unittest.TestCase):
 
         self.assertTrue("Identifier a already declared" in str(context.exception))
 
-    def test_declare_and_assign_with_different_type(self):
-        with self.assertRaises(CompileError) as context:
-            gen_simulate_commands("""
-            main () { int a <- true; }
-            """)
+    def test_declare_and_assign_with_different_type_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
+        for t1 in types:
+            for t2 in types:
+                if t1 == t2:
+                    continue
+                with self.assertRaises(CompileError) as context:
+                    gen_simulate_commands("""
+                    main () {{
+                     {} a;
+                     {} b <- a;
+                    }}
+                    """.format(t1, t2))
 
-        self.assertTrue("Identifier a has been declared as int, but assigned as boolean" in str(context.exception))
+                self.assertTrue("Identifier b has been declared as {}, but assigned as {}".format(t2.type_name, t1.type_name) in str(context.exception))
+
 
 
 

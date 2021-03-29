@@ -18,11 +18,16 @@ class Identifier:
         return copy.deepcopy(self._variable)
 
 class ListElem:
-    def __init__(self, container: Variable, index: int):
+    def __init__(self, ident: Optional[str], container: Variable, index: int):
         assert isinstance(container.type, ListType)
+        self._ident = ident
         self._container = container
         self._index = index
         self._variable = Variable(container.type.elem_type, container.value[index])
+
+    @property
+    def ident(self):
+        return copy.deepcopy(self._ident)
 
     @property
     def container(self):
@@ -36,11 +41,16 @@ class ListElem:
         return copy.deepcopy(self._variable)
 
 class VectorElem:
-    def __init__(self, container: Variable, index: int):
+    def __init__(self, ident: Optional[str], container: Variable, index: int):
         assert container.type == Type.vector()
+        self._ident = ident
         self._container = container
         self._index = index
         self._variable = Variable(Type.decimal(), container.value[index])
+
+    @property
+    def ident(self):
+        return copy.deepcopy(self._ident)
 
     @property
     def container(self):

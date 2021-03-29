@@ -65,25 +65,25 @@ class Simulate(Transformer):
             raise CompileError("Expression {} has type {} is not a list".format(expr1, expr1.type))
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
-        return ListElem(expr1, expr2.value)
+        return ListElem(expr1.ident, expr1, expr2.value)
 
     def vector_x(self, children) -> VectorElem:
         expr = children[0]
         if expr.type != Type.vector():
             raise CompileError("Expression {} should have type vector, but is {}".format(expr, expr.type))
-        return VectorElem(expr, 0)
+        return VectorElem(expr.ident, expr, 0)
 
     def vector_y(self, children) -> VectorElem:
         expr = children[0]
         if expr.type != Type.vector():
             raise CompileError("Expression {} should have type vector, but is {}".format(expr, expr.type))
-        return VectorElem(expr, 1)
+        return VectorElem(expr.ident, expr, 1)
 
     def vector_z(self, children) -> VectorElem:
         expr = children[0]
         if expr.type != Type.vector():
             raise CompileError("Expression {} should have type vector, but is {}".format(expr, expr.type))
-        return VectorElem(expr, 2)
+        return VectorElem(expr.ident, expr, 2)
 
     def list(self, children) -> Variable:
         exprs = children
@@ -132,7 +132,7 @@ class Simulate(Transformer):
         ident = identifier.ident
         if ident in self.symbol_table:
             raise CompileError("Identifier {} already declared".format(ident))
-        self.symbol_table.store(ident, Variable(type, type.default_value))
+        self.symbol_table.store(ident, Variable(type, type.default_value, ident=ident))
         return []
 
     def declare_assign(self, children):
@@ -142,7 +142,8 @@ class Simulate(Transformer):
             raise CompileError("Identifier {} already declared".format(ident))
         if expr.type != type:
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}".format(ident, type, expr.type))
-        self.symbol_table.store(ident, expr)
+        expr_with_ident = Variable(expr.type, expr.value, ident)
+        self.symbol_table.store(ident, expr_with_ident)
         return []
 
     def assign_ident(self, children):
@@ -159,24 +160,34 @@ class Simulate(Transformer):
 
     def assign_list_elem(self, children):
         list_elem, expr = children
+        ident = list_elem.ident
         list = list_elem.container
         index = list_elem.index
         assigned_type = expr.type
         declared_type = list.type.elem_type
         if assigned_type != declared_type:
             raise CompileError("Assigned value {} should have type {}, but is {}".format(expr.value, declared_type, assigned_type))
-        #TODO: not working, need st.update
-        list.value[index] = expr.value
+        if ident is not None:
+            assert ident in self.symbol_table
+            variable = self.symbol_table.get_variable(ident)
+            new_list = variable.value
+            new_list[index] = expr.value
+            self.symbol_table.update(ident, new_list)
         return []
 
     def assign_vector_elem(self, children):
         vector_elem, expr = children
+        ident = vector_elem.ident
         vector = vector_elem.container
         index = vector_elem.index
         if expr.type != Type.decimal():
             raise CompileError("Assigned value {} should have type decimal, but is {}".format(expr.value, expr.type))
-        #TODO: not working, need st.update
-        vector.value[index] = expr.value
+        if ident is not None:
+            assert ident in self.symbol_table
+            variable = self.symbol_table.get_variable(ident)
+            new_vector = variable.value
+            new_vector[index] = expr.value
+            self.symbol_table.update(ident, new_vector)
         return []
 
 
