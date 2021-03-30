@@ -10,17 +10,23 @@ class TestVariable(unittest.TestCase):
                       Variable(Type.vector(), [1.1, 2.2, -1.1]), Variable(Type.list_of(Type.int()), [1, 2, 3, 4]),
                       Variable(Type.list_of(Type.int()), []), (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0]),
                       Variable(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]]),
-                      Variable(Type.int(), 1, "a"), Variable(Type.decimal(), 1.1, "a"), Variable(Type.boolean(), False, "a"),
-                      Variable(Type.vector(), [1.1, 2.2, -1.1], "a"), Variable(Type.list_of(Type.int()), [1, 2, 3, 4], "a"),
-                      Variable(Type.list_of(Type.int()), [], "a"), (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"),
+                      Variable(Type.int(), 1, "a"), Variable(Type.decimal(), 1.1, "a"),
+                      Variable(Type.boolean(), False, "a"),
+                      Variable(Type.vector(), [1.1, 2.2, -1.1], "a"),
+                      Variable(Type.list_of(Type.int()), [1, 2, 3, 4], "a"),
+                      Variable(Type.list_of(Type.int()), [], "a"),
+                      (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"),
                       Variable(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]], "a")]
         variables2 = [Variable(Type.int(), 1), Variable(Type.decimal(), 1.1), Variable(Type.boolean(), False),
                       Variable(Type.vector(), [1.1, 2.2, -1.1]), Variable(Type.list_of(Type.int()), [1, 2, 3, 4]),
                       Variable(Type.list_of(Type.int()), []), (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0]),
                       Variable(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]]),
-                      Variable(Type.int(), 1, "a"), Variable(Type.decimal(), 1.1, "a"), Variable(Type.boolean(), False, "a"),
-                      Variable(Type.vector(), [1.1, 2.2, -1.1], "a"), Variable(Type.list_of(Type.int()), [1, 2, 3, 4], "a"),
-                      Variable(Type.list_of(Type.int()), [], "a"), (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"),
+                      Variable(Type.int(), 1, "a"), Variable(Type.decimal(), 1.1, "a"),
+                      Variable(Type.boolean(), False, "a"),
+                      Variable(Type.vector(), [1.1, 2.2, -1.1], "a"),
+                      Variable(Type.list_of(Type.int()), [1, 2, 3, 4], "a"),
+                      Variable(Type.list_of(Type.int()), [], "a"),
+                      (Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"),
                       Variable(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]], "a")]
         for i, j in zip(range(len(variables1)), range(len(variables2))):
             if i == j:
@@ -32,7 +38,8 @@ class TestVariable(unittest.TestCase):
         self.assertEqual("Variable: { type: int, value: 1, ident: None }", str(Variable(Type.int(), 1)))
         self.assertEqual("Variable: { type: decimal, value: 1.1, ident: None }", str(Variable(Type.decimal(), 1.1)))
         self.assertEqual("Variable: { type: boolean, value: False, ident: None }", str(Variable(Type.boolean(), False)))
-        self.assertEqual("Variable: { type: vector, value: [1.1, 2.2, -1.1], ident: None }", str(Variable(Type.vector(), [1.1, 2.2, -1.1])))
+        self.assertEqual("Variable: { type: vector, value: [1.1, 2.2, -1.1], ident: None }",
+                         str(Variable(Type.vector(), [1.1, 2.2, -1.1])))
         self.assertEqual("Variable: { type: list[int], value: [1, 2, 3, 4], ident: None }",
                          str(Variable(Type.list_of(Type.int()), [1, 2, 3, 4])))
         self.assertEqual("Variable: { type: list[list[vector]], value: [[[1.1, 2.2, -1.1], [1, 2, -1]]], ident: None }",
@@ -40,12 +47,15 @@ class TestVariable(unittest.TestCase):
 
         self.assertEqual("Variable: { type: int, value: 1, ident: a }", str(Variable(Type.int(), 1, "a")))
         self.assertEqual("Variable: { type: decimal, value: 1.1, ident: a }", str(Variable(Type.decimal(), 1.1, "a")))
-        self.assertEqual("Variable: { type: boolean, value: False, ident: a }", str(Variable(Type.boolean(), False, "a")))
-        self.assertEqual("Variable: { type: vector, value: [1.1, 2.2, -1.1], ident: a }", str(Variable(Type.vector(), [1.1, 2.2, -1.1], "a")))
+        self.assertEqual("Variable: { type: boolean, value: False, ident: a }",
+                         str(Variable(Type.boolean(), False, "a")))
+        self.assertEqual("Variable: { type: vector, value: [1.1, 2.2, -1.1], ident: a }",
+                         str(Variable(Type.vector(), [1.1, 2.2, -1.1], "a")))
         self.assertEqual("Variable: { type: list[int], value: [1, 2, 3, 4], ident: a }",
                          str(Variable(Type.list_of(Type.int()), [1, 2, 3, 4], "a")))
         self.assertEqual("Variable: { type: list[list[vector]], value: [[[1.1, 2.2, -1.1], [1, 2, -1]]], ident: a }",
-                         str(Variable(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]], "a")))
+                         str(Variable(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]],
+                                      "a")))
 
 
 class TestSymbolTable(unittest.TestCase):

@@ -11,15 +11,15 @@ class Variable:
         self._ident = ident
 
     @property
-    def type(self):
+    def type(self) -> Type:
         return copy.deepcopy(self._type)
 
     @property
-    def value(self):
+    def value(self) -> Union[int, float, str, bool, list]:
         return copy.deepcopy(self._value)
 
     @property
-    def ident(self):
+    def ident(self) -> Optional[str]:
         return copy.deepcopy(self._ident)
 
     def __str__(self):

@@ -218,7 +218,8 @@ class AssignIdentTest(unittest.TestCase):
                         }}
                     """.format(t1, t2))
 
-                self.assertTrue("Identifier a has been declared as {}, but assigned as {}".format(t1, t2) in str(context.exception))
+                self.assertTrue("Identifier a has been declared as {}, but assigned as {}"
+                                .format(t1, t2) in str(context.exception))
 
     def test_declare_and_then_assign_with_same_type_should_success(self):
         for type in ["int", "decimal", "string", "boolean", "vector", "list[int]", "list[decimal]", "list[list[int]]"]:
@@ -229,6 +230,7 @@ class AssignIdentTest(unittest.TestCase):
                  a <- b;
                 }}
             """.format(type, type))
+
 
 class AssignVectorElemTest(unittest.TestCase):
 
@@ -265,9 +267,9 @@ class AssignVectorElemTest(unittest.TestCase):
 
         self.assertTrue("Identifier a has not been declared" in str(context.exception))
 
-
     def test_declare_and_then_assign_vector_elem_with_different_type_should_give_error(self):
-        for type in [Type.int(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]:
+        for type in [Type.int(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                     Type.list_of(Type.list_of(Type.int()))]:
             with self.assertRaises(CompileError) as context:
                 generate_commands("""
                     main () {{
@@ -279,6 +281,7 @@ class AssignVectorElemTest(unittest.TestCase):
 
             self.assertTrue("Assigned value {} should have type decimal, but is {}"
                             .format(type.default_value, type.type_name) in str(context.exception))
+
 
 class AssignListElemTest(unittest.TestCase):
 
@@ -344,7 +347,8 @@ class AssignListElemTest(unittest.TestCase):
                 }
                 """)
 
-        self.assertTrue("List a has length 0, but has been assessed with out-of-range index 0" in str(context.exception))
+        self.assertTrue(
+            "List a has length 0, but has been assessed with out-of-range index 0" in str(context.exception))
 
     def test_assess_list_elem_out_of_bound_should_give_error(self):
         with self.assertRaises(CompileError) as context:
@@ -355,7 +359,8 @@ class AssignListElemTest(unittest.TestCase):
                 }
                 """)
 
-        self.assertTrue("List a has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
+        self.assertTrue(
+            "List a has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
 
     def test_assess_list_elem_nested_out_of_bound_should_give_error(self):
         with self.assertRaises(CompileError) as context:
@@ -365,7 +370,8 @@ class AssignListElemTest(unittest.TestCase):
                  a[0][2] <- [1];
                 }
                 """)
-        self.assertTrue("List a[0] has length 2, but has been assessed with out-of-range index 2" in str(context.exception))
+        self.assertTrue(
+            "List a[0] has length 2, but has been assessed with out-of-range index 2" in str(context.exception))
 
         with self.assertRaises(CompileError) as context:
             generate_commands("""
@@ -374,7 +380,8 @@ class AssignListElemTest(unittest.TestCase):
                  a[0][1][1] <- 1;
                 }
                 """)
-        self.assertTrue("List a[0][1] has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
+        self.assertTrue(
+            "List a[0][1] has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
 
     def test_assign_list_elem_not_declared_variable_should_give_error(self):
         with self.assertRaises(CompileError) as context:
@@ -423,6 +430,7 @@ class AssignListElemTest(unittest.TestCase):
 
                 self.assertTrue("Assigned value {} should have type {}, but is {}"
                                 .format(t2.default_value, t1.type_name, t2.type_name) in str(context.exception))
+
 
 class CombinedDeclareAssignTest(unittest.TestCase):
 
@@ -531,7 +539,3 @@ class CombinedDeclareAssignTest(unittest.TestCase):
 
                 self.assertTrue("Identifier b has been declared as {}, but assigned as {}"
                                 .format(t2.type_name, t1.type_name) in str(context.exception))
-
-
-
-

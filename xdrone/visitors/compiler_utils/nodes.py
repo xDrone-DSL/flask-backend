@@ -11,11 +11,12 @@ class Identifier:
         self._variable = variable
 
     @property
-    def ident(self):
+    def ident(self) -> str:
         return copy.deepcopy(self._ident)
 
-    def to_variable(self):
+    def to_variable(self) -> Optional[Variable]:
         return copy.deepcopy(self._variable)
+
 
 class ListElem:
     def __init__(self, ident: Optional[str], container: Variable, index: int):
@@ -26,19 +27,20 @@ class ListElem:
         self._variable = Variable(container.type.elem_type, container.value[index], ident="{}[{}]".format(ident, index))
 
     @property
-    def ident(self):
+    def ident(self) -> Optional[str]:
         return copy.deepcopy(self._ident)
 
     @property
-    def container(self):
+    def container(self) -> Variable:
         return copy.deepcopy(self._container)
 
     @property
-    def index(self):
+    def index(self) -> int:
         return copy.deepcopy(self._index)
 
-    def to_variable(self):
+    def to_variable(self) -> Optional[Variable]:
         return copy.deepcopy(self._variable)
+
 
 class VectorElem:
     def __init__(self, ident: Optional[str], container: Variable, index: int):
@@ -49,16 +51,16 @@ class VectorElem:
         self._variable = Variable(Type.decimal(), container.value[index])
 
     @property
-    def ident(self):
+    def ident(self) -> Optional[str]:
         return copy.deepcopy(self._ident)
 
     @property
-    def container(self):
+    def container(self) -> Variable:
         return copy.deepcopy(self._container)
 
     @property
-    def index(self):
+    def index(self) -> int:
         return copy.deepcopy(self._index)
 
-    def to_variable(self):
+    def to_variable(self) -> Optional[Variable]:
         return copy.deepcopy(self._variable)

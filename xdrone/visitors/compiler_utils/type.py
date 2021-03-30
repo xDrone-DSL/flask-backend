@@ -11,11 +11,11 @@ class Type:
         self._default_value = default_value
 
     @property
-    def type_name(self):
+    def type_name(self) -> str:
         return copy.deepcopy(self._type_name)
 
     @property
-    def default_value(self):
+    def default_value(self) -> Union[int, float, str, bool, list]:
         return copy.deepcopy(self._default_value)
 
     @staticmethod
@@ -43,7 +43,7 @@ class Type:
         return ListType(elem_type)
 
     @staticmethod
-    def empty_list():
+    def empty_list() -> EmptyList:
         return EmptyList()
 
     def __str__(self):
@@ -62,13 +62,13 @@ class ListType(Type):
         self._elem_type = elem_type
 
     @property
-    def elem_type(self):
+    def elem_type(self) -> Type:
         return copy.deepcopy(self._elem_type)
 
     def __eq__(self, other):
         if isinstance(other, ListType):
             return other.type_name == self.type_name and other.default_value == self.default_value \
-                    and other.elem_type == self.elem_type
+                   and other.elem_type == self.elem_type
         return False
 
 
