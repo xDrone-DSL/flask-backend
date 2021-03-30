@@ -70,6 +70,16 @@ class DeclareTest(unittest.TestCase):
         expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [], ident="a"))
         self.assertEqual(expected, actual)
 
+    def test_declare_with_different_variable_name_should_change_symbol_table(self):
+        for name in ["a", "A", "_a", "_1", "_A", "abc", "Abc", "a12", "aA1", "_aA1"]:
+            actual = SymbolTable()
+            generate_commands("""
+                main () {{ int {}; }}
+                """.format(name), actual)
+            expected = SymbolTable()
+            expected.store(name, Variable(Type.int(), 0, ident=name))
+            self.assertEqual(expected, actual)
+
     def test_repeated_declare_should_give_error(self):
         with self.assertRaises(CompileError) as context:
             generate_commands("""

@@ -39,55 +39,55 @@ class Interpreter(Transformer):
         return [Land()]
 
     def up(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Up(expr.value)]
 
     def down(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Down(expr.value)]
 
     def left(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Left(expr.value)]
 
     def right(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Right(expr.value)]
 
     def forward(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Forward(expr.value)]
 
     def backward(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Backward(expr.value)]
 
     def rotatel(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [RotateLeft(radians(expr.value))]
 
     def rotater(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [RotateRight(radians(expr.value))]
 
     def wait(self, children) -> List[Command]:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.int() and expr.type != Type.vector():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Wait(expr.value)]
@@ -167,10 +167,10 @@ class Interpreter(Transformer):
 
     def repeat(self, children) -> List[Command]:
         expr = children[0]
+        commands = children[1:]
         if expr.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr.value, expr.type))
         times = expr.value
-        commands = children[1:]
         return commands * times
 
     ######## func ########
@@ -191,7 +191,7 @@ class Interpreter(Transformer):
     ######## ident ########
 
     def ident(self, children) -> Identifier:
-        ident = children[0]
+        ident = "".join([str(child) for child in children])
         if ident in self.symbol_table:
             return Identifier(str(ident), self.symbol_table.get_variable(ident))
         return Identifier(str(ident), None)
@@ -212,19 +212,19 @@ class Interpreter(Transformer):
     ######## vector_elem ########
 
     def vector_x(self, children) -> VectorElem:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.vector():
             raise CompileError("Expression {} should have type vector, but is {}".format(expr, expr.type))
         return VectorElem(expr.ident, expr, 0)
 
     def vector_y(self, children) -> VectorElem:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.vector():
             raise CompileError("Expression {} should have type vector, but is {}".format(expr, expr.type))
         return VectorElem(expr.ident, expr, 1)
 
     def vector_z(self, children) -> VectorElem:
-        expr = children[0]
+        expr, = children
         if expr.type != Type.vector():
             raise CompileError("Expression {} should have type vector, but is {}".format(expr, expr.type))
         return VectorElem(expr.ident, expr, 2)
@@ -247,7 +247,7 @@ class Interpreter(Transformer):
         return Type.vector()
 
     def list_type(self, children) -> Type:
-        elem_type = children[0]
+        elem_type, = children
         return Type.list_of(elem_type)
 
     ######## expr ########
@@ -262,16 +262,20 @@ class Interpreter(Transformer):
         return child
 
     def expr(self, children) -> Variable:
-        return self._process_child(children[0])
+        unwrapped, = children
+        return self._process_child(unwrapped)
 
     def int_expr(self, children) -> Variable:
-        return Variable(Type.int(), int(children[0]))
+        signed_int, = children
+        return Variable(Type.int(), int(signed_int))
 
     def decimal_expr(self, children) -> Variable:
-        return Variable(Type.decimal(), float(children[0]))
+        signed_float, = children
+        return Variable(Type.decimal(), float(signed_float))
 
     def string_expr(self, children) -> Variable:
-        quotation_removed = str(children[0])[1:-1]
+        escaped_string, = children
+        quotation_removed = str(escaped_string)[1:-1]
         return Variable(Type.string(), quotation_removed)
 
     def true_expr(self, children) -> Variable:

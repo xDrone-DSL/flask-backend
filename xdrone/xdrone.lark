@@ -39,7 +39,7 @@ param_list: type ident ("," type ident)*
 func_call: ident "(" [arg_list] ")"
 arg_list: expr ("," expr)*
 
-ident: /\w/+
+ident: /[a-zA-Z_]/ /[a-zA-Z0-9_]/*
 
 list_elem: expr "[" expr "]"
 
