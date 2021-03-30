@@ -4,7 +4,7 @@ from lark.exceptions import VisitError
 
 from requirements import generate_requirements
 from xdrone.parser import xdrone_parser
-from xdrone.visitors.compiler_utils.commands import Command
+from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.fly import Fly
 from xdrone.visitors.interpreter import Interpreter
 from xdrone.visitors.validate import Validate

@@ -3,7 +3,7 @@ from typing import List
 from lark import Transformer
 from math import radians
 
-from xdrone.visitors.compiler_utils.commands import *
+from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError
 from xdrone.visitors.compiler_utils.nodes import Identifier, ListElem, VectorElem
 from xdrone.visitors.compiler_utils.symbol_table import SymbolTable, Variable
@@ -33,64 +33,64 @@ class Interpreter(Transformer):
     ######## command ########
 
     def takeoff(self, children) -> List[Command]:
-        return [Takeoff()]
+        return [Command.takeoff()]
 
     def land(self, children) -> List[Command]:
-        return [Land()]
+        return [Command.land()]
 
     def up(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Up(expr.value)]
+        return [Command.up(expr.value)]
 
     def down(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Down(expr.value)]
+        return [Command.down(expr.value)]
 
     def left(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Left(expr.value)]
+        return [Command.left(expr.value)]
 
     def right(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Right(expr.value)]
+        return [Command.right(expr.value)]
 
     def forward(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Forward(expr.value)]
+        return [Command.forward(expr.value)]
 
     def backward(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Backward(expr.value)]
+        return [Command.backward(expr.value)]
 
     def rotatel(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [RotateLeft(radians(expr.value))]
+        return [Command.rotate_left(radians(expr.value))]
 
     def rotater(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [RotateRight(radians(expr.value))]
+        return [Command.rotate_right(radians(expr.value))]
 
     def wait(self, children) -> List[Command]:
         expr, = children
-        if expr.type != Type.int() and expr.type != Type.vector():
+        if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Wait(expr.value)]
+        return [Command.wait(expr.value)]
 
     def declare(self, children) -> List[Command]:
         type, identifier = children
@@ -252,18 +252,14 @@ class Interpreter(Transformer):
 
     ######## expr ########
 
-    def _process_child(self, child) -> Variable:
-        # TODO turn plus minus etc to variable
+    def expr(self, children) -> Variable:
+        child, = children
         if isinstance(child, Identifier) and child.ident not in self.symbol_table:
             raise CompileError("Identifier {} has not been declared".format(child.ident))
         if not isinstance(child, Variable):
             return child.to_variable()
         assert isinstance(child, Variable)
         return child
-
-    def expr(self, children) -> Variable:
-        unwrapped, = children
-        return self._process_child(unwrapped)
 
     def int_expr(self, children) -> Variable:
         signed_int, = children
