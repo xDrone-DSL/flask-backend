@@ -99,7 +99,7 @@ class TestCommands(unittest.TestCase):
             else:
                 self.assertNotEqual(commands1[i], commands2[j])
 
-    def test_corrupted_command_not_affect_correct_type(self):
+    def test_corrupted_command_should_not_affect_correct_type(self):
         command = Command.forward(1)
         corrupted_command = Command.forward(1)
         corrupted_command._opcode = "corrupted"

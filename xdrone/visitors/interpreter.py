@@ -5,8 +5,8 @@ from math import radians
 
 from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError
-from xdrone.visitors.compiler_utils.nodes import Identifier, ListElem, VectorElem
-from xdrone.visitors.compiler_utils.symbol_table import SymbolTable, Variable
+from xdrone.visitors.compiler_utils.expressions import Identifier, ListElem, VectorElem, Expression, AbstractExpression
+from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type import Type, ListType
 
 
@@ -97,7 +97,7 @@ class Interpreter(Transformer):
         ident = identifier.ident
         if ident in self.symbol_table:
             raise CompileError("Identifier {} already declared".format(ident))
-        self.symbol_table.store(ident, Variable(type, type.default_value, ident=ident))
+        self.symbol_table.store(ident, Expression(type, type.default_value, ident=ident))
         return []
 
     def declare_assign(self, children) -> List[Command]:
@@ -108,7 +108,7 @@ class Interpreter(Transformer):
         if expr.type != type:
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
                                .format(ident, type, expr.type))
-        expr_with_ident = Variable(expr.type, expr.value, ident)
+        expr_with_ident = Expression(expr.type, expr.value, ident)
         self.symbol_table.store(ident, expr_with_ident)
         return []
 
@@ -118,7 +118,7 @@ class Interpreter(Transformer):
         if ident not in self.symbol_table:
             raise CompileError("Identifier {} has not been declared".format(ident))
         assigned_type = expr.type
-        declared_type = self.symbol_table.get_variable(ident).type
+        declared_type = self.symbol_table.get_expression(ident).type
         if assigned_type != declared_type:
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
                                .format(ident, declared_type, assigned_type))
@@ -134,8 +134,7 @@ class Interpreter(Transformer):
             else:
                 indices = []
             assert ident in self.symbol_table
-            variable = self.symbol_table.get_variable(ident)
-            new_list = variable.value
+            new_list = self.symbol_table.get_expression(ident).value
             curr = new_list
             for i in indices:
                 curr = curr[i]
@@ -193,7 +192,7 @@ class Interpreter(Transformer):
     def ident(self, children) -> Identifier:
         ident = "".join([str(child) for child in children])
         if ident in self.symbol_table:
-            return Identifier(str(ident), self.symbol_table.get_variable(ident))
+            return Identifier(str(ident), self.symbol_table.get_expression(ident))
         return Identifier(str(ident), None)
 
     ######## list_elem ########
@@ -252,45 +251,46 @@ class Interpreter(Transformer):
 
     ######## expr ########
 
-    def expr(self, children) -> Variable:
+    def expr(self, children) -> Expression:
         child, = children
+        assert isinstance(child, AbstractExpression)
         if isinstance(child, Identifier) and child.ident not in self.symbol_table:
+            # child.expression is None iff child.ident not in self.symbol_table
             raise CompileError("Identifier {} has not been declared".format(child.ident))
-        if not isinstance(child, Variable):
-            return child.to_variable()
-        assert isinstance(child, Variable)
-        return child
+        expr = child.to_expression()
+        assert expr is not None and isinstance(expr, Expression)
+        return expr
 
-    def int_expr(self, children) -> Variable:
+    def int_expr(self, children) -> Expression:
         signed_int, = children
-        return Variable(Type.int(), int(signed_int))
+        return Expression(Type.int(), int(signed_int))
 
-    def decimal_expr(self, children) -> Variable:
+    def decimal_expr(self, children) -> Expression:
         signed_float, = children
-        return Variable(Type.decimal(), float(signed_float))
+        return Expression(Type.decimal(), float(signed_float))
 
-    def string_expr(self, children) -> Variable:
+    def string_expr(self, children) -> Expression:
         escaped_string, = children
         quotation_removed = str(escaped_string)[1:-1]
-        return Variable(Type.string(), quotation_removed)
+        return Expression(Type.string(), quotation_removed)
 
-    def true_expr(self, children) -> Variable:
-        return Variable(Type.boolean(), True)
+    def true_expr(self, children) -> Expression:
+        return Expression(Type.boolean(), True)
 
-    def false_expr(self, children) -> Variable:
-        return Variable(Type.boolean(), False)
+    def false_expr(self, children) -> Expression:
+        return Expression(Type.boolean(), False)
 
-    def list(self, children) -> Variable:
+    def list(self, children) -> Expression:
         exprs = children
         if len(exprs) == 0:
-            return Variable(Type.empty_list(), [])
+            return Expression(Type.empty_list(), [])
         if not all(e.type == exprs[0].type for e in exprs):
             raise CompileError("Elements in list {} should have the same type".format(exprs))
-        return Variable(Type.list_of(exprs[0].type), [e.value for e in exprs])
+        return Expression(Type.list_of(exprs[0].type), [e.value for e in exprs])
 
-    def vector(self, children) -> Variable:
+    def vector(self, children) -> Expression:
         expr1, expr2, expr3 = children
         for expr in [expr1, expr2, expr3]:
             if expr.type != Type.decimal():
                 raise CompileError("Expression {} should have type decimal, but is {}".format(expr, expr.type))
-        return Variable(Type.vector(), [expr1.value, expr2.value, expr3.value])
+        return Expression(Type.vector(), [expr1.value, expr2.value, expr3.value])

@@ -83,11 +83,11 @@ class TestTypes(unittest.TestCase):
                 self.assertNotEqual(Type.empty_list(), type)
                 self.assertNotEqual(type, Type.empty_list())
 
-    def test_corrupted_type_not_equal_to_list_type(self):
+    def test_corrupted_type_should_not_equal_to_list_type(self):
         self.assertNotEqual(Type("list[int]", []), Type.list_of(Type.int()))
         self.assertNotEqual(Type("list[int]", []), ListType(Type.int()))
 
-    def test_corrupted_type_not_affect_correct_type(self):
+    def test_corrupted_type_should_not_affect_correct_type(self):
         int_type = Type.int()
         corrupted_type = Type.int()
         corrupted_type._type_name = "corrupted"
