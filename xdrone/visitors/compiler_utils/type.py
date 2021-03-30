@@ -74,7 +74,7 @@ class ListType(Type):
 
 class EmptyList(ListType):
     def __init__(self):
-        super(EmptyList, self).__init__(Type("all", 0))
+        super().__init__(Type("all", 0))
         self._type_name = "list[]"
 
     def __eq__(self, other):

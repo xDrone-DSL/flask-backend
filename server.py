@@ -34,7 +34,7 @@ def fly():
 def simulate():
     data = request.get_json()
     program = data['body']['body']['program']
-    commands = xdrone.gen_simulate_commands(program)
+    commands = xdrone.generate_simulation_json(program)
     return jsonify({'commands': commands})
 
 

@@ -20,6 +20,8 @@ commands: (command ";")*
        | vector_elem "<-" expr                              -> assign_vector_elem
        | list_elem "<-" expr                                -> assign_list_elem
        | ident "<-" expr                                    -> assign_ident
+       | expr "." "insert" "(" expr ")" ["at" "(" expr ")"] -> insert
+       | expr "." "remove" "(" expr ")"                     -> remove
        | func_call
        | "repeat" expr "times" "{" commands "}"                   -> repeat
        | "if" expr "{" commands "}" ["else" "{" commands "}"]     -> if
@@ -66,7 +68,7 @@ expr: SIGNED_INT                    -> int_expr
         | func_call
         | "not" expr                -> not
         | "-" expr                  -> negative
-        | "size" "(" expr ")"       -> size
+        | expr "." "size"           -> size
         | expr "*" expr             -> multi
         | expr "/" expr             -> divide
         | expr "+" expr             -> plus
