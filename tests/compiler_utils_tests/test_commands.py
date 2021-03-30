@@ -83,21 +83,22 @@ class TestCommands(unittest.TestCase):
         self.assertEqual({"action": "wait", "value": [1]}, Command.wait(1).to_simulation_json())
 
     def test_eq(self):
-        commands1 = [Command.takeoff(), Command.land(),
-                  Command.up(1), Command.down(1), Command.left(1), Command.right(1), Command.forward(1),
-                  Command.backward(1), Command.rotate_left(1), Command.rotate_right(1), Command.wait(1),
-                  Command.up(2), Command.down(2), Command.left(2), Command.right(2), Command.forward(2),
-                  Command.backward(2), Command.rotate_left(2), Command.rotate_right(2), Command.wait(2)]
-        commands2 = [Command.takeoff(), Command.land(),
-                  Command.up(1), Command.down(1), Command.left(1), Command.right(1), Command.forward(1),
-                  Command.backward(1), Command.rotate_left(1), Command.rotate_right(1), Command.wait(1),
-                  Command.up(2), Command.down(2), Command.left(2), Command.right(2), Command.forward(2),
-                  Command.backward(2), Command.rotate_left(2), Command.rotate_right(2), Command.wait(2)]
-        for i, j in zip(range(len(commands1)), range(len(commands2))):
-            if i == j:
-                self.assertEqual(commands1[i], commands2[j])
-            else:
-                self.assertNotEqual(commands1[i], commands2[j])
+        commands1 = [None, Command.takeoff(), Command.land(),
+                     Command.up(1), Command.down(1), Command.left(1), Command.right(1), Command.forward(1),
+                     Command.backward(1), Command.rotate_left(1), Command.rotate_right(1), Command.wait(1),
+                     Command.up(2), Command.down(2), Command.left(2), Command.right(2), Command.forward(2),
+                     Command.backward(2), Command.rotate_left(2), Command.rotate_right(2), Command.wait(2)]
+        commands2 = [None, Command.takeoff(), Command.land(),
+                     Command.up(1), Command.down(1), Command.left(1), Command.right(1), Command.forward(1),
+                     Command.backward(1), Command.rotate_left(1), Command.rotate_right(1), Command.wait(1),
+                     Command.up(2), Command.down(2), Command.left(2), Command.right(2), Command.forward(2),
+                     Command.backward(2), Command.rotate_left(2), Command.rotate_right(2), Command.wait(2)]
+        for i in range(len(commands1)):
+            for j in range(len(commands2)):
+                if i == j:
+                    self.assertEqual(commands1[i], commands2[j])
+                else:
+                    self.assertNotEqual(commands1[i], commands2[j])
 
     def test_corrupted_command_should_not_affect_correct_type(self):
         command = Command.forward(1)

@@ -28,7 +28,8 @@ class TestExpression(unittest.TestCase):
             self.assertEqual(expression, expression.to_expression())
 
     def test_eq(self):
-        expressions1 = [Expression(Type.int(), 1), Expression(Type.decimal(), 1.1), Expression(Type.boolean(), False),
+        expressions1 = [None,
+                        Expression(Type.int(), 1), Expression(Type.decimal(), 1.1), Expression(Type.boolean(), False),
                         Expression(Type.vector(), [1.1, 2.2, -1.1]), Expression(Type.list_of(Type.int()), [1, 2, 3, 4]),
                         Expression(Type.list_of(Type.int()), []),
                         Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0]),
@@ -40,7 +41,8 @@ class TestExpression(unittest.TestCase):
                         Expression(Type.list_of(Type.int()), [], "a"),
                         Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"),
                         Expression(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]], "a")]
-        expressions2 = [Expression(Type.int(), 1), Expression(Type.decimal(), 1.1), Expression(Type.boolean(), False),
+        expressions2 = [None,
+                        Expression(Type.int(), 1), Expression(Type.decimal(), 1.1), Expression(Type.boolean(), False),
                         Expression(Type.vector(), [1.1, 2.2, -1.1]), Expression(Type.list_of(Type.int()), [1, 2, 3, 4]),
                         Expression(Type.list_of(Type.int()), []),
                         Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0]),
@@ -52,11 +54,12 @@ class TestExpression(unittest.TestCase):
                         Expression(Type.list_of(Type.int()), [], "a"),
                         Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"),
                         Expression(Type.list_of(Type.list_of(Type.vector())), [[[1.1, 2.2, -1.1], [1, 2, -1]]], "a")]
-        for i, j in zip(range(len(expressions1)), range(len(expressions2))):
-            if i == j:
-                self.assertEqual(expressions1[i], expressions2[j])
-            else:
-                self.assertNotEqual(expressions1[i], expressions2[j])
+        for i in range(len(expressions1)):
+            for j in range(len(expressions2)):
+                if i == j:
+                    self.assertEqual(expressions1[i], expressions2[j])
+                else:
+                    self.assertNotEqual(expressions1[i], expressions2[j])
 
     def test_str(self):
         self.assertEqual("Expression: { type: int, value: 1, ident: None }", str(Expression(Type.int(), 1)))
@@ -102,19 +105,20 @@ class TestIdentifier(unittest.TestCase):
             self.assertEqual(expression, Identifier("a", expression).to_expression())
 
     def test_eq(self):
-        identifiers1 = [Identifier("a", None), Identifier("a", Expression(Type.int(), 1, "a")),
+        identifiers1 = [None, Identifier("a", None), Identifier("a", Expression(Type.int(), 1, "a")),
                         Identifier("a", Expression(Type.decimal(), 1.1, "a")),
                         Identifier("b", Expression(Type.int(), 1, "b")),
                         Identifier("b", Expression(Type.list_of(Type.int()), [], "b"))]
-        identifiers2 = [Identifier("a", None), Identifier("a", Expression(Type.int(), 1, "a")),
+        identifiers2 = [None, Identifier("a", None), Identifier("a", Expression(Type.int(), 1, "a")),
                         Identifier("a", Expression(Type.decimal(), 1.1, "a")),
                         Identifier("b", Expression(Type.int(), 1, "b")),
                         Identifier("b", Expression(Type.list_of(Type.int()), [], "b"))]
-        for i, j in zip(range(len(identifiers1)), range(len(identifiers2))):
-            if i == j:
-                self.assertEqual(identifiers1[i], identifiers2[j])
-            else:
-                self.assertNotEqual(identifiers1[i], identifiers2[j])
+        for i in range(len(identifiers1)):
+            for j in range(len(identifiers2)):
+                if i == j:
+                    self.assertEqual(identifiers1[i], identifiers2[j])
+                else:
+                    self.assertNotEqual(identifiers1[i], identifiers2[j])
 
     def test_str(self):
         self.assertEqual("Identifier: { ident: a, expression: None }", str(Identifier("a", None)))
@@ -145,23 +149,26 @@ class TestListElem(unittest.TestCase):
         self.assertEqual(expected, ListElem("b[1]", expression, 1).to_expression())
 
     def test_eq(self):
-        list_elems1 = [ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"), 0),
+        list_elems1 = [None,
+                       ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"), 0),
                        ListElem("b", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "b"), 0),
                        ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0], "a"), 0),
                        ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"), 1),
                        ListElem("a", Expression(Type.list_of(Type.list_of(Type.int())), [[[1], [1]]], "a"), 0),
                        ListElem("b[1]", Expression(Type.list_of(Type.boolean()), [True, False], "b[1]"), 0)]
-        list_elems2 = [ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"), 0),
+        list_elems2 = [None,
+                       ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"), 0),
                        ListElem("b", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "b"), 0),
                        ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0], "a"), 0),
                        ListElem("a", Expression(Type.list_of(Type.decimal()), [1.0, 2.0, 3.0, 4.0], "a"), 1),
                        ListElem("a", Expression(Type.list_of(Type.list_of(Type.int())), [[[1], [1]]], "a"), 0),
                        ListElem("b[1]", Expression(Type.list_of(Type.boolean()), [True, False], "b[1]"), 0)]
-        for i, j in zip(range(len(list_elems1)), range(len(list_elems2))):
-            if i == j:
-                self.assertEqual(list_elems1[i], list_elems2[j])
-            else:
-                self.assertNotEqual(list_elems1[i], list_elems2[j])
+        for i in range(len(list_elems1)):
+            for j in range(len(list_elems2)):
+                if i == j:
+                    self.assertEqual(list_elems1[i], list_elems2[j])
+                else:
+                    self.assertNotEqual(list_elems1[i], list_elems2[j])
 
     def test_str(self):
         self.assertEqual("ListElem: { ident: a, " +
@@ -190,21 +197,24 @@ class TestVectorElem(unittest.TestCase):
         self.assertEqual(expected, VectorElem("b[1]", expression, 2).to_expression())
 
     def test_eq(self):
-        vector_elems1 = [VectorElem("a", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 0),
+        vector_elems1 = [None,
+                         VectorElem("a", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 0),
                          VectorElem("b", Expression(Type.vector(), [1.0, 2.0, 3.0], "b"), 0),
                          VectorElem("a", Expression(Type.vector(), [2.0, 2.0, 3.0], "a"), 0),
                          VectorElem("a", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 1),
                          VectorElem("b[1]", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 0)]
-        vector_elems2 = [VectorElem("a", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 0),
+        vector_elems2 = [None,
+                         VectorElem("a", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 0),
                          VectorElem("b", Expression(Type.vector(), [1.0, 2.0, 3.0], "b"), 0),
                          VectorElem("a", Expression(Type.vector(), [2.0, 2.0, 3.0], "a"), 0),
                          VectorElem("a", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 1),
                          VectorElem("b[1]", Expression(Type.vector(), [1.0, 2.0, 3.0], "a"), 0)]
-        for i, j in zip(range(len(vector_elems1)), range(len(vector_elems2))):
-            if i == j:
-                self.assertEqual(vector_elems1[i], vector_elems2[j])
-            else:
-                self.assertNotEqual(vector_elems1[i], vector_elems2[j])
+        for i in range(len(vector_elems1)):
+            for j in range(len(vector_elems2)):
+                if i == j:
+                    self.assertEqual(vector_elems1[i], vector_elems2[j])
+                else:
+                    self.assertNotEqual(vector_elems1[i], vector_elems2[j])
 
     def test_str(self):
         self.assertEqual("ListElem: { ident: a, " +

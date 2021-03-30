@@ -21,6 +21,18 @@ class TestSymbolTable(unittest.TestCase):
         st2.store("a", Expression(Type.int(), 0))
         self.assertTrue(st1 == st2)
 
+        self.assertNotEqual(SymbolTable(), None)
+
+    def test_str(self):
+        st = SymbolTable()
+        st.store("a", Expression(Type.int(), 0))
+        st.store("b", Expression(Type.list_of(Type.boolean()), [True]))
+        expected = "SymbolTable: {\n" + \
+            "  a -> Expression: { type: int, value: 0, ident: None }\n" + \
+            "  b -> Expression: { type: list[boolean], value: [True], ident: None }\n" + \
+            "}"
+        self.assertEqual(expected, str(st))
+
     def test_store(self):
         st = SymbolTable()
         st.store("a", Expression(Type.int(), 1))

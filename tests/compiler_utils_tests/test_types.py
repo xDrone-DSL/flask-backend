@@ -62,17 +62,18 @@ class TestTypes(unittest.TestCase):
         self.assertEqual("list[]", str(empty_list))
 
     def test_eq(self):
-        types1 = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
+        types1 = [None, Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
                   Type.list_of(Type.int()), Type.list_of(Type.decimal()),
                   Type.list_of(Type.list_of(Type.int())), Type.list_of(Type.list_of(Type.decimal()))]
-        types2 = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
+        types2 = [None, Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
                   Type.list_of(Type.int()), Type.list_of(Type.decimal()),
                   Type.list_of(Type.list_of(Type.int())), Type.list_of(Type.list_of(Type.decimal()))]
-        for i, j in zip(range(len(types1)), range(len(types2))):
-            if i == j:
-                self.assertEqual(types1[i], types2[j])
-            else:
-                self.assertNotEqual(types1[i], types2[j])
+        for i in range(len(types1)):
+            for j in range(len(types2)):
+                if i == j:
+                    self.assertEqual(types1[i], types2[j])
+                else:
+                    self.assertNotEqual(types1[i], types2[j])
 
         self.assertEqual(Type.empty_list(), Type.empty_list())
         for type in types1:
