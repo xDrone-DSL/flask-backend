@@ -23,7 +23,7 @@ class ListElem:
         self._ident = ident
         self._container = container
         self._index = index
-        self._variable = Variable(container.type.elem_type, container.value[index])
+        self._variable = Variable(container.type.elem_type, container.value[index], ident="{}[{}]".format(ident, index))
 
     @property
     def ident(self):

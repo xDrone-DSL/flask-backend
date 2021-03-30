@@ -253,8 +253,6 @@ class AssignVectorElemTest(unittest.TestCase):
                 """.format(index, index), actual)
             expected = SymbolTable()
             expected.store("a", Variable(Type.vector(), vector, ident="a"))
-            print(expected)
-            print(actual)
             self.assertEqual(expected, actual)
 
     def test_assign_vector_elem_not_declared_variable_should_give_error(self):
@@ -320,8 +318,21 @@ class AssignListElemTest(unittest.TestCase):
             """, actual)
         expected = SymbolTable()
         expected.store("a", Variable(Type.list_of(Type.list_of(Type.int())), [[4, 5], [6, 7]], ident="a"))
-        print(actual)
-        print(expected)
+        self.assertEqual(expected, actual)
+
+    def test_assign_list_elem_with_vector_should_update_symbol_table(self):
+        actual = SymbolTable()
+        gen_simulate_commands("""
+            main () {
+             list[vector] a <- [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)];
+             a[0] <- (7.0, 8.0, 9.0);
+             a[1].x <- 10.0;
+             a[1].y <- 11.0;
+             a[1].z <- 12.0;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Variable(Type.list_of(Type.vector()), [[7, 8, 9], [10, 11, 12]], ident="a"))
         self.assertEqual(expected, actual)
 
     def test_assign_list_elem_to_variable_out_of_bound_should_give_error(self):
@@ -345,6 +356,25 @@ class AssignListElemTest(unittest.TestCase):
                 """)
 
         self.assertTrue("List a has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
+
+    def test_assess_list_elem_nested_out_of_bound_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            gen_simulate_commands("""
+                main () {
+                 list[list[list[int]]] a <- [[[1], [2]]];
+                 a[0][2] <- [1];
+                }
+                """)
+        self.assertTrue("List a[0] has length 2, but has been assessed with out-of-range index 2" in str(context.exception))
+
+        with self.assertRaises(CompileError) as context:
+            gen_simulate_commands("""
+                main () {
+                 list[list[list[int]]] a <- [[[1], [2]]];
+                 a[0][1][1] <- 1;
+                }
+                """)
+        self.assertTrue("List a[0][1] has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
 
     def test_assign_list_elem_not_declared_variable_should_give_error(self):
         with self.assertRaises(CompileError) as context:
@@ -374,7 +404,7 @@ class AssignListElemTest(unittest.TestCase):
                 self.assertTrue("Identifier b has been declared as list[{}], but assigned as list[{}]"
                                 .format(t2, t1) in str(context.exception))
 
-    def test_declare_and_then_assign_list_elem_with_different_type_should_give_error(self):
+    def test_assign_list_elem_with_different_type_should_give_error(self):
         types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(),
                  Type.list_of(Type.int()), Type.list_of(Type.list_of(Type.int()))]
         for t1 in types:
@@ -393,7 +423,6 @@ class AssignListElemTest(unittest.TestCase):
 
                 self.assertTrue("Assigned value {} should have type {}, but is {}"
                                 .format(t2.default_value, t1.type_name, t2.type_name) in str(context.exception))
-
 
 class CombinedDeclareAssignTest(unittest.TestCase):
 

@@ -76,7 +76,6 @@ class TestTypes(unittest.TestCase):
 
         self.assertEqual(Type.empty_list(), Type.empty_list())
         for type in types1:
-            print(type)
             if isinstance(type, ListType):
                 self.assertEqual(Type.empty_list(), type)
                 self.assertEqual(type, Type.empty_list())

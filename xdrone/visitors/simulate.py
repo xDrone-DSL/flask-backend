@@ -66,8 +66,6 @@ class Simulate(Transformer):
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
         if expr2.value >= len(expr1.value):
-            print("List {} has length {}, but has been assessed with out-of-range index {}"
-                               .format(expr1.ident, len(expr1.value), expr2.value))
             raise CompileError("List {} has length {}, but has been assessed with out-of-range index {}"
                                .format(expr1.ident, len(expr1.value), expr2.value))
         return ListElem(expr1.ident, expr1, expr2.value)
@@ -161,6 +159,23 @@ class Simulate(Transformer):
         self.symbol_table.update(ident, expr.value)
         return []
 
+    def _update_nested_ident(self, ident, expr, index):
+        if ident is not None:
+            if "[" in ident:
+                tokens = ident.split("[")
+                ident = tokens[0]
+                indices = [int(token.replace("]", "")) for token in tokens[1:]]
+            else:
+                indices = []
+            assert ident in self.symbol_table
+            variable = self.symbol_table.get_variable(ident)
+            new_list = variable.value
+            curr = new_list
+            for i in indices:
+                curr = curr[i]
+            curr[index] = expr.value
+            self.symbol_table.update(ident, new_list)
+
     def assign_list_elem(self, children):
         list_elem, expr = children
         ident = list_elem.ident
@@ -170,12 +185,7 @@ class Simulate(Transformer):
         declared_type = list.type.elem_type
         if assigned_type != declared_type:
             raise CompileError("Assigned value {} should have type {}, but is {}".format(expr.value, declared_type, assigned_type))
-        if ident is not None:
-            assert ident in self.symbol_table
-            variable = self.symbol_table.get_variable(ident)
-            new_list = variable.value
-            new_list[index] = expr.value
-            self.symbol_table.update(ident, new_list)
+        self._update_nested_ident(ident, expr, index)
         return []
 
     def assign_vector_elem(self, children):
@@ -185,12 +195,7 @@ class Simulate(Transformer):
         index = vector_elem.index
         if expr.type != Type.decimal():
             raise CompileError("Assigned value {} should have type decimal, but is {}".format(expr.value, expr.type))
-        if ident is not None:
-            assert ident in self.symbol_table
-            variable = self.symbol_table.get_variable(ident)
-            new_vector = variable.value
-            new_vector[index] = expr.value
-            self.symbol_table.update(ident, new_vector)
+        self._update_nested_ident(ident, expr, index)
         return []
 
 
