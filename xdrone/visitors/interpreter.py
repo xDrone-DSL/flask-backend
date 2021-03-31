@@ -74,13 +74,13 @@ class Interpreter(Transformer):
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Command.backward(expr.value)]
 
-    def rotatel(self, children) -> List[Command]:
+    def rotate_left(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
         return [Command.rotate_left(radians(expr.value))]
 
-    def rotater(self, children) -> List[Command]:
+    def rotate_right(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))

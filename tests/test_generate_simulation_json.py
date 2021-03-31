@@ -88,7 +88,7 @@ class GenerateSimulationJsonTest(unittest.TestCase):
               takeoff();
               repeat 4 times {
                 forward(3); rotate_left(90);
-              };
+              }
               land();
             }"""
         target = [{"action": "takeoff", "value": []},
@@ -110,8 +110,8 @@ class GenerateSimulationJsonTest(unittest.TestCase):
             repeat 2 times {
               repeat 2 times {
                 forward(3); rotate_left(90);
-              };
-            };
+              }
+            }
             land();
           }"""
         target = [{"action": "takeoff", "value": []},

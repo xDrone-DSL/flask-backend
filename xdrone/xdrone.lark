@@ -1,89 +1,173 @@
 //https://github.com/adamhosier/WACC-compiler/blob/master/antlr/WaccParser.g4
 
-prog: func* "main" "(" ")" "{" commands "}"
+prog: func* _MAIN _L_PAR _R_PAR _L_BRACE commands _R_BRACE
 
-commands: (command ";")*
+commands: command*
 
-?command: "takeoff" "(" ")"                                       -> takeoff
-       | "land" "(" ")"                                           -> land
-       | "up" "(" expr ")"                                        -> up
-       | "down" "(" expr ")"                                      -> down
-       | "left" "(" expr ")"                                      -> left
-       | "right" "(" expr ")"                                     -> right
-       | "forward" "(" expr ")"                                   -> forward
-       | "backward" "(" expr ")"                                  -> backward
-       | "rotate_left" "(" expr ")"                               -> rotatel
-       | "rotate_right" "(" expr ")"                              -> rotater
-       | "wait" "(" expr ")"                                      -> wait
-       | type ident                                               -> declare
-       | type ident "<-" expr                               -> declare_assign
-       | vector_elem "<-" expr                              -> assign_vector_elem
-       | list_elem "<-" expr                                -> assign_list_elem
-       | ident "<-" expr                                    -> assign_ident
-       | expr "." "insert" "(" expr ")" ["at" "(" expr ")"] -> insert
-       | expr "." "remove" "(" expr ")"                     -> remove
-       | func_call
-       | "repeat" expr "times" "{" commands "}"                   -> repeat
-       | "if" expr "{" commands "}" ["else" "{" commands "}"]     -> if
-       | "for" ident "from" expr "to" expr "{" commands "}"       -> for
-       | "while" expr "{" commands "}"                            -> while
+?command: _TAKEOFF _L_PAR _R_PAR _SEMICOLON                                                  -> takeoff
+       | _LAND _L_PAR _R_PAR _SEMICOLON                                                      -> land
+       | _UP _L_PAR expr _R_PAR _SEMICOLON                                                   -> up
+       | _DOWN _L_PAR expr _R_PAR _SEMICOLON                                                 -> down
+       | _LEFT _L_PAR expr _R_PAR _SEMICOLON                                                 -> left
+       | _RIGHT _L_PAR expr _R_PAR _SEMICOLON                                                -> right
+       | _FORWARD _L_PAR expr _R_PAR _SEMICOLON                                              -> forward
+       | _BACKWARD _L_PAR expr _R_PAR _SEMICOLON                                             -> backward
+       | _ROTATE_LEFT _L_PAR expr _R_PAR _SEMICOLON                                          -> rotate_left
+       | _ROTATE_RIGHT _L_PAR expr _R_PAR _SEMICOLON                                         -> rotate_right
+       | _WAIT _L_PAR expr _R_PAR _SEMICOLON                                                 -> wait
+       | type ident _SEMICOLON                                                               -> declare
+       | type ident _ARROW expr _SEMICOLON                                                   -> declare_assign
+       | vector_elem _ARROW expr _SEMICOLON                                                  -> assign_vector_elem
+       | list_elem _ARROW expr _SEMICOLON                                                    -> assign_list_elem
+       | ident _ARROW expr _SEMICOLON                                                        -> assign_ident
+       | expr [_DOT _AT _L_PAR expr _R_PAR] _DOT _INSERT _L_PAR expr _R_PAR _SEMICOLON       -> insert
+       | expr [_DOT _AT _L_PAR expr _R_PAR] _DOT _REMOVE _L_PAR _R_PAR _SEMICOLON            -> remove
+       | func_call _SEMICOLON
+       | _IF expr _L_BRACE commands _R_BRACE [_ELSE _L_BRACE commands _R_BRACE]              -> if
+       | _WHILE expr _L_BRACE commands _R_BRACE                                              -> while
+       | _FOR ident _FROM expr _TO expr _L_BRACE commands _R_BRACE                           -> for
+       | _REPEAT expr _TIMES _L_BRACE commands _R_BRACE                                      -> repeat
 
-?func: "function" ident "(" [param_list] ")" "return" type "{" (func_command ";")* "}"  -> func_return
-       | "function" ident "(" [param_list] ")" "{" commands "}"                  -> func_no_return
+?func: _FUNCTION ident _L_PAR [param_list] _R_PAR _RETURN type _L_BRACE (func_command)* _R_BRACE  -> function
+       | _FUNCTION ident _L_PAR [param_list] _R_PAR _L_BRACE commands _R_BRACE                    -> procedure
 
 ?func_command: command
-       | "return" expr       -> return
+       | _RETURN expr _SEMICOLON      -> func_return
 
-param_list: type ident ("," type ident)*
+param_list: type ident (_COMMA type ident)*
 
-func_call: ident "(" [arg_list] ")"
-arg_list: expr ("," expr)*
+func_call: ident _L_PAR [arg_list] _R_PAR
+arg_list: expr (_COMMA expr)*
 
 ident: /[a-zA-Z_]/ /[a-zA-Z0-9_]/*
 
-list_elem: expr "[" expr "]"
+list_elem: expr _L_BRACKET expr _R_BRACKET
 
-?vector_elem: expr "." "x"    -> vector_x
-        | expr "." "y"        -> vector_y
-        | expr "." "z"        -> vector_z
+?vector_elem: expr _DOT _VEC_X    -> vector_x
+        | expr _DOT _VEC_Y        -> vector_y
+        | expr _DOT _VEC_Z        -> vector_z
 
 
-type: "int"                    -> int_type
-        | "decimal"            -> decimal_type
-        | "string"             -> string_type
-        | "boolean"            -> boolean_type
-        | "vector"             -> vector_type
-        | "list" "[" type "]"  -> list_type
+type: _TYPE_INT                                  -> int_type
+        | _TYPE_DECIMAL                          -> decimal_type
+        | _TYPE_STRING                           -> string_type
+        | _TYPE_BOOLEAN                          -> boolean_type
+        | _TYPE_VECTOR                           -> vector_type
+        | _TYPE_LIST _L_BRACKET type _R_BRACKET  -> list_type
 
-expr: SIGNED_INT                    -> int_expr
-        | SIGNED_FLOAT              -> decimal_expr
-        | ESCAPED_STRING            -> string_expr
-        | "true"                    -> true_expr
-        | "false"                   -> false_expr
+// Lower precedence is matched earlier
+expr: expr _OR expr                                         -> bool_or
+
+        | expr _AND expr                                    -> bool_and
+
+        | _NOT expr                                         -> bool_not
+
+        | expr _GREATER expr                                -> greater
+        | expr _GREATER_EQ expr                             -> greater_equal
+        | expr _LESS expr                                   -> less
+        | expr _LESS_EQ expr                                -> less_equal
+        | expr _EQ expr                                     -> equal
+        | expr _NOT_EQ expr                                 -> not_equal
+
+        | expr _PLUS expr                                   -> plus
+        | expr _MINUS expr                                  -> minus
+
+        | expr _MULTI expr                                  -> multi
+        | expr _DIV expr                                    -> divide
+
+        | _MINUS expr                                       -> negative
+
+        | SIGNED_INT                                        -> int_expr
+        | SIGNED_FLOAT                                      -> decimal_expr
+        | ESCAPED_STRING                                    -> string_expr
+        | _TRUE                                             -> true_expr
+        | _FALSE                                            -> false_expr
         | ident
         | list_elem
         | vector_elem
-        | "[" [expr ("," expr)*] "]"       -> list
-        | "(" expr "," expr "," expr ")"   -> vector
-        | func_call
-        | "not" expr                -> not
-        | "-" expr                  -> negative
-        | expr "." "size"           -> size
-        | expr "*" expr             -> multi
-        | expr "/" expr             -> divide
-        | expr "+" expr             -> plus
-        | expr "-" expr             -> minus
-        | expr ">" expr             -> greater
-        | expr ">=" expr            -> greater_equal
-        | expr "<" expr             -> less
-        | expr "<=" expr            -> less_equal
-        | expr "==" expr            -> equal
-        | expr "=/=" expr           -> not_equal
-        | expr "&" expr             -> concat
-        | expr "and" expr           -> and
-        | expr "or" expr            -> or
-        | "(" expr ")"              -> parentheses
+        | _L_BRACKET [expr (_COMMA expr)*] _R_BRACKET       -> list
+        | _L_PAR expr _COMMA expr _COMMA expr _R_PAR        -> vector
 
+        | func_call
+        | expr _DOT _SIZE                                   -> size
+        | expr _CONCAT expr                                 -> concat
+
+        | _L_PAR expr _R_PAR                                -> parentheses
+
+_MAIN: "main"
+
+_TAKEOFF: "takeoff"
+_LAND: "land"
+_UP: "up"
+_DOWN: "down"
+_LEFT: "left"
+_RIGHT: "right"
+_FORWARD: "forward"
+_BACKWARD: "backward"
+_ROTATE_LEFT: "rotate_left"
+_ROTATE_RIGHT: "rotate_right"
+_WAIT: "wait"
+
+_AT: "at"
+_INSERT: "insert"
+_REMOVE: "remove"
+_SIZE: "size"
+
+_IF: "if"
+_ELSE: "else"
+_WHILE: "while"
+_FOR: "for"
+_FROM: "from"
+_TO: "to"
+_REPEAT: "repeat"
+_TIMES: "times"
+
+_FUNCTION: "function"
+_RETURN: "return"
+
+_TYPE_INT: "int"
+_TYPE_DECIMAL: "decimal"
+_TYPE_STRING: "string"
+_TYPE_BOOLEAN: "boolean"
+_TYPE_VECTOR: "vector"
+_TYPE_LIST: "list"
+
+_TRUE: "true"
+_FALSE: "false"
+
+_VEC_X: "x"
+_VEC_Y: "y"
+_VEC_Z: "z"
+
+_MULTI: "*"
+_DIV: "/"
+_PLUS: "+"
+_MINUS: "-"
+_CONCAT: "&"
+_GREATER: ">"
+_GREATER_EQ: ">="
+_LESS: "<"
+_LESS_EQ: "<="
+_EQ: "=="
+_NOT_EQ: "=/="
+_NOT: "not"
+_AND: "and"
+_OR: "or"
+
+_L_PAR: "("
+_R_PAR: ")"
+_L_BRACKET: "["
+_R_BRACKET: "]"
+_L_BRACE: "{"
+_R_BRACE: "}"
+
+_DOT: "."
+_COMMA: ","
+_SEMICOLON: ";"
+_ARROW: "<-"
+
+COMMENT: "#" /[^\n]/*
+%ignore COMMENT
 
 %import common.SIGNED_FLOAT
 %import common.INT
