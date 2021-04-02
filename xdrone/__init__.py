@@ -1,7 +1,12 @@
+from typing import Union, List
+
+from lark.exceptions import VisitError
+
 from requirements import generate_requirements
 from xdrone.parser import xdrone_parser
+from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.fly import Fly
-from xdrone.visitors.simulate import Simulate
+from xdrone.visitors.interpreter import Interpreter
 from xdrone.visitors.validate import Validate
 
 
@@ -31,12 +36,21 @@ def validate(program, bounds):
     return {"success": True}
 
 
-def flatten(x):
-    if isinstance(x, list):
-        return [a for i in x for a in flatten(i)]
-    else:
-        return [x]
+def generate_simulation_json(program):
+    commands = generate_commands(program)
+    return [command.to_simulation_json() for command in commands]
 
-def gen_simulate_commands(program):
+
+def generate_commands(program, symbol_table=None):
+    NestedCommands = Union[Command, List['NestedCommands']]
+    def _flatten(commands: NestedCommands) -> List[Command]:
+        if isinstance(commands, list):
+            return [a for i in commands for a in _flatten(i)]
+        else:
+            return [commands]
+
     parse_tree = xdrone_parser.parse(program)
-    return flatten(Simulate().transform(parse_tree))
+    try:
+        return _flatten(Interpreter(symbol_table).transform(parse_tree))
+    except VisitError as e:
+        raise e.orig_exc
