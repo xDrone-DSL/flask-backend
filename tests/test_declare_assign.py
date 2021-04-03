@@ -281,17 +281,19 @@ class AssignVectorElemTest(unittest.TestCase):
     def test_declare_and_then_assign_vector_elem_with_different_type_should_give_error(self):
         for type in [Type.int(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
                      Type.list_of(Type.list_of(Type.int()))]:
-            with self.assertRaises(CompileError) as context:
-                generate_commands("""
-                    main () {{
-                     vector a;
-                     {} b;
-                     a.x <- b;
-                    }}
-                """.format(type.type_name))
+            for index in ["x", "y", "z"]:
+                with self.assertRaises(CompileError) as context:
+                    generate_commands("""
+                        main () {{
+                         vector a;
+                         {} b;
+                         a.{} <- b;
+                        }}
+                    """.format(type.type_name, index))
 
-            self.assertTrue("Assigned value {} should have type decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                self.assertTrue("Assigned value {} should have type decimal, but is {}"
+                                .format(Expression(type, type.default_value, ident="b"), type.type_name)
+                                in str(context.exception))
 
 
 class AssignListElemTest(unittest.TestCase):
@@ -440,7 +442,8 @@ class AssignListElemTest(unittest.TestCase):
                     """.format(t1, t2, t1))
 
                 self.assertTrue("Assigned value {} should have type {}, but is {}"
-                                .format(t2.default_value, t1.type_name, t2.type_name) in str(context.exception))
+                                .format(Expression(t2, t2.default_value, ident="b"), t1.type_name, t2.type_name)
+                                in str(context.exception))
 
 
 class CombinedDeclareAssignTest(unittest.TestCase):

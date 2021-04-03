@@ -2,6 +2,7 @@ import unittest
 
 from xdrone import generate_commands, Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError
+from xdrone.visitors.compiler_utils.expressions import Expression
 from xdrone.visitors.compiler_utils.type import Type
 
 
@@ -47,7 +48,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_down_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -76,7 +78,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_left_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -105,7 +108,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_right_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -134,7 +138,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_forward_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -163,7 +168,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_backward_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -192,7 +198,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_rotate_left_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -221,7 +228,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_rotate_right_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -250,7 +258,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_wait_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
@@ -279,7 +288,8 @@ class MovementCommandsTest(unittest.TestCase):
                 """.format(type.type_name))
 
             self.assertTrue("Expression {} should have type int or decimal, but is {}"
-                            .format(type.default_value, type.type_name) in str(context.exception))
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
 
     def test_multiple_commands_should_return_correct_command(self):
         actual = generate_commands("""

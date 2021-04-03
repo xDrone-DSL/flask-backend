@@ -40,55 +40,55 @@ class Interpreter(Transformer):
     def up(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.up(expr.value)]
 
     def down(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.down(expr.value)]
 
     def left(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.left(expr.value)]
 
     def right(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.right(expr.value)]
 
     def forward(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.forward(expr.value)]
 
     def backward(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.backward(expr.value)]
 
     def rotate_left(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.rotate_left(expr.value)]
 
     def rotate_right(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.rotate_right(expr.value)]
 
     def wait(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
-            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
         return [Command.wait(expr.value)]
 
     def declare(self, children) -> List[Command]:
@@ -149,7 +149,7 @@ class Interpreter(Transformer):
         declared_type = list.type.elem_type
         if assigned_type != declared_type:
             raise CompileError("Assigned value {} should have type {}, but is {}"
-                               .format(expr.value, declared_type, assigned_type))
+                               .format(expr, declared_type, assigned_type))
         self._update_nested_ident(ident, expr, index)
         return []
 
@@ -159,7 +159,7 @@ class Interpreter(Transformer):
         vector = vector_elem.container
         index = vector_elem.index
         if expr.type != Type.decimal():
-            raise CompileError("Assigned value {} should have type decimal, but is {}".format(expr.value, expr.type))
+            raise CompileError("Assigned value {} should have type decimal, but is {}".format(expr, expr.type))
         self._update_nested_ident(ident, expr, index)
         return []
 
@@ -167,7 +167,7 @@ class Interpreter(Transformer):
         expr = children[0]
         commands = children[1:]
         if expr.type != Type.int():
-            raise CompileError("Expression {} should have type int, but is {}".format(expr.value, expr.type))
+            raise CompileError("Expression {} should have type int, but is {}".format(expr, expr.type))
         times = expr.value
         return commands * times
 
