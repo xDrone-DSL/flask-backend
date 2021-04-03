@@ -1,7 +1,6 @@
 from typing import List
 
 from lark import Transformer
-from math import radians
 
 from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError
@@ -78,13 +77,13 @@ class Interpreter(Transformer):
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Command.rotate_left(radians(expr.value))]
+        return [Command.rotate_left(expr.value)]
 
     def rotate_right(self, children) -> List[Command]:
         expr, = children
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr.value, expr.type))
-        return [Command.rotate_right(radians(expr.value))]
+        return [Command.rotate_right(expr.value)]
 
     def wait(self, children) -> List[Command]:
         expr, = children

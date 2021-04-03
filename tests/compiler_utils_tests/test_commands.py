@@ -63,17 +63,17 @@ class TestCommands(unittest.TestCase):
 
     def test_rotate_left(self):
         self.assertEqual(Command.rotate_left(1), Command.rotate_left(1))
-        self.assertEqual("rotateL", Command.rotate_left(1).opcode)
+        self.assertEqual("rotate_left", Command.rotate_left(1).opcode)
         self.assertEqual([1], Command.rotate_left(1).operands)
-        self.assertEqual("Command: { opcode: rotateL, operands: [1] }", str(Command.rotate_left(1)))
-        self.assertEqual({"action": "rotateL", "value": [1]}, Command.rotate_left(1).to_simulation_json())
+        self.assertEqual("Command: { opcode: rotate_left, operands: [1] }", str(Command.rotate_left(1)))
+        self.assertEqual({"action": "rotate_left", "value": [1]}, Command.rotate_left(1).to_simulation_json())
 
     def test_rotate_right(self):
         self.assertEqual(Command.rotate_right(1), Command.rotate_right(1))
-        self.assertEqual("rotateR", Command.rotate_right(1).opcode)
+        self.assertEqual("rotate_right", Command.rotate_right(1).opcode)
         self.assertEqual([1], Command.rotate_right(1).operands)
-        self.assertEqual("Command: { opcode: rotateR, operands: [1] }", str(Command.rotate_right(1)))
-        self.assertEqual({"action": "rotateR", "value": [1]}, Command.rotate_right(1).to_simulation_json())
+        self.assertEqual("Command: { opcode: rotate_right, operands: [1] }", str(Command.rotate_right(1)))
+        self.assertEqual({"action": "rotate_right", "value": [1]}, Command.rotate_right(1).to_simulation_json())
 
     def test_wait(self):
         self.assertEqual(Command.wait(1), Command.wait(1))

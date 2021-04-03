@@ -1,6 +1,5 @@
 import unittest
 from xdrone import generate_simulation_json
-from math import pi
 
 
 class GenerateSimulationJsonTest(unittest.TestCase):
@@ -24,13 +23,13 @@ class GenerateSimulationJsonTest(unittest.TestCase):
         commands = "main() {takeoff(); forward(3); rotate_left(90); forward(3); rotate_left(90); forward(3); rotate_left(90); forward(3); rotate_left(90); land();}"
         target = [{"action": "takeoff", "value": []},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "land", "value": []}]
         self.assertEqual(target, generate_simulation_json(commands))
 
@@ -49,9 +48,9 @@ class GenerateSimulationJsonTest(unittest.TestCase):
         """
         target = [{"action": "takeoff", "value": []},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "land", "value": []}]
         self.assertEqual(target, generate_simulation_json(commands))
 
@@ -74,11 +73,11 @@ class GenerateSimulationJsonTest(unittest.TestCase):
         """
         target = [{"action": "takeoff", "value": []},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [4]},
-                  {"action": "rotateL", "value": [pi]},
+                  {"action": "rotate_left", "value": [180]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "land", "value": []}]
         self.assertEqual(target, generate_simulation_json(commands))
 
@@ -93,13 +92,13 @@ class GenerateSimulationJsonTest(unittest.TestCase):
             }"""
         target = [{"action": "takeoff", "value": []},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "land", "value": []}]
         self.assertEqual(target, generate_simulation_json(commands))
 
@@ -116,12 +115,12 @@ class GenerateSimulationJsonTest(unittest.TestCase):
           }"""
         target = [{"action": "takeoff", "value": []},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "forward", "value": [3]},
-                  {"action": "rotateL", "value": [pi / 2]},
+                  {"action": "rotate_left", "value": [90]},
                   {"action": "land", "value": []}]
         self.assertEqual(target, generate_simulation_json(commands))

@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 from typing import Union
 
-
+#TODO: add distance and angle units to variable name
 class Command:
     def __init__(self, opcode: str, operands: list):
         self._opcode = opcode
@@ -51,11 +51,11 @@ class Command:
 
     @staticmethod
     def rotate_left(angle: Union[int, float]) -> Command:
-        return Command("rotateL", [angle])
+        return Command("rotate_left", [angle])
 
     @staticmethod
     def rotate_right(angle: Union[int, float]) -> Command:
-        return Command("rotateR", [angle])
+        return Command("rotate_right", [angle])
 
     @staticmethod
     def wait(time: Union[int, float]) -> Command:
