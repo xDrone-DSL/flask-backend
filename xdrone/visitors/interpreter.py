@@ -163,6 +163,44 @@ class Interpreter(xDroneParserVisitor):
         self.symbol_table.update(ident, expr.value)
         return []
 
+    def visitInsert(self, ctx: xDroneParser.InsertContext):
+        # TODO
+        return self.visitChildren(ctx)
+
+    def visitRemove(self, ctx: xDroneParser.RemoveContext):
+        # TODO
+        return self.visitChildren(ctx)
+
+    def visitProcedureCall(self, ctx: xDroneParser.ProcedureCallContext):
+        # TODO
+        return self.visitChildren(ctx)
+
+    def visitIf(self, ctx: xDroneParser.IfContext) -> List[NestedCommands]:
+        expr = self.visit(ctx.expr())
+        if expr.type != Type.boolean():
+            raise CompileError("Expression {} should have type boolean, but is {}".format(expr, expr.type))
+        if expr.value:
+            return self.visit(ctx.commands(0))
+        else:
+            if ctx.ELSE():
+                return self.visit(ctx.commands(1))
+            else:
+                return []
+
+    def visitWhile(self, ctx: xDroneParser.WhileContext) -> List[NestedCommands]:
+        expr = self.visit(ctx.expr())
+        if expr.type != Type.boolean():
+            raise CompileError("Expression {} should have type boolean, but is {}".format(expr, expr.type))
+        commands = []
+        while expr.value:
+            commands.append(self.visit(ctx.commands()))
+            expr = self.visit(ctx.expr())
+        return commands
+
+    def visitFor(self, ctx: xDroneParser.ForContext):
+        # TODO
+        return self.visitChildren(ctx)
+
     def visitRepeat(self, ctx: xDroneParser.RepeatContext) -> List[NestedCommands]:
         expr, commands = self.visit(ctx.expr()), self.visit(ctx.commands())
         if expr.type != Type.int():
