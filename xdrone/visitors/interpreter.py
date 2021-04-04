@@ -183,7 +183,7 @@ class Interpreter(xDroneParserVisitor):
     def visitListElem(self, ctx: xDroneParser.ListElemContext) -> ListElem:
         expr1, expr2 = self.visit(ctx.expr(0)), self.visit(ctx.expr(1))
         if not isinstance(expr1.type, ListType):
-            raise CompileError("Expression {} has type {} is not a list".format(expr1, expr1.type))
+            raise CompileError("Expression {} should have type list, but is {}".format(expr1, expr1.type))
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
         if expr2.value >= len(expr1.value):
@@ -300,7 +300,7 @@ class Interpreter(xDroneParserVisitor):
     def visitListElemExpr(self, ctx: xDroneParser.ListElemExprContext) -> Expression:
         expr1, expr2 = self.visit(ctx.expr(0)), self.visit(ctx.expr(1))
         if not isinstance(expr1.type, ListType):
-            raise CompileError("Expression {} has type {} is not a list".format(expr1, expr1.type))
+            raise CompileError("Expression {} should have type list, but is {}".format(expr1, expr1.type))
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
         if expr2.value >= len(expr1.value):
@@ -331,7 +331,7 @@ class Interpreter(xDroneParserVisitor):
         if len(exprs) == 0:
             return Expression(Type.empty_list(), [])
         if not all(e.type == exprs[0].type for e in exprs):
-            raise CompileError("Elements in list {} should have the same type".format(exprs))
+            raise CompileError("Elements in list {} should have the same type".format([str(e) for e in exprs]))
         return Expression(Type.list_of(exprs[0].type), [e.value for e in exprs])
 
     def visitVector(self, ctx: xDroneParser.VectorContext) -> Expression:

@@ -77,6 +77,28 @@ class BooleanOperationTest(unittest.TestCase):
                 generate_commands("""
                     main () {{
                       {} a;
+                      boolean b <- false and a;
+                    }}
+                    """.format(type))
+            self.assertTrue("Expression {} should have type boolean, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      boolean b <- a or false;
+                    }}
+                    """.format(type))
+            self.assertTrue("Expression {} should have type boolean, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
                       boolean b <- false or a;
                     }}
                     """.format(type))
