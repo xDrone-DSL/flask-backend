@@ -96,24 +96,3 @@ expr
   | expr AND expr                                           #and
   | expr OR expr                                            #or
   ;
-
-//unaryOperator
-//  : NOT
-//  | MINUS
-//  ;
-//
-//binaryOperator
-//  : MULTI
-//  | DIV
-//  | PLUS
-//  | MINUS
-//  | CONCAT
-//  | GREATER
-//  | GREATER_EQ
-//  | LESS
-//  | LESS_EQ
-//  | EQ
-//  | NOT_EQ
-//  | AND
-//  | OR
-//  ;

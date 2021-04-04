@@ -347,7 +347,7 @@ class Interpreter(xDroneParserVisitor):
 
     def visitSize(self, ctx: xDroneParser.SizeContext) -> Expression:
         expr = self.visit(ctx.expr())
-        if isinstance(expr.type, ListType):
+        if not isinstance(expr.type, ListType):
             raise CompileError("Expression {} should have type list, but is {}".format(expr, expr.type))
         return Expression(Type.int(), len(expr.value))
 

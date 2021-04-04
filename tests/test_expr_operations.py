@@ -653,11 +653,107 @@ class ArithmeticOperationTest(unittest.TestCase):
                             in str(context.exception))
 
 
-# TODO
-# class OtherOperationTest(unittest.TestCase):
-#     def test_size(self):
-#     def test_concat(self):
-#     def test_parentheses(self):
+class OtherOperationTest(unittest.TestCase):
+    def test_size_of_list_should_return_correct_value(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              list[int] a <- [1, 2];
+              int b <- a.size;
+              int c <- [1.0].size;
+              int d <- [].size;
+              int e <- [[], [], []].size;
+              int f <- [[[], []], [[], []]].size;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.list_of(Type.int()), [1, 2], ident="a"))
+        expected.store("b", Expression(Type.int(), 2, ident="b"))
+        expected.store("c", Expression(Type.int(), 1, ident="c"))
+        expected.store("d", Expression(Type.int(), 0, ident="d"))
+        expected.store("e", Expression(Type.int(), 3, ident="e"))
+        expected.store("f", Expression(Type.int(), 2, ident="f"))
+        self.assertEqual(expected, actual)
+
+    def test_size_of_wrong_type_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.boolean(), Type.string(), Type.vector()]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      int b <- a.size;
+                    }}
+                    """.format(type))
+            self.assertTrue("Expression {} should have type list, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_concat_of_strings_should_return_correct_value(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              string a <- "a";
+              string b <- a & "b";
+              string c <- "abc" & "";
+              string d <- "" & "abcd";
+              string e <- "" & "";
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.string(), "a", ident="a"))
+        expected.store("b", Expression(Type.string(), "ab", ident="b"))
+        expected.store("c", Expression(Type.string(), "abc", ident="c"))
+        expected.store("d", Expression(Type.string(), "abcd", ident="d"))
+        expected.store("e", Expression(Type.string(), "", ident="e"))
+        self.assertEqual(expected, actual)
+
+    def test_concat_of_wrong_types_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      string b <- a & "";
+                    }}
+                    """.format(type))
+            self.assertTrue("Expression {} should have type string, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      string b <- "" & a;
+                    }}
+                    """.format(type))
+            self.assertTrue("Expression {} should have type string, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_parentheses_should_visit_content(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              int a <- (1);
+              decimal b <- (1.2);
+              string c <- ("a");
+              boolean d <- (true);
+              vector e <- ((1.0, 2.0, (3.0)));
+              list[int] f <- ([(1), 2]);
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.int(), 1, ident="a"))
+        expected.store("b", Expression(Type.decimal(), 1.2, ident="b"))
+        expected.store("c", Expression(Type.string(), "a", ident="c"))
+        expected.store("d", Expression(Type.boolean(), True, ident="d"))
+        expected.store("e", Expression(Type.vector(), [1.0, 2.0, 3.0], ident="e"))
+        expected.store("f", Expression(Type.list_of(Type.int()), [1, 2], ident="f"))
+        self.assertEqual(expected, actual)
 
 
 class OperationPrecedenceTest(unittest.TestCase):
