@@ -186,7 +186,7 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("Expression {} should have type list, but is {}".format(expr1, expr1.type))
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
-        if expr2.value >= len(expr1.value):
+        if expr2.value >= len(expr1.value) or expr2.value < 0:
             raise CompileError("List {} has length {}, but has been assessed with out-of-range index {}"
                                .format(expr1.ident, len(expr1.value), expr2.value))
         return ListElem(expr1.ident, expr1, expr2.value)
@@ -303,7 +303,7 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("Expression {} should have type list, but is {}".format(expr1, expr1.type))
         if expr2.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
-        if expr2.value >= len(expr1.value):
+        if expr2.value >= len(expr1.value) or expr2.value < 0:
             raise CompileError("List {} has length {}, but has been assessed with out-of-range index {}"
                                .format(expr1.ident, len(expr1.value), expr2.value))
         return ListElem(expr1.ident, expr1, expr2.value).to_expression()

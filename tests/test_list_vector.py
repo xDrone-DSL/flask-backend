@@ -89,6 +89,18 @@ class ListTest(unittest.TestCase):
                         .format("a", 2, 2)
                         in str(context.exception))
 
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {{
+                  list[int] a <- [1, 2];
+                  a[-1] <- 1;
+                }}
+                """.format(type))
+
+        self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
+                        .format("a", 2, -1)
+                        in str(context.exception))
+
     def test_list_elem_expr_should_return_correct_value(self):
         actual = SymbolTable()
         generate_commands("""
@@ -149,6 +161,18 @@ class ListTest(unittest.TestCase):
 
         self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
                         .format("a", 2, 2)
+                        in str(context.exception))
+
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {{
+                  list[int] a <- [1, 2];
+                  int b <- a[-1];
+                }}
+                """.format(type))
+
+        self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
+                        .format("a", 2, -1)
                         in str(context.exception))
 
 
