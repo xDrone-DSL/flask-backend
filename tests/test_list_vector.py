@@ -151,3 +151,96 @@ class ListTest(unittest.TestCase):
                         .format("a", 2, 2)
                         in str(context.exception))
 
+
+class VectorTest(unittest.TestCase):
+    def test_vector_should_return_correct_value(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              vector a <- (1.0, 2.0, -3.0);
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.vector(), [1.0, 2.0, -3.0], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_vector_with_wrong_type_should_give_error(self):
+        types = [Type.int(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      vector b <- (a, 2.0, -3.0);
+                    }}
+                    """.format(type))
+            self.assertTrue("Expression {} should have type decimal, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_vector_elem_assign_should_update_symbol_table_correctly(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              vector a <- (1.0, 2.0, -3.0);
+              a.x <- 1.1;
+              a.y <- 2.2;
+              a.z <- -3.3;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.vector(), [1.1, 2.2, -3.3], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_vector_elem_assign_with_wrong_ident_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            for index in "xyz":
+                with self.assertRaises(CompileError) as context:
+                    generate_commands("""
+                        main () {{
+                          {} a;
+                          a.{} <- 1;
+                        }}
+                        """.format(type, index))
+
+                self.assertTrue("Expression {} should have type vector, but is {}"
+                                .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                                in str(context.exception))
+
+    def test_vector_elem_expr_should_return_correct_value(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              vector a <- (1.0, 2.0, 3.0);
+              decimal b <- a.x;
+              decimal c <- a.y;
+              decimal d <- a.z;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.vector(), [1.0, 2.0, 3.0], ident="a"))
+        expected.store("b", Expression(Type.decimal(), 1.0, ident="b"))
+        expected.store("c", Expression(Type.decimal(), 2.0, ident="c"))
+        expected.store("d", Expression(Type.decimal(), 3.0, ident="d"))
+        self.assertEqual(expected, actual)
+
+    def test_list_elem_expr_with_wrong_ident_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            for index in "xyz":
+                with self.assertRaises(CompileError) as context:
+                    generate_commands("""
+                        main () {{
+                          {} a;
+                          decimal b <- a.{};
+                        }}
+                        """.format(type, index))
+
+                self.assertTrue("Expression {} should have type vector, but is {}"
+                                .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                                in str(context.exception))
+
