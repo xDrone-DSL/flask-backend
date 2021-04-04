@@ -109,8 +109,8 @@ class xDroneParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by xDroneParser#precdureCall.
-    def visitPrecdureCall(self, ctx:xDroneParser.PrecdureCallContext):
+    # Visit a parse tree produced by xDroneParser#procedureCall.
+    def visitProcedureCall(self, ctx:xDroneParser.ProcedureCallContext):
         return self.visitChildren(ctx)
 
 

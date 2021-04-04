@@ -188,12 +188,12 @@ class xDroneParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by xDroneParser#precdureCall.
-    def enterPrecdureCall(self, ctx:xDroneParser.PrecdureCallContext):
+    # Enter a parse tree produced by xDroneParser#procedureCall.
+    def enterProcedureCall(self, ctx:xDroneParser.ProcedureCallContext):
         pass
 
-    # Exit a parse tree produced by xDroneParser#precdureCall.
-    def exitPrecdureCall(self, ctx:xDroneParser.PrecdureCallContext):
+    # Exit a parse tree produced by xDroneParser#procedureCall.
+    def exitProcedureCall(self, ctx:xDroneParser.ProcedureCallContext):
         pass
 
 

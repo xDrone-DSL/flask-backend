@@ -27,7 +27,7 @@ command
   | ident ARROW expr SEMICOLON                                              #assignIdent
   | expr (DOT AT L_PAR expr R_PAR)? DOT INSERT L_PAR expr R_PAR SEMICOLON   #insert
   | expr (DOT AT L_PAR expr R_PAR)? DOT REMOVE L_PAR R_PAR SEMICOLON        #remove
-  | call                                                                    #precdureCall
+  | call                                                                    #procedureCall
   | IF expr L_BRACE commands R_BRACE (ELSE L_BRACE commands R_BRACE)?       #if
   | WHILE expr L_BRACE commands R_BRACE                                     #while
   | FOR ident FROM expr TO expr L_BRACE commands R_BRACE                    #for

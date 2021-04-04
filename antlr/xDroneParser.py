@@ -654,31 +654,6 @@ class xDroneParser ( Parser ):
                 return visitor.visitChildren(self)
 
 
-    class PrecdureCallContext(CommandContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a xDroneParser.CommandContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def call(self):
-            return self.getTypedRuleContext(xDroneParser.CallContext,0)
-
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterPrecdureCall" ):
-                listener.enterPrecdureCall(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitPrecdureCall" ):
-                listener.exitPrecdureCall(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitPrecdureCall" ):
-                return visitor.visitPrecdureCall(self)
-            else:
-                return visitor.visitChildren(self)
-
-
     class ForwardContext(CommandContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a xDroneParser.CommandContext
@@ -1083,6 +1058,31 @@ class xDroneParser ( Parser ):
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitLeft" ):
                 return visitor.visitLeft(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class ProcedureCallContext(CommandContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a xDroneParser.CommandContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def call(self):
+            return self.getTypedRuleContext(xDroneParser.CallContext,0)
+
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterProcedureCall" ):
+                listener.enterProcedureCall(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitProcedureCall" ):
+                listener.exitProcedureCall(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProcedureCall" ):
+                return visitor.visitProcedureCall(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -1601,7 +1601,7 @@ class xDroneParser ( Parser ):
                 pass
 
             elif la_ == 19:
-                localctx = xDroneParser.PrecdureCallContext(self, localctx)
+                localctx = xDroneParser.ProcedureCallContext(self, localctx)
                 self.enterOuterAlt(localctx, 19)
                 self.state = 165
                 self.call()
