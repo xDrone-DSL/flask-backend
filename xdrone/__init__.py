@@ -62,3 +62,15 @@ def generate_commands(program, symbol_table=None):
     tree = parser.prog()
 
     return _flatten(Interpreter(symbol_table).visit(tree))
+
+if __name__ == '__main__':
+    commands = generate_commands("""
+    main() {
+      int i;
+      for i from 0 to 10 step 2 {
+        forward(i);
+      }
+      del i;
+    }
+    """)
+    for c in commands: print(c)

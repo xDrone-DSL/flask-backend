@@ -553,3 +553,26 @@ class CombinedDeclareAssignTest(unittest.TestCase):
 
                 self.assertTrue("Identifier b has been declared as {}, but assigned as {}"
                                 .format(t2.type_name, t1.type_name) in str(context.exception))
+
+
+class DelTest(unittest.TestCase):
+    def test_del_should_delete_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+             int a;
+             del a;
+            }
+            """, actual)
+        expected = SymbolTable()
+        self.assertEqual(expected, actual)
+
+    def test_del_not_declared_variable_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+            main () {
+             del a;
+            }
+            """)
+
+        self.assertTrue("Identifier a has not been declared" in str(context.exception))

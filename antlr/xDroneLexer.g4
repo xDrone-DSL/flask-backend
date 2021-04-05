@@ -25,8 +25,11 @@ WHILE: 'while' ;
 FOR: 'for' ;
 FROM: 'from' ;
 TO: 'to' ;
+STEP: 'step' ;
 REPEAT: 'repeat' ;
 TIMES: 'times' ;
+
+DEL: 'del' ;
 
 FUNCTION: 'function' ;
 RETURN: 'return' ;

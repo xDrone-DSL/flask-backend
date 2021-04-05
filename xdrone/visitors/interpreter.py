@@ -163,6 +163,14 @@ class Interpreter(xDroneParserVisitor):
         self.symbol_table.update(ident, expr.value)
         return []
 
+    def visitDel(self, ctx: xDroneParser.DelContext) -> List[Command]:
+        identifier = self.visit(ctx.ident())
+        ident = identifier.ident
+        if ident not in self.symbol_table:
+            raise CompileError("Identifier {} has not been declared".format(ident))
+        self.symbol_table.delete(ident)
+        return []
+
     def visitInsert(self, ctx: xDroneParser.InsertContext):
         # TODO
         return self.visitChildren(ctx)
@@ -198,15 +206,40 @@ class Interpreter(xDroneParserVisitor):
         return commands
 
     def visitFor(self, ctx: xDroneParser.ForContext):
-        # TODO
-        return self.visitChildren(ctx)
+        identifier, expr1, expr2 = self.visit(ctx.ident()), self.visit(ctx.expr(0)), self.visit(ctx.expr(1))
+        ident = identifier.ident
+        if ident not in self.symbol_table:
+            raise CompileError("Identifier {} has not been declared".format(ident))
+        declared_type = self.symbol_table.get_expression(ident).type
+        if declared_type != Type.int():
+            raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
+                               .format(ident, declared_type, Type.int()))
+        if expr1.type != Type.int():
+            raise CompileError("Expression {} should have type int, but is {}".format(expr1, expr1.type))
+        if expr2.type != Type.int():
+            raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
+
+        if ctx.STEP():
+            expr3 = self.visit(ctx.expr(2))
+            if expr3.type != Type.int():
+                raise CompileError("Expression {} should have type int, but is {}".format(expr3, expr3.type))
+            step = expr3.value
+        else:
+            step = 1
+
+        commands = []
+        for i in range(expr1.value, expr2.value + 1, step):
+            self.symbol_table.update(ident, i)
+            commands.append(self.visit(ctx.commands()))
+
+        return commands
 
     def visitRepeat(self, ctx: xDroneParser.RepeatContext) -> List[NestedCommands]:
         expr, commands = self.visit(ctx.expr()), self.visit(ctx.commands())
         if expr.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr, expr.type))
         times = expr.value
-        return commands * times
+        return [commands for _ in range(times)]
 
     ######## ident ########
 

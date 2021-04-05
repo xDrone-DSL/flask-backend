@@ -170,6 +170,15 @@ class xDroneParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by xDroneParser#del.
+    def enterDel(self, ctx:xDroneParser.DelContext):
+        pass
+
+    # Exit a parse tree produced by xDroneParser#del.
+    def exitDel(self, ctx:xDroneParser.DelContext):
+        pass
+
+
     # Enter a parse tree produced by xDroneParser#insert.
     def enterInsert(self, ctx:xDroneParser.InsertContext):
         pass

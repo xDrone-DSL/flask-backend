@@ -99,6 +99,11 @@ class xDroneParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by xDroneParser#del.
+    def visitDel(self, ctx:xDroneParser.DelContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by xDroneParser#insert.
     def visitInsert(self, ctx:xDroneParser.InsertContext):
         return self.visitChildren(ctx)

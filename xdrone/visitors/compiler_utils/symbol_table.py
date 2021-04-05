@@ -32,6 +32,10 @@ class SymbolTable:
         old_expression = self._symbol_table[ident]
         self._symbol_table[ident] = Expression(old_expression.type, value, ident=ident)
 
+    def delete(self, ident: str) -> None:
+        assert self.__contains__(ident), "Expression not in symbol table"
+        del self._symbol_table[ident]
+
     def get_expression(self, ident: str) -> Expression:
         assert self.__contains__(ident), "Expression not in symbol table"
         return copy.deepcopy(self._symbol_table[ident])

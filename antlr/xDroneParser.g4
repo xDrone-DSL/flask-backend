@@ -9,29 +9,30 @@ prog : func* MAIN L_PAR R_PAR L_BRACE commands R_BRACE ;
 commands : command* ;
 
 command
-  : TAKEOFF L_PAR R_PAR SEMICOLON                                           #takeoff
-  | LAND L_PAR R_PAR SEMICOLON                                              #land
-  | UP L_PAR expr R_PAR SEMICOLON                                           #up
-  | DOWN L_PAR expr R_PAR SEMICOLON                                         #down
-  | LEFT L_PAR expr R_PAR SEMICOLON                                         #left
-  | RIGHT L_PAR expr R_PAR SEMICOLON                                        #right
-  | FORWARD L_PAR expr R_PAR SEMICOLON                                      #forward
-  | BACKWARD L_PAR expr R_PAR SEMICOLON                                     #backward
-  | ROTATE_LEFT L_PAR expr R_PAR SEMICOLON                                  #rotateLeft
-  | ROTATE_RIGHT L_PAR expr R_PAR SEMICOLON                                 #rotateRight
-  | WAIT L_PAR expr R_PAR SEMICOLON                                         #wait
-  | type_ ident SEMICOLON                                                   #declare
-  | type_ ident ARROW expr SEMICOLON                                        #declareAssign
-  | vectorElem ARROW expr SEMICOLON                                         #assignVectorElem
-  | listElem ARROW expr SEMICOLON                                           #assignListElem
-  | ident ARROW expr SEMICOLON                                              #assignIdent
-  | expr (DOT AT L_PAR expr R_PAR)? DOT INSERT L_PAR expr R_PAR SEMICOLON   #insert
-  | expr (DOT AT L_PAR expr R_PAR)? DOT REMOVE L_PAR R_PAR SEMICOLON        #remove
-  | call                                                                    #procedureCall
-  | IF expr L_BRACE commands R_BRACE (ELSE L_BRACE commands R_BRACE)?       #if
-  | WHILE expr L_BRACE commands R_BRACE                                     #while
-  | FOR ident FROM expr TO expr L_BRACE commands R_BRACE                    #for
-  | REPEAT expr TIMES L_BRACE commands R_BRACE                              #repeat
+  : TAKEOFF L_PAR R_PAR SEMICOLON                                                    #takeoff
+  | LAND L_PAR R_PAR SEMICOLON                                                       #land
+  | UP L_PAR expr R_PAR SEMICOLON                                                    #up
+  | DOWN L_PAR expr R_PAR SEMICOLON                                                  #down
+  | LEFT L_PAR expr R_PAR SEMICOLON                                                  #left
+  | RIGHT L_PAR expr R_PAR SEMICOLON                                                 #right
+  | FORWARD L_PAR expr R_PAR SEMICOLON                                               #forward
+  | BACKWARD L_PAR expr R_PAR SEMICOLON                                              #backward
+  | ROTATE_LEFT L_PAR expr R_PAR SEMICOLON                                           #rotateLeft
+  | ROTATE_RIGHT L_PAR expr R_PAR SEMICOLON                                          #rotateRight
+  | WAIT L_PAR expr R_PAR SEMICOLON                                                  #wait
+  | type_ ident SEMICOLON                                                            #declare
+  | type_ ident ARROW expr SEMICOLON                                                 #declareAssign
+  | vectorElem ARROW expr SEMICOLON                                                  #assignVectorElem
+  | listElem ARROW expr SEMICOLON                                                    #assignListElem
+  | ident ARROW expr SEMICOLON                                                       #assignIdent
+  | DEL ident SEMICOLON                                                              #del
+  | expr (DOT AT L_PAR expr R_PAR)? DOT INSERT L_PAR expr R_PAR SEMICOLON            #insert
+  | expr (DOT AT L_PAR expr R_PAR)? DOT REMOVE L_PAR R_PAR SEMICOLON                 #remove
+  | call                                                                             #procedureCall
+  | IF expr L_BRACE commands R_BRACE (ELSE L_BRACE commands R_BRACE)?                #if
+  | WHILE expr L_BRACE commands R_BRACE                                              #while
+  | FOR ident FROM expr TO expr (STEP expr)? L_BRACE commands R_BRACE                #for
+  | REPEAT expr TIMES L_BRACE commands R_BRACE                                       #repeat
   ;
 
 ident : IDENT ;
