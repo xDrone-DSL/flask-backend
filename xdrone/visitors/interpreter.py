@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import List, Callable, Union, Optional
 
 from antlr.xDroneParser import xDroneParser
 from antlr.xDroneParserVisitor import xDroneParserVisitor
@@ -7,7 +7,7 @@ from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError
 from xdrone.visitors.compiler_utils.expressions import Identifier, ListElem, VectorElem, Expression, AbstractExpression
 from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
-from xdrone.visitors.compiler_utils.type import Type, ListType
+from xdrone.visitors.compiler_utils.type import Type, ListType, EmptyList
 
 
 class Interpreter(xDroneParserVisitor):
@@ -107,11 +107,45 @@ class Interpreter(xDroneParserVisitor):
         if expr.type != type:
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
                                .format(ident, type, expr.type))
-        expr_with_ident = Expression(expr.type, expr.value, ident)
+        expr_with_ident = Expression(type, expr.value, ident)
         self.symbol_table.store(ident, expr_with_ident)
         return []
 
-    def _update_nested_ident(self, ident, expr, index) -> None:
+    def _insert_nested_ident(self, ident: Optional[str], expr: Expression, index: int) -> None:
+        # TODO extract
+        if ident is not None:
+            if "[" in ident:
+                tokens = ident.split("[")
+                ident = tokens[0]
+                indices = [int(token.replace("]", "")) for token in tokens[1:]]
+            else:
+                indices = []
+            assert ident in self.symbol_table
+            new_list = self.symbol_table.get_expression(ident).value
+            curr = new_list
+            for i in indices:
+                curr = curr[i]
+            curr.insert(index, expr.value)
+            self.symbol_table.update(ident, new_list)
+
+    def _remove_nested_ident(self, ident: Optional[str], index: int) -> None:
+        # TODO extract
+        if ident is not None:
+            if "[" in ident:
+                tokens = ident.split("[")
+                ident = tokens[0]
+                indices = [int(token.replace("]", "")) for token in tokens[1:]]
+            else:
+                indices = []
+            assert ident in self.symbol_table
+            new_list = self.symbol_table.get_expression(ident).value
+            curr = new_list
+            for i in indices:
+                curr = curr[i]
+            curr.pop(index)
+            self.symbol_table.update(ident, new_list)
+
+    def _update_nested_ident(self, ident: Optional[str], expr: Expression, index: int) -> None:
         if ident is not None:
             if "[" in ident:
                 tokens = ident.split("[")
@@ -171,13 +205,42 @@ class Interpreter(xDroneParserVisitor):
         self.symbol_table.delete(ident)
         return []
 
-    def visitInsert(self, ctx: xDroneParser.InsertContext):
-        # TODO
-        return self.visitChildren(ctx)
+    def visitInsert(self, ctx: xDroneParser.InsertContext) -> List[Command]:
+        list = self.visit(ctx.expr(0))
+        if not isinstance(list.type, ListType):
+            raise CompileError("Expression {} should have type list, but is {}".format(list, list.type))
+        if ctx.AT():
+            index = self.visit(ctx.expr(1))
+            value = self.visit(ctx.expr(2))
+        else:
+            index = Expression(Type.int(), len(list.value))
+            value = self.visit(ctx.expr(1))
+        if index.type != Type.int():
+            raise CompileError("Expression {} should have type int, but is {}".format(index, index.type))
+        if index.value > len(list.value) or index.value < 0:
+            raise CompileError("List {} has length {}, but has been inserted at out-of-range index {}"
+                               .format(list, len(list.value), index.value))
+        if not isinstance(list.type, EmptyList) and value.type != list.type.elem_type:
+            raise CompileError("List {} has been declared as {}, but inserted with element type {}"
+                               .format(list, list.type, value.type))
+        self._insert_nested_ident(list.ident, value, index.value)
+        return []
 
-    def visitRemove(self, ctx: xDroneParser.RemoveContext):
-        # TODO
-        return self.visitChildren(ctx)
+    def visitRemove(self, ctx: xDroneParser.RemoveContext) -> List[Command]:
+        list = self.visit(ctx.expr(0))
+        if not isinstance(list.type, ListType):
+            raise CompileError("Expression {} should have type list, but is {}".format(list, list.type))
+        if ctx.AT():
+            index = self.visit(ctx.expr(1))
+        else:
+            index = Expression(Type.int(), len(list.value) - 1)
+        if index.type != Type.int():
+            raise CompileError("Expression {} should have type int, but is {}".format(index, index.type))
+        if index.value >= len(list.value) or index.value < 0:
+            raise CompileError("List {} has length {}, but has been removed at out-of-range index {}"
+                               .format(list, len(list.value), index.value))
+        self._remove_nested_ident(list.ident, index.value)
+        return []
 
     def visitProcedureCall(self, ctx: xDroneParser.ProcedureCallContext):
         # TODO
@@ -205,7 +268,7 @@ class Interpreter(xDroneParserVisitor):
             expr = self.visit(ctx.expr())
         return commands
 
-    def visitFor(self, ctx: xDroneParser.ForContext):
+    def visitFor(self, ctx: xDroneParser.ForContext) -> List[NestedCommands]:
         identifier, expr1, expr2 = self.visit(ctx.ident()), self.visit(ctx.expr(0)), self.visit(ctx.expr(1))
         ident = identifier.ident
         if ident not in self.symbol_table:
@@ -259,7 +322,7 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
         if expr2.value >= len(expr1.value) or expr2.value < 0:
             raise CompileError("List {} has length {}, but has been assessed with out-of-range index {}"
-                               .format(expr1.ident, len(expr1.value), expr2.value))
+                               .format(expr1, len(expr1.value), expr2.value))
         return ListElem(expr1.ident, expr1, expr2.value)
 
     ######## vector_elem ########
@@ -376,7 +439,7 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("Expression {} should have type int, but is {}".format(expr2, expr2.type))
         if expr2.value >= len(expr1.value) or expr2.value < 0:
             raise CompileError("List {} has length {}, but has been assessed with out-of-range index {}"
-                               .format(expr1.ident, len(expr1.value), expr2.value))
+                               .format(expr1, len(expr1.value), expr2.value))
         return ListElem(expr1.ident, expr1, expr2.value).to_expression()
 
     def visitVectorXExpr(self, ctx: xDroneParser.VectorXExprContext) -> Expression:

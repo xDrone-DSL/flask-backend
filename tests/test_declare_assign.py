@@ -360,8 +360,9 @@ class AssignListElemTest(unittest.TestCase):
                 }
                 """)
 
-        self.assertTrue(
-            "List a has length 0, but has been assessed with out-of-range index 0" in str(context.exception))
+        self.assertTrue("List {} has length 0, but has been assessed with out-of-range index 0"
+                        .format(Expression(Type.list_of(Type.int()), [], ident="a"))
+                        in str(context.exception))
 
     def test_assess_list_elem_out_of_bound_should_give_error(self):
         with self.assertRaises(CompileError) as context:
@@ -372,8 +373,9 @@ class AssignListElemTest(unittest.TestCase):
                 }
                 """)
 
-        self.assertTrue(
-            "List a has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
+        self.assertTrue("List {} has length 1, but has been assessed with out-of-range index 1"
+                        .format(Expression(Type.list_of(Type.int()), [1], ident="a"))
+                        in str(context.exception))
 
     def test_assess_list_elem_nested_out_of_bound_should_give_error(self):
         with self.assertRaises(CompileError) as context:
@@ -383,8 +385,9 @@ class AssignListElemTest(unittest.TestCase):
                  a[0][2] <- [1];
                 }
                 """)
-        self.assertTrue(
-            "List a[0] has length 2, but has been assessed with out-of-range index 2" in str(context.exception))
+        self.assertTrue("List {} has length 2, but has been assessed with out-of-range index 2"
+                        .format(Expression(Type.list_of(Type.list_of(Type.int())), [[1], [2]], ident="a[0]"))
+                        in str(context.exception))
 
         with self.assertRaises(CompileError) as context:
             generate_commands("""
@@ -393,8 +396,9 @@ class AssignListElemTest(unittest.TestCase):
                  a[0][1][1] <- 1;
                 }
                 """)
-        self.assertTrue(
-            "List a[0][1] has length 1, but has been assessed with out-of-range index 1" in str(context.exception))
+        self.assertTrue("List {} has length 1, but has been assessed with out-of-range index 1"
+                        .format(Expression(Type.list_of(Type.int()), [2], ident="a[0][1]"))
+                        in str(context.exception))
 
     def test_assign_list_elem_not_declared_variable_should_give_error(self):
         with self.assertRaises(CompileError) as context:

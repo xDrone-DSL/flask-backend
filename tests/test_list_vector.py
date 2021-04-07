@@ -86,7 +86,7 @@ class ListTest(unittest.TestCase):
                 """.format(type))
 
         self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
-                        .format("a", 2, 2)
+                        .format(Expression(Type.list_of(Type.int()), [1, 2], ident="a"), 2, 2)
                         in str(context.exception))
 
         with self.assertRaises(CompileError) as context:
@@ -98,7 +98,7 @@ class ListTest(unittest.TestCase):
                 """.format(type))
 
         self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
-                        .format("a", 2, -1)
+                        .format(Expression(Type.list_of(Type.int()), [1, 2], ident="a"), 2, -1)
                         in str(context.exception))
 
     def test_list_elem_expr_should_return_correct_value(self):
@@ -160,7 +160,7 @@ class ListTest(unittest.TestCase):
                 """.format(type))
 
         self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
-                        .format("a", 2, 2)
+                        .format(Expression(Type.list_of(Type.int()), [1, 2], ident="a"), 2, 2)
                         in str(context.exception))
 
         with self.assertRaises(CompileError) as context:
@@ -172,7 +172,283 @@ class ListTest(unittest.TestCase):
                 """.format(type))
 
         self.assertTrue("List {} has length {}, but has been assessed with out-of-range index {}"
-                        .format("a", 2, -1)
+                        .format(Expression(Type.list_of(Type.int()), [1, 2], ident="a"), 2, -1)
+                        in str(context.exception))
+
+
+class ListInsertTest(unittest.TestCase):
+    def test_list_insert_with_index_should_update_symbol_table(self):
+        for index in [0, 1, 2, 3]:
+            actual = SymbolTable()
+            generate_commands("""
+                main () {{
+                  list[int] a <- [1, 2, 3];
+                  a.at({}).insert(0);
+                }}
+                """.format(index), actual)
+            expected = SymbolTable()
+            list = [1, 2, 3]
+            list.insert(index, 0)
+            expected.store("a", Expression(Type.list_of(Type.int()), list, ident="a"))
+            self.assertEqual(expected, actual)
+
+    def test_list_insert_without_index_should_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              list[int] a <- [1, 2, 3];
+              a.insert(0);
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.list_of(Type.int()), [1, 2, 3, 0], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_list_insert_to_empty_list_should_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              list[int] a <- [];
+              a.insert(0);
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.list_of(Type.int()), [0], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_list_insert_to_nested_list_should_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              list[list[int]] a <- [[1], [2], [3]];
+              a[0].insert(0);
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[1, 0], [2], [3]], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_list_insert_to_temp_list_should_not_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              [1].insert(0);
+            }
+            """, actual)
+        expected = SymbolTable()
+        self.assertEqual(expected, actual)
+
+    def test_list_insert_to_temp_empty_list_should_not_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              [].insert(0);
+            }
+            """, actual)
+        expected = SymbolTable()
+        self.assertEqual(expected, actual)
+
+    def test_list_insert_with_wrong_type_index_should_give_error(self):
+        types = [Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      list[int] b <- [1, 2, 3];
+                      b.at(a).insert(0);
+                    }}
+                    """.format(type))
+
+            self.assertTrue("Expression {} should have type int, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_list_insert_to_non_list_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector()]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      a.insert(b);
+                    }}
+                    """.format(type))
+
+            self.assertTrue("Expression {} should have type list, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_list_insert_with_wrong_type_value_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for t1 in types:
+            for t2 in types:
+                if t1 == t2:
+                    continue
+                with self.assertRaises(CompileError) as context:
+                    generate_commands("""
+                        main () {{
+                          {} a;
+                          list[{}] b;
+                          b.insert(a);
+                        }}
+                        """.format(t1, t2))
+                self.assertTrue("List {} has been declared as {}, but inserted with element type {}"
+                                .format(Expression(Type.list_of(t2), [], ident="b"), Type.list_of(t2), t1)
+                                in str(context.exception))
+
+    def test_list_insert_with_out_of_range_index_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {
+                  list[int] a <- [1, 2, 3];
+                  a.at(-1).insert(0);
+                }
+                """)
+        self.assertTrue("List {} has length {}, but has been inserted at out-of-range index {}"
+                        .format(Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"), 3, -1)
+                        in str(context.exception))
+
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {
+                  list[int] a <- [1, 2, 3];
+                  a.at(4).insert(0);
+                }
+                """)
+        self.assertTrue("List {} has length {}, but has been inserted at out-of-range index {}"
+                        .format(Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"), 3, 4)
+                        in str(context.exception))
+
+
+class ListRemoveTest(unittest.TestCase):
+    def test_list_remove_with_index_should_update_symbol_table(self):
+        for index in [0, 1, 2]:
+            actual = SymbolTable()
+            generate_commands("""
+                main () {{
+                  list[int] a <- [1, 2, 3];
+                  a.at({}).remove();
+                }}
+                """.format(index), actual)
+            expected = SymbolTable()
+            list = [1, 2, 3]
+            list.pop(index)
+            expected.store("a", Expression(Type.list_of(Type.int()), list, ident="a"))
+            self.assertEqual(expected, actual)
+
+    def test_list_remove_without_index_should_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              list[int] a <- [1, 2, 3];
+              a.remove();
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.list_of(Type.int()), [1, 2], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_list_remove_from_empty_list_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {
+                  list[int] a <- [];
+                  a.remove();
+                }
+                """)
+        self.assertTrue("List {} has length {}, but has been removed at out-of-range index {}"
+                        .format(Expression(Type.list_of(Type.int()), [], ident="a"), 0, -1)
+                        in str(context.exception))
+
+    def test_list_remove_from_nested_list_should_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              list[list[int]] a <- [[1], [2], [3]];
+              a[0].remove();
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[], [2], [3]], ident="a"))
+        self.assertEqual(expected, actual)
+
+    def test_list_remove_from_temp_list_should_not_update_symbol_table(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              [1].remove();
+            }
+            """, actual)
+        expected = SymbolTable()
+        self.assertEqual(expected, actual)
+
+    def test_list_remove_from_temp_empty_list_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {
+                  [].remove();
+                }
+                """)
+        self.assertTrue("List {} has length {}, but has been removed at out-of-range index {}"
+                        .format(Expression(Type.empty_list(), []), 0, -1)
+                        in str(context.exception))
+
+    def test_list_remove_with_wrong_type_index_should_give_error(self):
+        types = [Type.decimal(), Type.string(), Type.boolean(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      list[int] b <- [1, 2, 3];
+                      b.at(a).remove();
+                    }}
+                    """.format(type))
+
+            self.assertTrue("Expression {} should have type int, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_list_remove_from_non_list_should_give_error(self):
+        types = [Type.int(), Type.decimal(), Type.string(), Type.boolean(), Type.vector()]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      a.remove();
+                    }}
+                    """.format(type))
+
+            self.assertTrue("Expression {} should have type list, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
+    def test_list_remove_with_out_of_range_index_should_give_error(self):
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {
+                  list[int] a <- [1, 2, 3];
+                  a.at(-1).remove();
+                }
+                """)
+        self.assertTrue("List {} has length {}, but has been removed at out-of-range index {}"
+                        .format(Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"), 3, -1)
+                        in str(context.exception))
+
+        with self.assertRaises(CompileError) as context:
+            generate_commands("""
+                main () {
+                  list[int] a <- [1, 2, 3];
+                  a.at(3).remove();
+                }
+                """)
+        self.assertTrue("List {} has length {}, but has been removed at out-of-range index {}"
+                        .format(Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"), 3, 3 )
                         in str(context.exception))
 
 
