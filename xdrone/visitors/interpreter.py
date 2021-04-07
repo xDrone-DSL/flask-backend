@@ -111,55 +111,37 @@ class Interpreter(xDroneParserVisitor):
         self.symbol_table.store(ident, expr_with_ident)
         return []
 
+    def _unfold_nested_list(self, ident: str) -> (str, list, list):
+        if "[" in ident:
+            tokens = ident.split("[")
+            ident = tokens[0]
+            indices = [int(token.replace("]", "")) for token in tokens[1:]]
+        else:
+            indices = []
+        assert ident in self.symbol_table
+        new_list = self.symbol_table.get_expression(ident).value
+        inner = new_list
+        for i in indices:
+            inner = inner[i]
+        return ident, new_list, inner
+
     def _insert_nested_ident(self, ident: Optional[str], expr: Expression, index: int) -> None:
-        # TODO extract
         if ident is not None:
-            if "[" in ident:
-                tokens = ident.split("[")
-                ident = tokens[0]
-                indices = [int(token.replace("]", "")) for token in tokens[1:]]
-            else:
-                indices = []
-            assert ident in self.symbol_table
-            new_list = self.symbol_table.get_expression(ident).value
-            curr = new_list
-            for i in indices:
-                curr = curr[i]
-            curr.insert(index, expr.value)
-            self.symbol_table.update(ident, new_list)
+            new_ident, new_list, inner = self._unfold_nested_list(ident)
+            inner.insert(index, expr.value)
+            self.symbol_table.update(new_ident, new_list)
 
     def _remove_nested_ident(self, ident: Optional[str], index: int) -> None:
-        # TODO extract
         if ident is not None:
-            if "[" in ident:
-                tokens = ident.split("[")
-                ident = tokens[0]
-                indices = [int(token.replace("]", "")) for token in tokens[1:]]
-            else:
-                indices = []
-            assert ident in self.symbol_table
-            new_list = self.symbol_table.get_expression(ident).value
-            curr = new_list
-            for i in indices:
-                curr = curr[i]
-            curr.pop(index)
-            self.symbol_table.update(ident, new_list)
+            new_ident, new_list, inner = self._unfold_nested_list(ident)
+            inner.pop(index)
+            self.symbol_table.update(new_ident, new_list)
 
     def _update_nested_ident(self, ident: Optional[str], expr: Expression, index: int) -> None:
         if ident is not None:
-            if "[" in ident:
-                tokens = ident.split("[")
-                ident = tokens[0]
-                indices = [int(token.replace("]", "")) for token in tokens[1:]]
-            else:
-                indices = []
-            assert ident in self.symbol_table
-            new_list = self.symbol_table.get_expression(ident).value
-            curr = new_list
-            for i in indices:
-                curr = curr[i]
-            curr[index] = expr.value
-            self.symbol_table.update(ident, new_list)
+            new_ident, new_list, inner = self._unfold_nested_list(ident)
+            inner[index] = expr.value
+            self.symbol_table.update(new_ident, new_list)
 
     def visitAssignVectorElem(self, ctx: xDroneParser.AssignVectorElemContext) -> List[Command]:
         vector_elem, expr = self.visit(ctx.vectorElem()), self.visit(ctx.expr())
