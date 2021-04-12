@@ -28,11 +28,12 @@ command
   | DEL ident SEMICOLON                                                              #del
   | expr (DOT AT L_PAR expr R_PAR)? DOT INSERT L_PAR expr R_PAR SEMICOLON            #insert
   | expr (DOT AT L_PAR expr R_PAR)? DOT REMOVE L_PAR R_PAR SEMICOLON                 #remove
-  | call                                                                             #procedureCall
+  | call SEMICOLON                                                                   #procedureCall
   | IF expr L_BRACE commands R_BRACE (ELSE L_BRACE commands R_BRACE)?                #if
   | WHILE expr L_BRACE commands R_BRACE                                              #while
   | FOR ident FROM expr TO expr (STEP expr)? L_BRACE commands R_BRACE                #for
   | REPEAT expr TIMES L_BRACE commands R_BRACE                                       #repeat
+  | RETURN (expr)? SEMICOLON                                                         #return
   ;
 
 ident : IDENT ;
@@ -45,21 +46,17 @@ vectorElem
   | expr DOT VEC_Z                                                          #vectorZ
   ;
 
-call : ident L_PAR (argList)? R_PAR SEMICOLON ;
+funcIdent : IDENT ;
+
+call : funcIdent L_PAR (argList)? R_PAR ;
 
 argList: expr (COMMA expr)* ;
 
 func
-  : FUNCTION ident L_PAR (paramList)? R_PAR RETURN type_ L_BRACE (funcCommand)* R_BRACE      #function
-  | FUNCTION ident L_PAR (paramList)? R_PAR L_BRACE commands R_BRACE                         #procedure
+  : FUNCTION funcIdent L_PAR (paramList)? R_PAR RETURN type_ L_BRACE commands R_BRACE      #function
+  | FUNCTION funcIdent L_PAR (paramList)? R_PAR L_BRACE commands R_BRACE                   #procedure
   ;
 paramList: type_ ident (COMMA type_ ident)* ;
-
-funcCommand
-  : command
-  | funcReturn
-  ;
-funcReturn : RETURN expr SEMICOLON ;
 
 
 type_

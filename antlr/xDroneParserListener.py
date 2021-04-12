@@ -242,6 +242,15 @@ class xDroneParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by xDroneParser#return.
+    def enterReturn(self, ctx:xDroneParser.ReturnContext):
+        pass
+
+    # Exit a parse tree produced by xDroneParser#return.
+    def exitReturn(self, ctx:xDroneParser.ReturnContext):
+        pass
+
+
     # Enter a parse tree produced by xDroneParser#ident.
     def enterIdent(self, ctx:xDroneParser.IdentContext):
         pass
@@ -287,6 +296,15 @@ class xDroneParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by xDroneParser#funcIdent.
+    def enterFuncIdent(self, ctx:xDroneParser.FuncIdentContext):
+        pass
+
+    # Exit a parse tree produced by xDroneParser#funcIdent.
+    def exitFuncIdent(self, ctx:xDroneParser.FuncIdentContext):
+        pass
+
+
     # Enter a parse tree produced by xDroneParser#call.
     def enterCall(self, ctx:xDroneParser.CallContext):
         pass
@@ -329,24 +347,6 @@ class xDroneParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by xDroneParser#paramList.
     def exitParamList(self, ctx:xDroneParser.ParamListContext):
-        pass
-
-
-    # Enter a parse tree produced by xDroneParser#funcCommand.
-    def enterFuncCommand(self, ctx:xDroneParser.FuncCommandContext):
-        pass
-
-    # Exit a parse tree produced by xDroneParser#funcCommand.
-    def exitFuncCommand(self, ctx:xDroneParser.FuncCommandContext):
-        pass
-
-
-    # Enter a parse tree produced by xDroneParser#funcReturn.
-    def enterFuncReturn(self, ctx:xDroneParser.FuncReturnContext):
-        pass
-
-    # Exit a parse tree produced by xDroneParser#funcReturn.
-    def exitFuncReturn(self, ctx:xDroneParser.FuncReturnContext):
         pass
 
 

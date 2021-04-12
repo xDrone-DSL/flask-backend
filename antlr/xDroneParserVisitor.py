@@ -139,6 +139,11 @@ class xDroneParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by xDroneParser#return.
+    def visitReturn(self, ctx:xDroneParser.ReturnContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by xDroneParser#ident.
     def visitIdent(self, ctx:xDroneParser.IdentContext):
         return self.visitChildren(ctx)
@@ -164,6 +169,11 @@ class xDroneParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by xDroneParser#funcIdent.
+    def visitFuncIdent(self, ctx:xDroneParser.FuncIdentContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by xDroneParser#call.
     def visitCall(self, ctx:xDroneParser.CallContext):
         return self.visitChildren(ctx)
@@ -186,16 +196,6 @@ class xDroneParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by xDroneParser#paramList.
     def visitParamList(self, ctx:xDroneParser.ParamListContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by xDroneParser#funcCommand.
-    def visitFuncCommand(self, ctx:xDroneParser.FuncCommandContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by xDroneParser#funcReturn.
-    def visitFuncReturn(self, ctx:xDroneParser.FuncReturnContext):
         return self.visitChildren(ctx)
 
 

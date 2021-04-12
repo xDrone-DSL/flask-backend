@@ -47,12 +47,6 @@ def generate_simulation_json(program):
 
 
 def generate_commands(program, symbol_table=None):
-    def _flatten(commands: NestedCommands) -> List[Command]:
-        if isinstance(commands, list):
-            return [a for i in commands for a in _flatten(i)]
-        else:
-            return [commands]
-
     inputStream = antlr4.InputStream(program)
     # lexing
     lexer = xDroneLexer(inputStream)
@@ -61,16 +55,4 @@ def generate_commands(program, symbol_table=None):
     parser = xDroneParser(stream)
     tree = parser.prog()
 
-    return _flatten(Interpreter(symbol_table).visit(tree))
-
-if __name__ == '__main__':
-    commands = generate_commands("""
-    main() {
-      int i;
-      for i from 0 to 10 step 2 {
-        forward(i);
-      }
-      del i;
-    }
-    """)
-    for c in commands: print(c)
+    return Interpreter(symbol_table).visit(tree)

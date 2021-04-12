@@ -1,11 +1,11 @@
-from typing import List, Callable, Union, Optional
+from typing import List, Optional
 
 from antlr.xDroneParser import xDroneParser
 from antlr.xDroneParserVisitor import xDroneParserVisitor
-from xdrone import NestedCommands
 from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError
-from xdrone.visitors.compiler_utils.expressions import Identifier, ListElem, VectorElem, Expression, AbstractExpression
+from xdrone.visitors.compiler_utils.expressions import Identifier, ListElem, VectorElem, Expression
+from xdrone.visitors.compiler_utils.functions import FunctionTable, Function, Parameter, FunctionIdentifier
 from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type import Type, ListType, EmptyList
 
@@ -14,102 +14,112 @@ class Interpreter(xDroneParserVisitor):
 
     def __init__(self, symbol_table):
         super().__init__()
-        self.symbol_table = SymbolTable() if symbol_table is None else symbol_table
+        self.function_table = FunctionTable()
+        self.symbol_table = [SymbolTable() if symbol_table is None else symbol_table]
+        self.returned = [False]
+        self.returned_value = [[]]
+        self.commands = []
+
+    def _get_latest_symbol_table(self):
+        return self.symbol_table[-1]
 
     ######## prog ########
 
-    def visitProg(self, ctx: xDroneParser.ProgContext) -> List[NestedCommands]:
-        # #TODO visit functions
-        commands = self.visit(ctx.commands())
+    def visitProg(self, ctx: xDroneParser.ProgContext) -> List[Command]:
+        for func in ctx.func():
+            self.visit(func)
+        self.visit(ctx.commands())
+        commands = self.commands
+        self.commands = []
         return commands
 
     ######## commands ########
 
-    def visitCommands(self, ctx: xDroneParser.CommandsContext) -> List[NestedCommands]:
-        commands = [self.visit(c) for c in ctx.command()]
-        return commands
+    def visitCommands(self, ctx: xDroneParser.CommandsContext) -> None:
+        for command in ctx.command():
+            if self.returned[-1]:
+                break
+            self.visit(command)
 
     ######## command ########
 
-    def visitTakeoff(self, ctx: xDroneParser.TakeoffContext) -> List[Command]:
-        return [Command.takeoff()]
+    def visitTakeoff(self, ctx: xDroneParser.TakeoffContext) -> None:
+        self.commands.append(Command.takeoff())
 
-    def visitLand(self, ctx: xDroneParser.LandContext) -> List[Command]:
-        return [Command.land()]
+    def visitLand(self, ctx: xDroneParser.LandContext) -> None:
+        self.commands.append(Command.land())
 
-    def visitUp(self, ctx: xDroneParser.UpContext) -> List[Command]:
+    def visitUp(self, ctx: xDroneParser.UpContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.up(expr.value)]
+        self.commands.append(Command.up(expr.value))
 
-    def visitDown(self, ctx: xDroneParser.DownContext) -> List[Command]:
+    def visitDown(self, ctx: xDroneParser.DownContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.down(expr.value)]
+        self.commands.append(Command.down(expr.value))
 
-    def visitLeft(self, ctx: xDroneParser.LeftContext) -> List[Command]:
+    def visitLeft(self, ctx: xDroneParser.LeftContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.left(expr.value)]
+        self.commands.append(Command.left(expr.value))
 
-    def visitRight(self, ctx: xDroneParser.RightContext) -> List[Command]:
+    def visitRight(self, ctx: xDroneParser.RightContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.right(expr.value)]
+        self.commands.append(Command.right(expr.value))
 
-    def visitForward(self, ctx: xDroneParser.ForwardContext) -> List[Command]:
+    def visitForward(self, ctx: xDroneParser.ForwardContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.forward(expr.value)]
+        self.commands.append(Command.forward(expr.value))
 
-    def visitBackward(self, ctx: xDroneParser.BackwardContext) -> List[Command]:
+    def visitBackward(self, ctx: xDroneParser.BackwardContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.backward(expr.value)]
+        self.commands.append(Command.backward(expr.value))
 
-    def visitRotateLeft(self, ctx: xDroneParser.RotateLeftContext) -> List[Command]:
+    def visitRotateLeft(self, ctx: xDroneParser.RotateLeftContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.rotate_left(expr.value)]
+        self.commands.append(Command.rotate_left(expr.value))
 
-    def visitRotateRight(self, ctx: xDroneParser.RotateRightContext) -> List[Command]:
+    def visitRotateRight(self, ctx: xDroneParser.RotateRightContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.rotate_right(expr.value)]
+        self.commands.append(Command.rotate_right(expr.value))
 
-    def visitWait(self, ctx: xDroneParser.WaitContext) -> List[Command]:
+    def visitWait(self, ctx: xDroneParser.WaitContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return [Command.wait(expr.value)]
+        self.commands.append(Command.wait(expr.value))
 
-    def visitDeclare(self, ctx: xDroneParser.DeclareContext) -> List[Command]:
+    def visitDeclare(self, ctx: xDroneParser.DeclareContext) -> None:
         type, identifier = self.visit(ctx.type_()), self.visit(ctx.ident())
         ident = identifier.ident
-        if ident in self.symbol_table:
+        if ident in self._get_latest_symbol_table():
             raise CompileError("Identifier {} already declared".format(ident))
-        self.symbol_table.store(ident, Expression(type, type.default_value, ident=ident))
-        return []
+        self._get_latest_symbol_table().store(ident, Expression(type, type.default_value, ident=ident))
 
-    def visitDeclareAssign(self, ctx: xDroneParser.DeclareAssignContext) -> List[Command]:
+    def visitDeclareAssign(self, ctx: xDroneParser.DeclareAssignContext) -> None:
         type, identifier, expr = self.visit(ctx.type_()), self.visit(ctx.ident()), self.visit(ctx.expr())
         ident = identifier.ident
-        if ident in self.symbol_table:
+        if ident in self._get_latest_symbol_table():
             raise CompileError("Identifier {} already declared".format(ident))
         if expr.type != type:
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
                                .format(ident, type, expr.type))
         expr_with_ident = Expression(type, expr.value, ident)
-        self.symbol_table.store(ident, expr_with_ident)
-        return []
+        self._get_latest_symbol_table().store(ident, expr_with_ident)
 
     def _unfold_nested_list(self, ident: str) -> (str, list, list):
         if "[" in ident:
@@ -118,8 +128,8 @@ class Interpreter(xDroneParserVisitor):
             indices = [int(token.replace("]", "")) for token in tokens[1:]]
         else:
             indices = []
-        assert ident in self.symbol_table
-        new_list = self.symbol_table.get_expression(ident).value
+        assert ident in self._get_latest_symbol_table()
+        new_list = self._get_latest_symbol_table().get_expression(ident).value
         inner = new_list
         for i in indices:
             inner = inner[i]
@@ -129,21 +139,21 @@ class Interpreter(xDroneParserVisitor):
         if ident is not None:
             new_ident, new_list, inner = self._unfold_nested_list(ident)
             inner.insert(index, expr.value)
-            self.symbol_table.update(new_ident, new_list)
+            self._get_latest_symbol_table().update(new_ident, new_list)
 
     def _remove_nested_ident(self, ident: Optional[str], index: int) -> None:
         if ident is not None:
             new_ident, new_list, inner = self._unfold_nested_list(ident)
             inner.pop(index)
-            self.symbol_table.update(new_ident, new_list)
+            self._get_latest_symbol_table().update(new_ident, new_list)
 
     def _update_nested_ident(self, ident: Optional[str], expr: Expression, index: int) -> None:
         if ident is not None:
             new_ident, new_list, inner = self._unfold_nested_list(ident)
             inner[index] = expr.value
-            self.symbol_table.update(new_ident, new_list)
+            self._get_latest_symbol_table().update(new_ident, new_list)
 
-    def visitAssignVectorElem(self, ctx: xDroneParser.AssignVectorElemContext) -> List[Command]:
+    def visitAssignVectorElem(self, ctx: xDroneParser.AssignVectorElemContext) -> None:
         vector_elem, expr = self.visit(ctx.vectorElem()), self.visit(ctx.expr())
         ident = vector_elem.ident
         vector = vector_elem.container
@@ -151,9 +161,8 @@ class Interpreter(xDroneParserVisitor):
         if expr.type != Type.decimal():
             raise CompileError("Assigned value {} should have type decimal, but is {}".format(expr, expr.type))
         self._update_nested_ident(ident, expr, index)
-        return []
 
-    def visitAssignListElem(self, ctx: xDroneParser.AssignListElemContext) -> List[Command]:
+    def visitAssignListElem(self, ctx: xDroneParser.AssignListElemContext) -> None:
         list_elem, expr = self.visit(ctx.listElem()), self.visit(ctx.expr())
         ident = list_elem.ident
         list = list_elem.container
@@ -164,30 +173,27 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("Assigned value {} should have type {}, but is {}"
                                .format(expr, declared_type, assigned_type))
         self._update_nested_ident(ident, expr, index)
-        return []
 
-    def visitAssignIdent(self, ctx: xDroneParser.AssignIdentContext) -> List[Command]:
+    def visitAssignIdent(self, ctx: xDroneParser.AssignIdentContext) -> None:
         identifier, expr = self.visit(ctx.ident()), self.visit(ctx.expr())
         ident = identifier.ident
-        if ident not in self.symbol_table:
+        if ident not in self._get_latest_symbol_table():
             raise CompileError("Identifier {} has not been declared".format(ident))
         assigned_type = expr.type
-        declared_type = self.symbol_table.get_expression(ident).type
+        declared_type = self._get_latest_symbol_table().get_expression(ident).type
         if assigned_type != declared_type:
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
                                .format(ident, declared_type, assigned_type))
-        self.symbol_table.update(ident, expr.value)
-        return []
+        self._get_latest_symbol_table().update(ident, expr.value)
 
-    def visitDel(self, ctx: xDroneParser.DelContext) -> List[Command]:
+    def visitDel(self, ctx: xDroneParser.DelContext) -> None:
         identifier = self.visit(ctx.ident())
         ident = identifier.ident
-        if ident not in self.symbol_table:
+        if ident not in self._get_latest_symbol_table():
             raise CompileError("Identifier {} has not been declared".format(ident))
-        self.symbol_table.delete(ident)
-        return []
+        self._get_latest_symbol_table().delete(ident)
 
-    def visitInsert(self, ctx: xDroneParser.InsertContext) -> List[Command]:
+    def visitInsert(self, ctx: xDroneParser.InsertContext) -> None:
         list = self.visit(ctx.expr(0))
         if not isinstance(list.type, ListType):
             raise CompileError("Expression {} should have type list, but is {}".format(list, list.type))
@@ -206,9 +212,8 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("List {} has been declared as {}, but inserted with element type {}"
                                .format(list, list.type, value.type))
         self._insert_nested_ident(list.ident, value, index.value)
-        return []
 
-    def visitRemove(self, ctx: xDroneParser.RemoveContext) -> List[Command]:
+    def visitRemove(self, ctx: xDroneParser.RemoveContext) -> None:
         list = self.visit(ctx.expr(0))
         if not isinstance(list.type, ListType):
             raise CompileError("Expression {} should have type list, but is {}".format(list, list.type))
@@ -222,40 +227,34 @@ class Interpreter(xDroneParserVisitor):
             raise CompileError("List {} has length {}, but has been removed at out-of-range index {}"
                                .format(list, len(list.value), index.value))
         self._remove_nested_ident(list.ident, index.value)
-        return []
 
-    def visitProcedureCall(self, ctx: xDroneParser.ProcedureCallContext):
-        # TODO
-        return self.visitChildren(ctx)
+    def visitProcedureCall(self, ctx: xDroneParser.ProcedureCallContext) -> None:
+        return self.visit(ctx.call())
 
-    def visitIf(self, ctx: xDroneParser.IfContext) -> List[NestedCommands]:
+    def visitIf(self, ctx: xDroneParser.IfContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.boolean():
             raise CompileError("Expression {} should have type boolean, but is {}".format(expr, expr.type))
         if expr.value:
-            return self.visit(ctx.commands(0))
+            self.visit(ctx.commands(0))
         else:
             if ctx.ELSE():
-                return self.visit(ctx.commands(1))
-            else:
-                return []
+                self.visit(ctx.commands(1))
 
-    def visitWhile(self, ctx: xDroneParser.WhileContext) -> List[NestedCommands]:
+    def visitWhile(self, ctx: xDroneParser.WhileContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.boolean():
             raise CompileError("Expression {} should have type boolean, but is {}".format(expr, expr.type))
-        commands = []
         while expr.value:
-            commands.append(self.visit(ctx.commands()))
+            self.visit(ctx.commands())
             expr = self.visit(ctx.expr())
-        return commands
 
-    def visitFor(self, ctx: xDroneParser.ForContext) -> List[NestedCommands]:
+    def visitFor(self, ctx: xDroneParser.ForContext) -> None:
         identifier, expr1, expr2 = self.visit(ctx.ident()), self.visit(ctx.expr(0)), self.visit(ctx.expr(1))
         ident = identifier.ident
-        if ident not in self.symbol_table:
+        if ident not in self._get_latest_symbol_table():
             raise CompileError("Identifier {} has not been declared".format(ident))
-        declared_type = self.symbol_table.get_expression(ident).type
+        declared_type = self._get_latest_symbol_table().get_expression(ident).type
         if declared_type != Type.int():
             raise CompileError("Identifier {} has been declared as {}, but assigned as {}"
                                .format(ident, declared_type, Type.int()))
@@ -272,26 +271,35 @@ class Interpreter(xDroneParserVisitor):
         else:
             step = 1
 
-        commands = []
         for i in range(expr1.value, expr2.value + 1, step):
-            self.symbol_table.update(ident, i)
-            commands.append(self.visit(ctx.commands()))
+            self._get_latest_symbol_table().update(ident, i)
+            self.visit(ctx.commands())
 
-        return commands
-
-    def visitRepeat(self, ctx: xDroneParser.RepeatContext) -> List[NestedCommands]:
-        expr, commands = self.visit(ctx.expr()), self.visit(ctx.commands())
+    def visitRepeat(self, ctx: xDroneParser.RepeatContext) -> None:
+        expr = self.visit(ctx.expr())
         if expr.type != Type.int():
             raise CompileError("Expression {} should have type int, but is {}".format(expr, expr.type))
         times = expr.value
-        return [commands for _ in range(times)]
+
+        for _ in range(times):
+            self.visit(ctx.commands())
+
+    def visitReturn(self, ctx: xDroneParser.ReturnContext) -> None:
+        if len(self.returned) == 1:
+            raise CompileError("Cannot run return in the Main function")
+        self.returned[-1] = True  # order important
+        if ctx.expr():
+            expr = self.visit(ctx.expr())
+            self.returned_value[-1].append(Expression(expr.type, expr.value, ident=None))
+        else:
+            self.returned_value[-1].append(None)
 
     ######## ident ########
 
     def visitIdent(self, ctx: xDroneParser.IdentContext) -> Identifier:
         ident = ctx.IDENT().getText()
-        if ident in self.symbol_table:
-            return Identifier(str(ident), self.symbol_table.get_expression(ident))
+        if ident in self._get_latest_symbol_table():
+            return Identifier(str(ident), self._get_latest_symbol_table().get_expression(ident))
         return Identifier(str(ident), None)
 
     ######## list_elem ########
@@ -328,41 +336,7 @@ class Interpreter(xDroneParserVisitor):
         return VectorElem(expr.ident, expr, 2)
 
     ######## functions ########
-
-    # Visit a parse tree produced by xDroneParser#call.
-    def visitCall(self, ctx: xDroneParser.CallContext):
-        # TODO
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by xDroneParser#argList.
-    def visitArgList(self, ctx: xDroneParser.ArgListContext):
-        # TODO
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by xDroneParser#function.
-    def visitFunction(self, ctx: xDroneParser.FunctionContext):
-        # TODO
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by xDroneParser#procedure.
-    def visitProcedure(self, ctx: xDroneParser.ProcedureContext):
-        # TODO
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by xDroneParser#paramList.
-    def visitParamList(self, ctx: xDroneParser.ParamListContext):
-        # TODO
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by xDroneParser#funcCommand.
-    def visitFuncCommand(self, ctx: xDroneParser.FuncCommandContext):
-        # TODO
-        return self.visitChildren(ctx)
-
-    # Visit a parse tree produced by xDroneParser#funcReturn.
-    def visitFuncReturn(self, ctx: xDroneParser.FuncReturnContext):
-        # TODO
-        return self.visitChildren(ctx)
+    # TODO
 
     ######## type ########
 
@@ -408,8 +382,8 @@ class Interpreter(xDroneParserVisitor):
 
     def visitIdentExpr(self, ctx: xDroneParser.IdentExprContext) -> Expression:
         identifier = self.visit(ctx.ident())
-        if identifier.ident not in self.symbol_table:
-            # identifier.expression is None iff child.ident not in self.symbol_table
+        if identifier.ident not in self._get_latest_symbol_table():
+            # identifier.expression is None iff child.ident not in latest symbol table
             raise CompileError("Identifier {} has not been declared".format(identifier.ident))
         return identifier.to_expression()
 
@@ -458,8 +432,7 @@ class Interpreter(xDroneParserVisitor):
         return Expression(Type.vector(), [expr1.value, expr2.value, expr3.value])
 
     def visitFunctionCall(self, ctx: xDroneParser.FunctionCallContext) -> Expression:
-        # TODO
-        return self.visitChildren(ctx)
+        return self.visit(ctx.call())
 
     def visitSize(self, ctx: xDroneParser.SizeContext) -> Expression:
         expr = self.visit(ctx.expr())
