@@ -49,8 +49,16 @@ class TestSymbolTable(unittest.TestCase):
         self.assertEqual(Type.int(), st.get_expression("a").type)
         self.assertEqual(2, st.get_expression("a").value)
 
+    def test_delete(self):
+        st = SymbolTable()
+        st.store("a", Expression(Type.int(), 1))
+        self.assertTrue("a" in st)
+        st.delete("a")
+        self.assertFalse("a" in st)
+
     def test_get_expression(self):
         st = SymbolTable()
+        self.assertRaises(AssertionError, st.get_expression, "a")
         st.store("a", Expression(Type.list_of(Type.int()), [1]))
         self.assertEqual([1], st.get_expression("a").value)
         self.assertEqual(1, st.get_expression("a").value[0])
