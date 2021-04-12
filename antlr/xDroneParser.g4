@@ -54,7 +54,7 @@ argList: expr (COMMA expr)* ;
 
 func
   : FUNCTION funcIdent L_PAR (paramList)? R_PAR RETURN type_ L_BRACE commands R_BRACE      #function
-  | FUNCTION funcIdent L_PAR (paramList)? R_PAR L_BRACE commands R_BRACE                   #procedure
+  | PROCEDURE funcIdent L_PAR (paramList)? R_PAR L_BRACE commands R_BRACE                  #procedure
   ;
 paramList: type_ ident (COMMA type_ ident)* ;
 

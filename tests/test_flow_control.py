@@ -78,6 +78,18 @@ class IfTest(unittest.TestCase):
         expected_commands = [Command.forward(3)]
         self.assertEqual(expected_commands, actual_commands)
 
+    def test_if_with_error_commands_not_entering_should_not_give_error(self):
+        actual_commands = generate_commands("""
+            main () {
+              if false {
+                int a <- "error";
+                forward(1);
+              }
+            }
+            """)
+        expected_commands = []
+        self.assertEqual(expected_commands, actual_commands)
+
     def test_if_wrong_type_should_give_error(self):
         types = [Type.int(), Type.decimal(), Type.string(), Type.vector(), Type.list_of(Type.int()),
                  Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
@@ -131,6 +143,17 @@ class WhileTest(unittest.TestCase):
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 10, ident="a"))
         self.assertEqual(expected, actual)
+        expected_commands = []
+        self.assertEqual(expected_commands, actual_commands)
+
+    def test_while_with_error_command_not_entering_should_not_give_error(self):
+        actual_commands = generate_commands("""
+            main () {
+              while false {
+                int a <- "error";
+              }
+            }
+            """)
         expected_commands = []
         self.assertEqual(expected_commands, actual_commands)
 
@@ -209,6 +232,18 @@ class ForTest(unittest.TestCase):
         expected_st.store("i", Expression(Type.int(), 0, ident="i"))
         expected_st.store("a", Expression(Type.int(), 0, ident="a"))
         self.assertEqual(expected_st, actual_st)
+        expected_commands = []
+        self.assertEqual(expected_commands, actual_commands)
+
+    def test_for_with_error_commands_not_entering_should_not_give_error(self):
+        actual_commands = generate_commands("""
+            main () {
+              int i;
+              for i from 10 to 5 {
+                int a <- "error";
+              }
+            }
+            """)
         expected_commands = []
         self.assertEqual(expected_commands, actual_commands)
 

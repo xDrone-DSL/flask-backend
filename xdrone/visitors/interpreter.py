@@ -12,12 +12,12 @@ from xdrone.visitors.compiler_utils.type import Type, ListType, EmptyList
 
 class Interpreter(xDroneParserVisitor):
 
-    def __init__(self, symbol_table):
+    def __init__(self, symbol_table, function_table):
         super().__init__()
-        self.function_table = FunctionTable()
         self.symbol_table = [SymbolTable() if symbol_table is None else symbol_table]
+        self.function_table = FunctionTable() if function_table is None else function_table
         self.returned = [False]
-        self.returned_value = [[]]
+        self.returned_value = []
         self.commands = []
 
     def _get_latest_symbol_table(self):
@@ -229,7 +229,10 @@ class Interpreter(xDroneParserVisitor):
         self._remove_nested_ident(list.ident, index.value)
 
     def visitProcedureCall(self, ctx: xDroneParser.ProcedureCallContext) -> None:
-        return self.visit(ctx.call())
+        call = self.visit(ctx.call())
+        if call is not None:
+            raise CompileError("Procedure call should not return any expression, but {} is returned".format(call))
+        return call
 
     def visitIf(self, ctx: xDroneParser.IfContext) -> None:
         expr = self.visit(ctx.expr())
@@ -286,13 +289,11 @@ class Interpreter(xDroneParserVisitor):
 
     def visitReturn(self, ctx: xDroneParser.ReturnContext) -> None:
         if len(self.returned) == 1:
-            raise CompileError("Cannot run return in the Main function")
+            raise CompileError("Cannot return in the Main function")
         self.returned[-1] = True  # order important
         if ctx.expr():
             expr = self.visit(ctx.expr())
-            self.returned_value[-1].append(Expression(expr.type, expr.value, ident=None))
-        else:
-            self.returned_value[-1].append(None)
+            self.returned_value[-1] = Expression(expr.type, expr.value, ident=None)
 
     ######## ident ########
 
@@ -336,7 +337,78 @@ class Interpreter(xDroneParserVisitor):
         return VectorElem(expr.ident, expr, 2)
 
     ######## functions ########
-    # TODO
+
+    def visitFuncIdent(self, ctx: xDroneParser.FuncIdentContext):
+        ident = ctx.IDENT().getText()
+        return FunctionIdentifier(str(ident))
+
+    def visitCall(self, ctx: xDroneParser.CallContext) -> Optional[Expression]:
+        func_identifier = self.visit(ctx.funcIdent())
+        ident = func_identifier.ident
+        arg_list = self.visit(ctx.argList()) if ctx.argList() else []
+        if ident not in self.function_table:
+            raise CompileError("Function or procedure {} has not been defined".format(ident))
+        function = self.function_table.get_function(ident)
+        arg_types = [arg.type for arg in arg_list]
+        param_types = [param.type for param in function.param_list]
+        if arg_types != param_types:
+            raise CompileError("Arguments when calling function or procedure {} should have types {}, but is {}"
+                               .format(ident, [str(type) for type in param_types], [str(type) for type in arg_types]))
+        new_symbol_table = SymbolTable()
+        param_idents = [param.ident for param in function.param_list]
+        for param_ident, expr in zip(param_idents, arg_list):
+            new_symbol_table.store(param_ident, expr)
+
+        self.symbol_table.append(new_symbol_table)
+        self.returned.append(False)
+        self.returned_value.append(None)
+        self.visit(function.get_commands())
+        returned_value = self.returned_value.pop(-1)
+        self.returned.pop(-1)
+        self.symbol_table.pop(-1)
+        if function.return_type is None:
+            if returned_value is not None:
+                raise CompileError("Procedure {} should not return anything, but {} is returned"
+                                   .format(ident, returned_value))
+            return None
+        else:
+            if returned_value is None:
+                raise CompileError("Function {} has returned type {}, but nothing is returned"
+                                   .format(ident, function.return_type))
+            if returned_value.type != function.return_type:
+                raise CompileError("Function {} has returned type {}, but {} is returned"
+                                   .format(ident, function.return_type, returned_value.type))
+            return returned_value
+
+    def visitArgList(self, ctx: xDroneParser.ArgListContext) -> List[Expression]:
+        exprs = [self.visit(expr) for expr in ctx.expr()]
+        return exprs
+
+    def visitFunction(self, ctx: xDroneParser.FunctionContext) -> None:
+        func_identifier, return_type = self.visit(ctx.funcIdent()), self.visit(ctx.type_())
+        ident = func_identifier.ident
+        if ident in self.function_table:
+            raise CompileError("Function or procedure {} already defined".format(ident))
+        param_list = self.visit(ctx.paramList()) if ctx.paramList() else []
+        self.function_table.store(ident, Function(ident, param_list, return_type, ctx.commands()))
+
+    def visitProcedure(self, ctx: xDroneParser.ProcedureContext) -> None:
+        func_identifier = self.visit(ctx.funcIdent())
+        ident = func_identifier.ident
+        if ident in self.function_table:
+            raise CompileError("Function or procedure {} already defined".format(ident))
+        param_list = self.visit(ctx.paramList()) if ctx.paramList() else []
+        self.function_table.store(ident, Function(ident, param_list, None, ctx.commands()))
+
+    def visitParamList(self, ctx: xDroneParser.ParamListContext) -> List[Parameter]:
+        types = [self.visit(type) for type in ctx.type_()]
+        idents = [self.visit(ident).ident for ident in ctx.ident()]
+        if len(idents) != len(set(idents)):
+            raise CompileError("Parameter names are duplicated in {}".format(idents))
+        parameters = []
+        for type, ident in zip(types, idents):
+            parameters.append(Parameter(ident, type))
+        return parameters
 
     ######## type ########
 
@@ -432,7 +504,10 @@ class Interpreter(xDroneParserVisitor):
         return Expression(Type.vector(), [expr1.value, expr2.value, expr3.value])
 
     def visitFunctionCall(self, ctx: xDroneParser.FunctionCallContext) -> Expression:
-        return self.visit(ctx.call())
+        call = self.visit(ctx.call())
+        if call is None:
+            raise CompileError("Function call should return an expression, but nothing is returned")
+        return call
 
     def visitSize(self, ctx: xDroneParser.SizeContext) -> Expression:
         expr = self.visit(ctx.expr())

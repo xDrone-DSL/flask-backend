@@ -44,6 +44,12 @@ class Parameter:
 
 
 class Function:
+    """
+    Note that the attribute `commands` is a list of antlr contexts, which is difficult to compare and copy,
+    so we do NOT regard the attribute `commands` as a property of a Function object,
+    e.g. in __eq__ the attribute `commands` will not be compared,
+    in __str__ the attribute `commands` will not be printed
+    """
     def __init__(self, ident: str, param_list: List[Parameter], return_type: Optional[Type], commands: list):
         self._ident = ident
         self._param_list = param_list
@@ -62,20 +68,19 @@ class Function:
     def return_type(self) -> Type:
         return copy.deepcopy(self._return_type)
 
-    @property
-    def commands(self) -> list:
+    def get_commands(self) -> list:
         # deepcopy will give error, so use shallow copy
         return self._commands
 
     def __str__(self):
         param_list_str = "[" + ", ".join(map(str, self._param_list)) + "]"
-        return "Function: {{ ident: {}, param_list: {}, return_type: {}, commands: {} }}"\
-            .format(self._ident, param_list_str, self._return_type, self._commands)
+        return "Function: {{ ident: {}, param_list: {}, return_type: {} }}"\
+            .format(self._ident, param_list_str, self._return_type)
 
     def __eq__(self, other):
         if isinstance(other, Function):
             return other._ident == self._ident and other._param_list == self._param_list\
-                   and other._return_type == self._return_type and other._commands == self._commands
+                   and other._return_type == self._return_type
         return False
 
 
@@ -104,5 +109,5 @@ class FunctionTable:
 
     def get_function(self, ident: str) -> Function:
         assert self.__contains__(ident), "Function not in symbol table"
-        # deepcopy will give error, so use shallow copy
+        # deepcopy will give error due to `commands` in Function, so use shallow copy
         return self._function_table[ident]

@@ -46,7 +46,7 @@ def generate_simulation_json(program):
     return [command.to_simulation_json() for command in commands]
 
 
-def generate_commands(program, symbol_table=None):
+def generate_commands(program, symbol_table=None, function_table=None):
     inputStream = antlr4.InputStream(program)
     # lexing
     lexer = xDroneLexer(inputStream)
@@ -55,4 +55,4 @@ def generate_commands(program, symbol_table=None):
     parser = xDroneParser(stream)
     tree = parser.prog()
 
-    return Interpreter(symbol_table).visit(tree)
+    return Interpreter(symbol_table, function_table).visit(tree)

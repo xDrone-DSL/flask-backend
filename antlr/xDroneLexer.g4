@@ -32,6 +32,7 @@ TIMES: 'times' ;
 DEL: 'del' ;
 
 FUNCTION: 'function' ;
+PROCEDURE: 'procedure' ;
 RETURN: 'return' ;
 
 TYPE_INT: 'int' ;

@@ -38,14 +38,16 @@ class TestFunction(unittest.TestCase):
         self.assertEqual([Parameter("a", Type.int())],
                          Function("a", [Parameter("a", Type.int())], Type.int(), []).param_list)
         self.assertEqual(Type.int(), Function("a", [], Type.int(), []).return_type)
-        self.assertEqual([], Function("a", [Parameter("a", Type.int())], Type.int(), []).commands)
+
+    def test_get_commands(self):
+        self.assertEqual([], Function("a", [Parameter("a", Type.int())], Type.int(), []).get_commands())
 
     def test_str(self):
-        self.assertEqual("Function: { ident: a, param_list: [], return_type: int, commands: [] }",
+        self.assertEqual("Function: { ident: a, param_list: [], return_type: int }",
                          str(Function("a", [], Type.int(), [])))
         self.assertEqual("Function: { ident: a, param_list: [Parameter: { ident: a, type: int }, "
                          "Parameter: { ident: b, type: string }], "
-                         "return_type: None, commands: [] }",
+                         "return_type: None }",
                          str(Function("a", [Parameter("a", Type.int()), Parameter("b", Type.string())], None, [])))
 
     def test_eq(self):
@@ -57,8 +59,9 @@ class TestFunction(unittest.TestCase):
                             Function("a", [Parameter("a", Type.int())], None, []))
         self.assertNotEqual(Function("a", [Parameter("a", Type.int()), Parameter("b", Type.string())], None, []),
                             Function("a", [Parameter("a", Type.int()), Parameter("b", Type.string())], Type.int(), []))
-        self.assertNotEqual(Function("a", [Parameter("a", Type.int())], None, []),
-                            Function("a", [Parameter("a", Type.int())], None, ['dummy command']))
+        # Note that `commands` will not be compared
+        self.assertEqual(Function("a", [Parameter("a", Type.int())], None, []),
+                         Function("a", [Parameter("a", Type.int())], None, ['dummy command']))
         self.assertNotEqual(Function("a", [Parameter("a", Type.int())], None, []),
                             None)
 
@@ -68,7 +71,7 @@ class TestFunctionTable(unittest.TestCase):
         ft = FunctionTable()
         ft.store("a", Function("a", [], None, []))
         expected = "FunctionTable: {\n" \
-                   + "  a -> Function: { ident: a, param_list: [], return_type: None, commands: [] }\n" \
+                   + "  a -> Function: { ident: a, param_list: [], return_type: None }\n" \
                    + "}"
         self.assertEqual(expected, str(ft))
 
@@ -78,7 +81,8 @@ class TestFunctionTable(unittest.TestCase):
         self.assertEqual(ft1, ft2)
         ft1.store("a", Function("a", [Parameter("a", Type.int()), Parameter("b", Type.string())], None, []))
         self.assertNotEqual(ft1, ft2)
-        ft2.store("a", Function("a", [Parameter("a", Type.int()), Parameter("b", Type.string())], None, []))
+        # Note that `commands` in Function will not be compared
+        ft2.store("a", Function("a", [Parameter("a", Type.int()), Parameter("b", Type.string())], None, ["dummy"]))
         self.assertEqual(ft1, ft2)
 
         self.assertNotEqual(FunctionTable(), None)
