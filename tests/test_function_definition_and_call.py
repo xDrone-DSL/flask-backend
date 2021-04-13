@@ -383,4 +383,140 @@ class FunctionCallTest(unittest.TestCase):
                 """)
         self.assertTrue("Function call should return an expression, but nothing is returned" in str(context.exception))
 
-# TODO add test of recursion, flow control in functions, functions in functions...
+
+class ComplexFunctionTest(unittest.TestCase):
+    def test_recursion(self):
+        commands = generate_commands("""
+            function func(int i) return int {
+              if i >= 10 {
+                return 10;
+              }
+              return func(i + 1);
+            }
+            main () {
+              forward(func(1));
+            }
+            """)
+        self.assertEqual([Command.forward(10)], commands)
+
+    def test_loops_in_function(self):
+        commands = generate_commands("""
+            function func(int i) return int {
+              while i < 10 {
+                i <- i + 1;
+              }
+              return i;
+            }
+            main () {
+              forward(func(1));
+            }
+            """)
+        self.assertEqual([Command.forward(10)], commands)
+
+    def test_function_procedure_in_function(self):
+        commands = generate_commands("""
+            function func(int i) return int {
+              while i < 10 {
+                i <- i + 1;
+              }
+              return i;
+            }
+            procedure proc(int i) {
+              forward(i * i);
+            }
+            function func2(int i) return int {
+              proc(func(i));
+              return func(i) * func(i);
+            }
+            main () {
+              forward(func2(1));
+            }
+            """)
+        self.assertEqual([Command.forward(100), Command.forward(100)], commands)
+
+    def test_scope(self):
+        actual = SymbolTable()
+        commands = generate_commands("""
+            function func(int i) return int {
+              int j <- 100;
+              while i < 10 {
+                i <- i + 1;
+              }
+              return i;
+            }
+            main () {
+              int i <- 1;
+              forward(func(i));
+            }
+            """, actual)
+        self.assertEqual([Command.forward(10)], commands)
+        expected = SymbolTable()
+        expected.store("i", Expression(Type.int(), 1, ident="i"))
+        self.assertEqual(expected, actual)
+
+
+class ComplexProcedureTest(unittest.TestCase):
+    def test_recursion(self):
+        commands = generate_commands("""
+            procedure proc(int i) {
+              if i >= 10 {
+                forward(10);
+                return;
+              }
+              proc(i + 1);
+            }
+            main () {
+              proc(1);
+            }
+            """)
+        self.assertEqual([Command.forward(10)], commands)
+
+    def test_loops_in_function(self):
+        commands = generate_commands("""
+            procedure proc(int i) {
+              while i < 10 {
+                i <- i + 1;
+              }
+              forward(i);
+            }
+            main () {
+              proc(1);
+            }
+            """)
+        self.assertEqual([Command.forward(10)], commands)
+
+    def test_function_procedure_in_procedure(self):
+        commands = generate_commands("""
+            function func(int i) return int {
+              return i * i;
+            }
+            procedure proc(int i) {
+              forward(i);
+            }
+            procedure proc2() {
+              proc(func(10));
+              proc(func(10));
+            }
+            main () {
+              proc2();
+            }
+            """)
+        self.assertEqual([Command.forward(100), Command.forward(100)], commands)
+
+    def test_scope(self):
+        actual = SymbolTable()
+        generate_commands("""
+            procedure proc(int i) {
+              int j <- 100;
+              while i < 10 {
+                i <- i + 1;
+              }
+            }
+            main () {
+              int i <- 1;
+              proc(i);
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("i", Expression(Type.int(), 1, ident="i"))
+        self.assertEqual(expected, actual)
