@@ -10,6 +10,9 @@ from xdrone.visitors.compiler_utils.error_listener import ParserErrorListener
 from xdrone.visitors.compiler_utils.type_hints import NestedCommands
 from xdrone.visitors.fly import Fly
 from xdrone.visitors.interpreter import Interpreter
+from xdrone.visitors.safety_checker import SafetyChecker
+from xdrone.visitors.safety_checker_utils.drone_config import DroneConfig
+from xdrone.visitors.safety_checker_utils.safety_boundary import SafetyBoundary
 from xdrone.visitors.validate import Validate
 
 
@@ -63,3 +66,7 @@ def generate_commands(program, symbol_table=None, function_table=None):
         raise XDroneSyntaxError(error_listener.get_error_string())
 
     return Interpreter(symbol_table, function_table).visit(tree)
+
+
+def check_for_safety(commands: List[Command], drone_config: DroneConfig, safety_boundary: SafetyBoundary):
+    SafetyChecker().check(commands, drone_config, safety_boundary)
