@@ -5,6 +5,8 @@ import antlr4
 from antlr.xDroneLexer import xDroneLexer, CommonTokenStream
 from antlr.xDroneParser import xDroneParser
 from xdrone.visitors.compiler_utils.command import Command
+from xdrone.visitors.compiler_utils.compile_error import XDroneSyntaxError
+from xdrone.visitors.compiler_utils.error_listener import ParserErrorListener
 from xdrone.visitors.compiler_utils.type_hints import NestedCommands
 from xdrone.visitors.fly import Fly
 from xdrone.visitors.interpreter import Interpreter
@@ -53,6 +55,11 @@ def generate_commands(program, symbol_table=None, function_table=None):
     stream = CommonTokenStream(lexer)
     # parsing
     parser = xDroneParser(stream)
+    parser.removeErrorListeners()
+    error_listener = ParserErrorListener()
+    parser.addErrorListener(error_listener)
     tree = parser.prog()
+    if error_listener.syntax_errors:
+        raise XDroneSyntaxError(error_listener.get_error_string())
 
     return Interpreter(symbol_table, function_table).visit(tree)
