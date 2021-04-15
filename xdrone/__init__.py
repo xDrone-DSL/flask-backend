@@ -12,7 +12,7 @@ from xdrone.visitors.fly import Fly
 from xdrone.visitors.interpreter import Interpreter
 from xdrone.visitors.safety_checker import SafetyChecker
 from xdrone.visitors.safety_checker_utils.drone_config import DroneConfig
-from xdrone.visitors.safety_checker_utils.safety_boundary import SafetyBoundary
+from xdrone.visitors.safety_checker_utils.safety_config import SafetyConfig
 from xdrone.visitors.validate import Validate
 
 
@@ -68,5 +68,5 @@ def generate_commands(program, symbol_table=None, function_table=None):
     return Interpreter(symbol_table, function_table).visit(tree)
 
 
-def check_for_safety(commands: List[Command], drone_config: DroneConfig, safety_boundary: SafetyBoundary):
-    SafetyChecker().check(commands, drone_config, safety_boundary)
+def check_for_safety(commands: List[Command], drone_config: DroneConfig, safety_config: SafetyConfig):
+    SafetyChecker().check(commands, drone_config, safety_config)

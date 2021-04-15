@@ -2,7 +2,7 @@ from xdrone.visitors.safety_checker_utils.safety_check_error import SafetyCheckE
 from xdrone.visitors.safety_checker_utils.status import Status
 
 
-class SafetyBoundary:
+class SafetyConfig:
     def __init__(self, max_seconds: float = 0,
                  max_x_meters: float = 0, max_y_meters: float = 0, max_z_meters: float = 0,
                  min_x_meters: float = 0, min_y_meters: float = 0, min_z_meters: float = 0):
@@ -38,12 +38,12 @@ class SafetyBoundary:
                                    .format(status.time_used_seconds, self._max_seconds))
 
     def __str__(self):
-        return ("SafetyBoundary: {{ max_seconds: {}, x_range_meters: {}, y_range_meters: {}, z_range_meters: {} }}"
+        return ("SafetyConfig: {{ max_seconds: {}, x_range_meters: {}, y_range_meters: {}, z_range_meters: {} }}"
                 .format(self._max_seconds, (self._min_x_meters, self._min_x_meters),
                         (self._min_y_meters, self._min_y_meters), (self._min_z_meters, self._min_z_meters)))
 
     def __eq__(self, other):
-        if isinstance(other, SafetyBoundary):
+        if isinstance(other, SafetyConfig):
             return other._max_seconds == self._max_seconds and other._max_x_meters == self._max_x_meters \
                    and other._max_y_meters == self._max_y_meters and other._max_z_meters == self._max_z_meters \
                    and other._min_x_meters == self._min_x_meters and other._min_y_meters == self._min_y_meters \
