@@ -46,7 +46,7 @@ def serializedATN():
         buf.write("\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16\3\16")
         buf.write("\3\16\3\16\3\16\3\16\3\16\3\16\7\16\u017e\n\16\f\16\16")
         buf.write("\16\u0181\13\16\3\16\2\3\32\17\2\4\6\b\n\f\16\20\22\24")
-        buf.write("\26\30\32\2\6\3\2+,\3\2-.\3\2\60\63\3\2\64\65\2\u01ba")
+        buf.write("\26\30\32\2\6\3\2-.\3\2+,\3\2\60\63\3\2\64\65\2\u01ba")
         buf.write("\2\37\3\2\2\2\4,\3\2\2\2\6\u00d8\3\2\2\2\b\u00da\3\2\2")
         buf.write("\2\n\u00dc\3\2\2\2\f\u00ed\3\2\2\2\16\u00ef\3\2\2\2\20")
         buf.write("\u00f1\3\2\2\2\22\u00f8\3\2\2\2\24\u0118\3\2\2\2\26\u011a")
@@ -163,14 +163,14 @@ def serializedATN():
         buf.write("\u014a\5\32\16\2\u014a\u014b\7:\2\2\u014b\u0156\3\2\2")
         buf.write("\2\u014c\u0156\5\20\t\2\u014d\u014e\79\2\2\u014e\u014f")
         buf.write("\5\32\16\2\u014f\u0150\7:\2\2\u0150\u0156\3\2\2\2\u0151")
-        buf.write("\u0152\7.\2\2\u0152\u0156\5\32\16\13\u0153\u0154\7\66")
+        buf.write("\u0152\t\2\2\2\u0152\u0156\5\32\16\13\u0153\u0154\7\66")
         buf.write("\2\2\u0154\u0156\5\32\16\n\u0155\u0131\3\2\2\2\u0155\u0133")
         buf.write("\3\2\2\2\u0155\u0134\3\2\2\2\u0155\u0135\3\2\2\2\u0155")
         buf.write("\u0136\3\2\2\2\u0155\u0137\3\2\2\2\u0155\u0138\3\2\2\2")
         buf.write("\u0155\u0144\3\2\2\2\u0155\u014c\3\2\2\2\u0155\u014d\3")
         buf.write("\2\2\2\u0155\u0151\3\2\2\2\u0155\u0153\3\2\2\2\u0156\u017f")
-        buf.write("\3\2\2\2\u0157\u0158\f\t\2\2\u0158\u0159\t\2\2\2\u0159")
-        buf.write("\u017e\5\32\16\n\u015a\u015b\f\b\2\2\u015b\u015c\t\3\2")
+        buf.write("\3\2\2\2\u0157\u0158\f\t\2\2\u0158\u0159\t\3\2\2\u0159")
+        buf.write("\u017e\5\32\16\n\u015a\u015b\f\b\2\2\u015b\u015c\t\2\2")
         buf.write("\2\u015c\u017e\5\32\16\t\u015d\u015e\f\7\2\2\u015e\u015f")
         buf.write("\7/\2\2\u015f\u017e\5\32\16\b\u0160\u0161\f\6\2\2\u0161")
         buf.write("\u0162\t\4\2\2\u0162\u017e\5\32\16\7\u0163\u0164\f\5\2")
@@ -230,7 +230,7 @@ class xDroneParser ( Parser ):
                       "LESS", "LESS_EQ", "EQ", "NOT_EQ", "NOT", "AND", "OR", 
                       "L_PAR", "R_PAR", "L_BRACKET", "R_BRACKET", "L_BRACE", 
                       "R_BRACE", "DOT", "COMMA", "SEMICOLON", "ARROW", "COMMENT", 
-                      "WS", "IDENT", "SIGNED_INT", "SIGNED_FLOAT", "ESCAPED_STRING" ]
+                      "WS", "IDENT", "INT", "FLOAT", "ESCAPED_STRING" ]
 
     RULE_prog = 0
     RULE_commands = 1
@@ -318,8 +318,8 @@ class xDroneParser ( Parser ):
     COMMENT=65
     WS=66
     IDENT=67
-    SIGNED_INT=68
-    SIGNED_FLOAT=69
+    INT=68
+    FLOAT=69
     ESCAPED_STRING=70
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
@@ -466,7 +466,7 @@ class xDroneParser ( Parser ):
             self.state = 42
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << xDroneParser.TAKEOFF) | (1 << xDroneParser.LAND) | (1 << xDroneParser.UP) | (1 << xDroneParser.DOWN) | (1 << xDroneParser.LEFT) | (1 << xDroneParser.RIGHT) | (1 << xDroneParser.FORWARD) | (1 << xDroneParser.BACKWARD) | (1 << xDroneParser.ROTATE_LEFT) | (1 << xDroneParser.ROTATE_RIGHT) | (1 << xDroneParser.WAIT) | (1 << xDroneParser.IF) | (1 << xDroneParser.WHILE) | (1 << xDroneParser.FOR) | (1 << xDroneParser.REPEAT) | (1 << xDroneParser.DEL) | (1 << xDroneParser.RETURN) | (1 << xDroneParser.TYPE_INT) | (1 << xDroneParser.TYPE_DECIMAL) | (1 << xDroneParser.TYPE_STRING) | (1 << xDroneParser.TYPE_BOOLEAN) | (1 << xDroneParser.TYPE_VECTOR) | (1 << xDroneParser.TYPE_LIST) | (1 << xDroneParser.TRUE) | (1 << xDroneParser.FALSE) | (1 << xDroneParser.MINUS) | (1 << xDroneParser.NOT) | (1 << xDroneParser.L_PAR) | (1 << xDroneParser.L_BRACKET))) != 0) or ((((_la - 67)) & ~0x3f) == 0 and ((1 << (_la - 67)) & ((1 << (xDroneParser.IDENT - 67)) | (1 << (xDroneParser.SIGNED_INT - 67)) | (1 << (xDroneParser.SIGNED_FLOAT - 67)) | (1 << (xDroneParser.ESCAPED_STRING - 67)))) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << xDroneParser.TAKEOFF) | (1 << xDroneParser.LAND) | (1 << xDroneParser.UP) | (1 << xDroneParser.DOWN) | (1 << xDroneParser.LEFT) | (1 << xDroneParser.RIGHT) | (1 << xDroneParser.FORWARD) | (1 << xDroneParser.BACKWARD) | (1 << xDroneParser.ROTATE_LEFT) | (1 << xDroneParser.ROTATE_RIGHT) | (1 << xDroneParser.WAIT) | (1 << xDroneParser.IF) | (1 << xDroneParser.WHILE) | (1 << xDroneParser.FOR) | (1 << xDroneParser.REPEAT) | (1 << xDroneParser.DEL) | (1 << xDroneParser.RETURN) | (1 << xDroneParser.TYPE_INT) | (1 << xDroneParser.TYPE_DECIMAL) | (1 << xDroneParser.TYPE_STRING) | (1 << xDroneParser.TYPE_BOOLEAN) | (1 << xDroneParser.TYPE_VECTOR) | (1 << xDroneParser.TYPE_LIST) | (1 << xDroneParser.TRUE) | (1 << xDroneParser.FALSE) | (1 << xDroneParser.PLUS) | (1 << xDroneParser.MINUS) | (1 << xDroneParser.NOT) | (1 << xDroneParser.L_PAR) | (1 << xDroneParser.L_BRACKET))) != 0) or ((((_la - 67)) & ~0x3f) == 0 and ((1 << (_la - 67)) & ((1 << (xDroneParser.IDENT - 67)) | (1 << (xDroneParser.INT - 67)) | (1 << (xDroneParser.FLOAT - 67)) | (1 << (xDroneParser.ESCAPED_STRING - 67)))) != 0):
                 self.state = 39
                 self.command()
                 self.state = 44
@@ -1787,7 +1787,7 @@ class xDroneParser ( Parser ):
                 self.state = 211
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if ((((_la - 36)) & ~0x3f) == 0 and ((1 << (_la - 36)) & ((1 << (xDroneParser.TRUE - 36)) | (1 << (xDroneParser.FALSE - 36)) | (1 << (xDroneParser.MINUS - 36)) | (1 << (xDroneParser.NOT - 36)) | (1 << (xDroneParser.L_PAR - 36)) | (1 << (xDroneParser.L_BRACKET - 36)) | (1 << (xDroneParser.IDENT - 36)) | (1 << (xDroneParser.SIGNED_INT - 36)) | (1 << (xDroneParser.SIGNED_FLOAT - 36)) | (1 << (xDroneParser.ESCAPED_STRING - 36)))) != 0):
+                if ((((_la - 36)) & ~0x3f) == 0 and ((1 << (_la - 36)) & ((1 << (xDroneParser.TRUE - 36)) | (1 << (xDroneParser.FALSE - 36)) | (1 << (xDroneParser.PLUS - 36)) | (1 << (xDroneParser.MINUS - 36)) | (1 << (xDroneParser.NOT - 36)) | (1 << (xDroneParser.L_PAR - 36)) | (1 << (xDroneParser.L_BRACKET - 36)) | (1 << (xDroneParser.IDENT - 36)) | (1 << (xDroneParser.INT - 36)) | (1 << (xDroneParser.FLOAT - 36)) | (1 << (xDroneParser.ESCAPED_STRING - 36)))) != 0):
                     self.state = 210
                     self.expr(0)
 
@@ -2174,7 +2174,7 @@ class xDroneParser ( Parser ):
             self.state = 242
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            if ((((_la - 36)) & ~0x3f) == 0 and ((1 << (_la - 36)) & ((1 << (xDroneParser.TRUE - 36)) | (1 << (xDroneParser.FALSE - 36)) | (1 << (xDroneParser.MINUS - 36)) | (1 << (xDroneParser.NOT - 36)) | (1 << (xDroneParser.L_PAR - 36)) | (1 << (xDroneParser.L_BRACKET - 36)) | (1 << (xDroneParser.IDENT - 36)) | (1 << (xDroneParser.SIGNED_INT - 36)) | (1 << (xDroneParser.SIGNED_FLOAT - 36)) | (1 << (xDroneParser.ESCAPED_STRING - 36)))) != 0):
+            if ((((_la - 36)) & ~0x3f) == 0 and ((1 << (_la - 36)) & ((1 << (xDroneParser.TRUE - 36)) | (1 << (xDroneParser.FALSE - 36)) | (1 << (xDroneParser.PLUS - 36)) | (1 << (xDroneParser.MINUS - 36)) | (1 << (xDroneParser.NOT - 36)) | (1 << (xDroneParser.L_PAR - 36)) | (1 << (xDroneParser.L_BRACKET - 36)) | (1 << (xDroneParser.IDENT - 36)) | (1 << (xDroneParser.INT - 36)) | (1 << (xDroneParser.FLOAT - 36)) | (1 << (xDroneParser.ESCAPED_STRING - 36)))) != 0):
                 self.state = 241
                 self.argList()
 
@@ -2873,8 +2873,8 @@ class xDroneParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def SIGNED_INT(self):
-            return self.getToken(xDroneParser.SIGNED_INT, 0)
+        def INT(self):
+            return self.getToken(xDroneParser.INT, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterIntExpr" ):
@@ -2927,8 +2927,8 @@ class xDroneParser ( Parser ):
             super().__init__(parser)
             self.copyFrom(ctx)
 
-        def SIGNED_FLOAT(self):
-            return self.getToken(xDroneParser.SIGNED_FLOAT, 0)
+        def FLOAT(self):
+            return self.getToken(xDroneParser.FLOAT, 0)
 
         def enterRule(self, listener:ParseTreeListener):
             if hasattr( listener, "enterDecimalExpr" ):
@@ -2997,6 +2997,35 @@ class xDroneParser ( Parser ):
         def accept(self, visitor:ParseTreeVisitor):
             if hasattr( visitor, "visitListElemExpr" ):
                 return visitor.visitListElemExpr(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class PositNegateContext(ExprContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a xDroneParser.ExprContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def expr(self):
+            return self.getTypedRuleContext(xDroneParser.ExprContext,0)
+
+        def PLUS(self):
+            return self.getToken(xDroneParser.PLUS, 0)
+        def MINUS(self):
+            return self.getToken(xDroneParser.MINUS, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterPositNegate" ):
+                listener.enterPositNegate(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitPositNegate" ):
+                listener.exitPositNegate(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPositNegate" ):
+                return visitor.visitPositNegate(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -3231,33 +3260,6 @@ class xDroneParser ( Parser ):
                 return visitor.visitChildren(self)
 
 
-    class NegateContext(ExprContext):
-
-        def __init__(self, parser, ctx:ParserRuleContext): # actually a xDroneParser.ExprContext
-            super().__init__(parser)
-            self.copyFrom(ctx)
-
-        def MINUS(self):
-            return self.getToken(xDroneParser.MINUS, 0)
-        def expr(self):
-            return self.getTypedRuleContext(xDroneParser.ExprContext,0)
-
-
-        def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterNegate" ):
-                listener.enterNegate(self)
-
-        def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitNegate" ):
-                listener.exitNegate(self)
-
-        def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitNegate" ):
-                return visitor.visitNegate(self)
-            else:
-                return visitor.visitChildren(self)
-
-
     class AndContext(ExprContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a xDroneParser.ExprContext
@@ -3487,7 +3489,7 @@ class xDroneParser ( Parser ):
                 _prevctx = localctx
 
                 self.state = 304
-                self.match(xDroneParser.SIGNED_INT)
+                self.match(xDroneParser.INT)
                 pass
 
             elif la_ == 2:
@@ -3495,7 +3497,7 @@ class xDroneParser ( Parser ):
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 305
-                self.match(xDroneParser.SIGNED_FLOAT)
+                self.match(xDroneParser.FLOAT)
                 pass
 
             elif la_ == 3:
@@ -3539,7 +3541,7 @@ class xDroneParser ( Parser ):
                 self.state = 319
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if ((((_la - 36)) & ~0x3f) == 0 and ((1 << (_la - 36)) & ((1 << (xDroneParser.TRUE - 36)) | (1 << (xDroneParser.FALSE - 36)) | (1 << (xDroneParser.MINUS - 36)) | (1 << (xDroneParser.NOT - 36)) | (1 << (xDroneParser.L_PAR - 36)) | (1 << (xDroneParser.L_BRACKET - 36)) | (1 << (xDroneParser.IDENT - 36)) | (1 << (xDroneParser.SIGNED_INT - 36)) | (1 << (xDroneParser.SIGNED_FLOAT - 36)) | (1 << (xDroneParser.ESCAPED_STRING - 36)))) != 0):
+                if ((((_la - 36)) & ~0x3f) == 0 and ((1 << (_la - 36)) & ((1 << (xDroneParser.TRUE - 36)) | (1 << (xDroneParser.FALSE - 36)) | (1 << (xDroneParser.PLUS - 36)) | (1 << (xDroneParser.MINUS - 36)) | (1 << (xDroneParser.NOT - 36)) | (1 << (xDroneParser.L_PAR - 36)) | (1 << (xDroneParser.L_BRACKET - 36)) | (1 << (xDroneParser.IDENT - 36)) | (1 << (xDroneParser.INT - 36)) | (1 << (xDroneParser.FLOAT - 36)) | (1 << (xDroneParser.ESCAPED_STRING - 36)))) != 0):
                     self.state = 311
                     self.expr(0)
                     self.state = 316
@@ -3601,11 +3603,16 @@ class xDroneParser ( Parser ):
                 pass
 
             elif la_ == 11:
-                localctx = xDroneParser.NegateContext(self, localctx)
+                localctx = xDroneParser.PositNegateContext(self, localctx)
                 self._ctx = localctx
                 _prevctx = localctx
                 self.state = 335
-                self.match(xDroneParser.MINUS)
+                _la = self._input.LA(1)
+                if not(_la==xDroneParser.PLUS or _la==xDroneParser.MINUS):
+                    self._errHandler.recoverInline(self)
+                else:
+                    self._errHandler.reportMatch(self)
+                    self.consume()
                 self.state = 336
                 self.expr(9)
                 pass

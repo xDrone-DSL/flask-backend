@@ -47,9 +47,9 @@ def generate_simulation_json(program):
 
 
 def generate_commands(program, symbol_table=None, function_table=None):
-    inputStream = antlr4.InputStream(program)
+    input_stream = antlr4.InputStream(program)
     # lexing
-    lexer = xDroneLexer(inputStream)
+    lexer = xDroneLexer(input_stream)
     stream = CommonTokenStream(lexer)
     # parsing
     parser = xDroneParser(stream)

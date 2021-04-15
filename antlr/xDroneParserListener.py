@@ -476,6 +476,15 @@ class xDroneParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by xDroneParser#positNegate.
+    def enterPositNegate(self, ctx:xDroneParser.PositNegateContext):
+        pass
+
+    # Exit a parse tree produced by xDroneParser#positNegate.
+    def exitPositNegate(self, ctx:xDroneParser.PositNegateContext):
+        pass
+
+
     # Enter a parse tree produced by xDroneParser#concat.
     def enterConcat(self, ctx:xDroneParser.ConcatContext):
         pass
@@ -545,15 +554,6 @@ class xDroneParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by xDroneParser#size.
     def exitSize(self, ctx:xDroneParser.SizeContext):
-        pass
-
-
-    # Enter a parse tree produced by xDroneParser#negate.
-    def enterNegate(self, ctx:xDroneParser.NegateContext):
-        pass
-
-    # Exit a parse tree produced by xDroneParser#negate.
-    def exitNegate(self, ctx:xDroneParser.NegateContext):
         pass
 
 

@@ -69,8 +69,8 @@ type_
   ;
 
 expr
-  : SIGNED_INT                                              #intExpr
-  | SIGNED_FLOAT                                            #decimalExpr
+  : INT                                                     #intExpr
+  | FLOAT                                                   #decimalExpr
   | ESCAPED_STRING                                          #stringExpr
   | TRUE                                                    #trueExpr
   | FALSE                                                   #falseExpr
@@ -84,7 +84,7 @@ expr
   | call                                                    #functionCall
   | expr DOT SIZE                                           #size
   | L_PAR expr R_PAR                                        #parentheses
-  | MINUS expr                                              #negate
+  | (PLUS | MINUS) expr                                     #positNegate
   | NOT expr                                                #not
   | expr (MULTI | DIV) expr                                 #multiDivide
   | expr (PLUS | MINUS) expr                                #plusMinus

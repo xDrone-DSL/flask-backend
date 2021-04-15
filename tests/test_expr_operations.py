@@ -646,6 +646,34 @@ class ArithmeticOperationTest(unittest.TestCase):
                 """.format(type))
         self.assertTrue("Division by zero" in str(context.exception))
 
+    def test_posit_should_return_correct_value(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              int a <- + 1;
+              decimal b <- + 1.0;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.int(), 1, ident="a"))
+        expected.store("b", Expression(Type.decimal(), 1.0, ident="b"))
+        self.assertEqual(expected, actual)
+
+    def test_posit_with_wrong_type_should_give_error(self):
+        types = [Type.boolean(), Type.string(), Type.vector(), Type.list_of(Type.int()),
+                 Type.list_of(Type.decimal()), Type.list_of(Type.list_of(Type.int()))]
+        for type in types:
+            with self.assertRaises(CompileError) as context:
+                generate_commands("""
+                    main () {{
+                      {} a;
+                      {} b <- + a;
+                    }}
+                    """.format(type, type))
+            self.assertTrue("Expression {} should have type int or decimal, but is {}"
+                            .format(Expression(type, type.default_value, ident="a"), type.type_name)
+                            in str(context.exception))
+
     def test_negate_should_return_correct_value(self):
         actual = SymbolTable()
         generate_commands("""
@@ -980,4 +1008,42 @@ class OperationPrecedenceTest(unittest.TestCase):
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), False, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
+        self.assertEqual(expected, actual)
+
+
+class OperationConfusionTest(unittest.TestCase):
+    def test_posit_not_confused_with_plus(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              int a <- 1 + 2;
+              int b <- 1+2;
+              int c <- +2;
+              int d <- 1++2;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.int(), 3, ident="a"))
+        expected.store("b", Expression(Type.int(), 3, ident="b"))
+        expected.store("c", Expression(Type.int(), 2, ident="c"))
+        expected.store("d", Expression(Type.int(), 3, ident="d"))
+        self.assertEqual(expected, actual)
+
+    def test_negate_not_confused_with_minus(self):
+        actual = SymbolTable()
+        generate_commands("""
+            main () {
+              int a <- 1 - 2;
+              int b <- 1-2;
+              int c <- -2;
+              int d <- 1--2;
+              int e <- 1---2;
+            }
+            """, actual)
+        expected = SymbolTable()
+        expected.store("a", Expression(Type.int(), -1, ident="a"))
+        expected.store("b", Expression(Type.int(), -1, ident="b"))
+        expected.store("c", Expression(Type.int(), -2, ident="c"))
+        expected.store("d", Expression(Type.int(), 3, ident="d"))
+        expected.store("e", Expression(Type.int(), -1, ident="e"))
         self.assertEqual(expected, actual)

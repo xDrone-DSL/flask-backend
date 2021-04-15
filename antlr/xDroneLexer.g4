@@ -96,13 +96,12 @@ IDENT :
   | DIGIT)*
   ;
 
-fragment INT : DIGIT+ ;
-SIGNED_INT : ('+'|'-')? INT ;
+INT : DIGIT+ ;
+fragment SIGNED_INT : ('+'|'-')? INT ;
 fragment DECIMAL : INT '.' INT? | '.' INT ;
 
 fragment EXP: ('e'|'E') SIGNED_INT ;
-fragment FLOAT: INT EXP | DECIMAL EXP? ;
-SIGNED_FLOAT: ('+'|'-')? FLOAT ;
+FLOAT: INT EXP | DECIMAL EXP? ;
 
 fragment DOUBLE_QUOTE : '"' ;
 fragment ESCAPED_CHAR

@@ -269,6 +269,11 @@ class xDroneParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by xDroneParser#positNegate.
+    def visitPositNegate(self, ctx:xDroneParser.PositNegateContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by xDroneParser#concat.
     def visitConcat(self, ctx:xDroneParser.ConcatContext):
         return self.visitChildren(ctx)
@@ -306,11 +311,6 @@ class xDroneParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by xDroneParser#size.
     def visitSize(self, ctx:xDroneParser.SizeContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by xDroneParser#negate.
-    def visitNegate(self, ctx:xDroneParser.NegateContext):
         return self.visitChildren(ctx)
 
 

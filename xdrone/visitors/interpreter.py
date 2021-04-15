@@ -434,11 +434,11 @@ class Interpreter(xDroneParserVisitor):
     ######## expr ########
 
     def visitIntExpr(self, ctx: xDroneParser.IntExprContext) -> Expression:
-        signed_int = ctx.SIGNED_INT().getText()
+        signed_int = ctx.INT().getText()
         return Expression(Type.int(), int(signed_int))
 
     def visitDecimalExpr(self, ctx: xDroneParser.DecimalExprContext) -> Expression:
-        signed_float = ctx.SIGNED_FLOAT().getText()
+        signed_float = ctx.FLOAT().getText()
         return Expression(Type.decimal(), float(signed_float))
 
     def visitStringExpr(self, ctx: xDroneParser.StringExprContext) -> Expression:
@@ -519,11 +519,15 @@ class Interpreter(xDroneParserVisitor):
         expr = self.visit(ctx.expr())
         return expr
 
-    def visitNegate(self, ctx: xDroneParser.NegateContext) -> Expression:
+    def visitPositNegate(self, ctx: xDroneParser.PositNegateContext) -> Expression:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        return Expression(expr.type, -expr.value)
+        if ctx.PLUS():
+            result_value = +expr.value
+        else:  # MINUS
+            result_value = -expr.value
+        return Expression(expr.type, result_value)
 
     def visitNot(self, ctx: xDroneParser.NotContext) -> Expression:
         expr = self.visit(ctx.expr())
