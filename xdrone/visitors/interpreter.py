@@ -444,7 +444,8 @@ class Interpreter(xDroneParserVisitor):
     def visitStringExpr(self, ctx: xDroneParser.StringExprContext) -> Expression:
         escaped_string = ctx.ESCAPED_STRING().getText()
         quotation_removed = str(escaped_string)[1:-1]
-        return Expression(Type.string(), quotation_removed)
+        unescaped = bytes(quotation_removed, "utf-8").decode("unicode_escape")
+        return Expression(Type.string(), unescaped)
 
     def visitTrueExpr(self, ctx: xDroneParser.TrueExprContext) -> Expression:
         return Expression(Type.boolean(), True)

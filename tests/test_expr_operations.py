@@ -7,6 +7,32 @@ from xdrone.visitors.compiler_utils.expressions import Expression
 from xdrone.visitors.compiler_utils.type import Type
 
 
+class EscapedStringTest(unittest.TestCase):
+    def test_normal_string_should_be_parsed_to_correct_expr(self):
+        for string in ["", "abc", " ", "abc 123"]:
+            actual = SymbolTable()
+            generate_commands("""
+                main () {{
+                  string a <- "{}";
+                }}
+                """.format(string), actual)
+            expected = SymbolTable()
+            expected.store("a", Expression(Type.string(), string, ident="a"))
+            self.assertEqual(expected, actual)
+
+    def test_escaped_string_should_be_parsed_to_correct_expr(self):
+        for escaped, unescaped in [(r"\0", "\0"), (r"\n", "\n"), (r" \"", " \"")]:
+            actual = SymbolTable()
+            generate_commands("""
+                main () {{
+                  string a <- "{}";
+                }}
+                """.format(escaped), actual)
+            expected = SymbolTable()
+            expected.store("a", Expression(Type.string(), unescaped, ident="a"))
+            self.assertEqual(expected, actual)
+
+
 class BooleanOperationTest(unittest.TestCase):
     def test_bool_or_should_return_correct_value(self):
         for b1, b2 in [("true", "true"), ("true", "false"), ("false", "true"), ("false", "false")]:
