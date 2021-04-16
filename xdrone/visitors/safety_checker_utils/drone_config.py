@@ -3,6 +3,12 @@ import copy
 
 class DroneConfig:
     def __init__(self, speed_mps: float, rotate_speed_dps: float, takeoff_height_meters: float):
+        if speed_mps <= 0:
+            raise ValueError("speed_mps should > 0")
+        if rotate_speed_dps <= 0:
+            raise ValueError("rotate_speed_dps should > 0")
+        if takeoff_height_meters <= 0:
+            raise ValueError("takeoff_height_meters should > 0")
         self._speed_mps = speed_mps
         self._rotate_speed_dps = rotate_speed_dps
         self._takeoff_height_meters = takeoff_height_meters
