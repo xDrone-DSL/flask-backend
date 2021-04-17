@@ -1,6 +1,7 @@
 import unittest
 
-from xdrone import generate_simulation_json
+from xdrone import generate_simulation_json, SafetyChecker, SafetyConfig, StateUpdater, DroneConfig, DefaultSafetyConfig
+from xdrone.visitors.state_safety_checker.safety_check_error import SafetyCheckError
 
 
 class GenerateSimulationJsonTest(unittest.TestCase):
@@ -125,3 +126,26 @@ class GenerateSimulationJsonTest(unittest.TestCase):
                   {"action": "rotate_left", "value": [90]},
                   {"action": "land", "value": []}]
         self.assertEqual(target, generate_simulation_json(commands))
+
+    def test_if_not_given_state_updater_should_use_default_to_update_state(self):
+        commands = "main() {takeoff(); land();}"
+        generate_simulation_json(commands, safety_checker=SafetyChecker(SafetyConfig(max_seconds=10, max_z_meters=1)))
+
+    def test_if_given_state_updater_should_use_it_to_update_state(self):
+        commands = "main() {takeoff(); land();}"
+        with self.assertRaises(SafetyCheckError) as context:
+            generate_simulation_json(commands,
+                                     state_updater=StateUpdater(DroneConfig(speed_mps=1, rotate_speed_dps=90,
+                                                                            takeoff_height_meters=10)),
+                                     safety_checker=SafetyChecker(SafetyConfig(max_seconds=10, max_z_meters=1)))
+        self.assertTrue("The z coordinate 10 will go beyond its upper limit 1" in str(context.exception))
+
+    def test_if_not_given_safety_checker_should_not_check_safety(self):
+        commands = "main() {up(1);}"
+        generate_simulation_json(commands)
+
+    def test_if_given_safety_checker_should_use_it_to_check_safety(self):
+        commands = "main() {up(1);}"
+        with self.assertRaises(SafetyCheckError) as context:
+            generate_simulation_json(commands, safety_checker=SafetyChecker(DefaultSafetyConfig()))
+        self.assertTrue("'up' command used when the drone has not been taken off" in str(context.exception))

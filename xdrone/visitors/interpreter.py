@@ -17,8 +17,8 @@ class Interpreter(xDroneParserVisitor):
     def __init__(self, state_updater: StateUpdater, symbol_table: SymbolTable, function_table: FunctionTable):
         super().__init__()
         self.state_updater = state_updater
-        self.symbol_table = [SymbolTable() if symbol_table is None else symbol_table]
-        self.function_table = FunctionTable() if function_table is None else function_table
+        self.symbol_table = [symbol_table]
+        self.function_table = function_table
 
         self.returned = [False]
         self.returned_value = []

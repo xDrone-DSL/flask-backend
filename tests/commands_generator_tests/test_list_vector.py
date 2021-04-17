@@ -15,7 +15,7 @@ class ListTest(unittest.TestCase):
               list[int] a <- [];
               list[boolean] b <- [true, false];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [], ident="a"))
         expected.store("b", Expression(Type.list_of(Type.boolean()), [True, False], ident="b"))
@@ -39,7 +39,7 @@ class ListTest(unittest.TestCase):
               list[int] a <- [1, 2, 3];
               a[0] <- 4;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [4, 2, 3], ident="a"))
         self.assertEqual(expected, actual)
@@ -110,7 +110,7 @@ class ListTest(unittest.TestCase):
               int c <- a[1];
               int d <- a[2];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"))
         expected.store("b", Expression(Type.int(), 1, ident="b"))
@@ -185,7 +185,7 @@ class ListInsertTest(unittest.TestCase):
                   list[int] a <- [1, 2, 3];
                   a.at({}).insert(0);
                 }}
-                """.format(index), actual)
+                """.format(index), symbol_table=actual)
             expected = SymbolTable()
             list = [1, 2, 3]
             list.insert(index, 0)
@@ -199,7 +199,7 @@ class ListInsertTest(unittest.TestCase):
               list[int] a <- [1, 2, 3];
               a.insert(0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, 2, 3, 0], ident="a"))
         self.assertEqual(expected, actual)
@@ -211,7 +211,7 @@ class ListInsertTest(unittest.TestCase):
               list[int] a <- [];
               a.insert(0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [0], ident="a"))
         self.assertEqual(expected, actual)
@@ -223,7 +223,7 @@ class ListInsertTest(unittest.TestCase):
               list[list[int]] a <- [[1], [2], [3]];
               a[0].insert(0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[1, 0], [2], [3]], ident="a"))
         self.assertEqual(expected, actual)
@@ -234,7 +234,7 @@ class ListInsertTest(unittest.TestCase):
             main () {
               [1].insert(0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         self.assertEqual(expected, actual)
 
@@ -244,7 +244,7 @@ class ListInsertTest(unittest.TestCase):
             main () {
               [].insert(0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         self.assertEqual(expected, actual)
 
@@ -332,7 +332,7 @@ class ListRemoveTest(unittest.TestCase):
                   list[int] a <- [1, 2, 3];
                   a.at({}).remove();
                 }}
-                """.format(index), actual)
+                """.format(index), symbol_table=actual)
             expected = SymbolTable()
             list = [1, 2, 3]
             list.pop(index)
@@ -346,7 +346,7 @@ class ListRemoveTest(unittest.TestCase):
               list[int] a <- [1, 2, 3];
               a.remove();
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, 2], ident="a"))
         self.assertEqual(expected, actual)
@@ -370,7 +370,7 @@ class ListRemoveTest(unittest.TestCase):
               list[list[int]] a <- [[1], [2], [3]];
               a[0].remove();
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[], [2], [3]], ident="a"))
         self.assertEqual(expected, actual)
@@ -381,7 +381,7 @@ class ListRemoveTest(unittest.TestCase):
             main () {
               [1].remove();
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         self.assertEqual(expected, actual)
 
@@ -459,7 +459,7 @@ class VectorTest(unittest.TestCase):
             main () {
               vector a <- (1.0, 2.0, -3.0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.vector(), [1.0, 2.0, -3.0], ident="a"))
         self.assertEqual(expected, actual)
@@ -488,7 +488,7 @@ class VectorTest(unittest.TestCase):
               a.y <- 2.2;
               a.z <- -3.3;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.vector(), [1.1, 2.2, -3.3], ident="a"))
         self.assertEqual(expected, actual)
@@ -519,7 +519,7 @@ class VectorTest(unittest.TestCase):
               decimal c <- a.y;
               decimal d <- a.z;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.vector(), [1.0, 2.0, 3.0], ident="a"))
         expected.store("b", Expression(Type.decimal(), 1.0, ident="b"))

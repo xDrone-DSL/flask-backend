@@ -12,7 +12,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { int a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 0, ident="a"))
         self.assertEqual(expected, actual)
@@ -21,7 +21,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { decimal a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.decimal(), 0, ident="a"))
         self.assertEqual(expected, actual)
@@ -30,7 +30,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { string a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.string(), "", ident="a"))
         self.assertEqual(expected, actual)
@@ -39,7 +39,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { boolean a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), False, ident="a"))
         self.assertEqual(expected, actual)
@@ -48,7 +48,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { vector a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.vector(), [0, 0, 0], ident="a"))
         self.assertEqual(expected, actual)
@@ -57,7 +57,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { list[int] a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [], ident="a"))
         self.assertEqual(expected, actual)
@@ -66,7 +66,7 @@ class DeclareTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { list[list[int]] a; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [], ident="a"))
         self.assertEqual(expected, actual)
@@ -76,7 +76,7 @@ class DeclareTest(unittest.TestCase):
             actual = SymbolTable()
             generate_commands("""
                 main () {{ int {}; }}
-                """.format(name), actual)
+                """.format(name), symbol_table=actual)
             expected = SymbolTable()
             expected.store(name, Expression(Type.int(), 0, ident=name))
             self.assertEqual(expected, actual)
@@ -112,7 +112,7 @@ class AssignIdentTest(unittest.TestCase):
              int a;
              a <- -1;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), -1, ident="a"))
         self.assertEqual(expected, actual)
@@ -124,7 +124,7 @@ class AssignIdentTest(unittest.TestCase):
              decimal a;
              a <- -1.5e10;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.decimal(), -1.5e10, ident="a"))
         self.assertEqual(expected, actual)
@@ -136,7 +136,7 @@ class AssignIdentTest(unittest.TestCase):
              string a;
              a <- "1";
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.string(), "1", ident="a"))
         self.assertEqual(expected, actual)
@@ -148,7 +148,7 @@ class AssignIdentTest(unittest.TestCase):
              boolean a;
              a <- true;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         self.assertEqual(expected, actual)
@@ -160,7 +160,7 @@ class AssignIdentTest(unittest.TestCase):
              vector a;
              a <- (1.0, -1.0, +1.0);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.vector(), [1, -1, 1], ident="a"))
         self.assertEqual(expected, actual)
@@ -172,7 +172,7 @@ class AssignIdentTest(unittest.TestCase):
              list[int] a;
              a <- [1, -1, +1];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, -1, 1], ident="a"))
         self.assertEqual(expected, actual)
@@ -184,7 +184,7 @@ class AssignIdentTest(unittest.TestCase):
              list[list[int]] a;
              a <- [[1], [-1], [+1]];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[1], [-1], [1]], ident="a"))
         self.assertEqual(expected, actual)
@@ -199,7 +199,7 @@ class AssignIdentTest(unittest.TestCase):
                  list[{}] a;
                  a <- [];
                 }}
-                """.format(type.type_name), actual)
+                """.format(type.type_name), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.list_of(type), [], ident="a"))
             self.assertEqual(expected, actual)
@@ -251,7 +251,7 @@ class AssignVectorElemTest(unittest.TestCase):
             main () {
              (0.0, 0.0, 0.0).x <- 1.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         self.assertEqual(expected, actual)
 
@@ -263,7 +263,7 @@ class AssignVectorElemTest(unittest.TestCase):
                  vector a;
                  a.{} <- (-1.0, -2.0, -3.0).{};
                 }}
-                """.format(index, index), actual)
+                """.format(index, index), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.vector(), vector, ident="a"))
             self.assertEqual(expected, actual)
@@ -305,7 +305,7 @@ class AssignListElemTest(unittest.TestCase):
                 main () {{
                  {};
                 }}
-                """.format(code), actual)
+                """.format(code), symbol_table=actual)
             expected = SymbolTable()
             self.assertEqual(expected, actual)
 
@@ -317,7 +317,7 @@ class AssignListElemTest(unittest.TestCase):
              a[0] <- 1;
              a[2] <- a[0];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, 1, 1], ident="a"))
         self.assertEqual(expected, actual)
@@ -331,7 +331,7 @@ class AssignListElemTest(unittest.TestCase):
              a[1][0] <- 6;
              a[1][1] <- 7;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[4, 5], [6, 7]], ident="a"))
         self.assertEqual(expected, actual)
@@ -346,7 +346,7 @@ class AssignListElemTest(unittest.TestCase):
              a[1].y <- 11.0;
              a[1].z <- 12.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.vector()), [[7, 8, 9], [10, 11, 12]], ident="a"))
         self.assertEqual(expected, actual)
@@ -456,7 +456,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { int a <- 1; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 1, ident="a"))
         self.assertEqual(expected, actual)
@@ -465,7 +465,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { decimal a <- 1.0; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.decimal(), 1.0, ident="a"))
         self.assertEqual(expected, actual)
@@ -474,7 +474,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { string a <- "\0a"; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.string(), "\0a", ident="a"))
         self.assertEqual(expected, actual)
@@ -483,7 +483,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { boolean a <- true; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         self.assertEqual(expected, actual)
@@ -492,7 +492,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { vector a <- (1.0, 2.0, -3.0); }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.vector(), [1, 2, -3], ident="a"))
         self.assertEqual(expected, actual)
@@ -501,7 +501,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { list[int] a <- [1, 2, -3]; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, 2, -3], ident="a"))
         self.assertEqual(expected, actual)
@@ -510,7 +510,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
         actual = SymbolTable()
         generate_commands("""
             main () { list[list[int]] a <- [[1], [2]]; }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.list_of(Type.int())), [[1], [2]], ident="a"))
         self.assertEqual(expected, actual)
@@ -524,7 +524,7 @@ class CombinedDeclareAssignTest(unittest.TestCase):
                 main () {{
                  list[{}] a <- [];
                 }}
-                """.format(type.type_name), actual)
+                """.format(type.type_name), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.list_of(type), [], ident="a"))
             self.assertEqual(expected, actual)
@@ -567,7 +567,7 @@ class DelTest(unittest.TestCase):
              int a;
              del a;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         self.assertEqual(expected, actual)
 

@@ -15,7 +15,7 @@ class EscapedStringTest(unittest.TestCase):
                 main () {{
                   string a <- "{}";
                 }}
-                """.format(string), actual)
+                """.format(string), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.string(), string, ident="a"))
             self.assertEqual(expected, actual)
@@ -27,7 +27,7 @@ class EscapedStringTest(unittest.TestCase):
                 main () {{
                   string a <- "{}";
                 }}
-                """.format(escaped), actual)
+                """.format(escaped), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.string(), unescaped, ident="a"))
             self.assertEqual(expected, actual)
@@ -41,7 +41,7 @@ class BooleanOperationTest(unittest.TestCase):
                 main () {{
                   boolean a <- {} or {};
                 }}
-                """.format(b1, b2), actual)
+                """.format(b1, b2), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.boolean(), (b1 == 'true') or (b2 == 'true'), ident="a"))
             self.assertEqual(expected, actual)
@@ -79,7 +79,7 @@ class BooleanOperationTest(unittest.TestCase):
                 main () {{
                   boolean a <- {} and {};
                 }}
-                """.format(b1, b2), actual)
+                """.format(b1, b2), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.boolean(), (b1 == 'true') and (b2 == 'true'), ident="a"))
             self.assertEqual(expected, actual)
@@ -139,7 +139,7 @@ class BooleanOperationTest(unittest.TestCase):
                 main () {{
                   boolean a <- not {};
                 }}
-                """.format(b1), actual)
+                """.format(b1), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(Type.boolean(), not (b1 == 'true'), ident="a"))
             self.assertEqual(expected, actual)
@@ -173,7 +173,7 @@ class ComparisonOperationTest(unittest.TestCase):
               boolean f <- 0.0 > 0.0;
               boolean g <- -1 > 1;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -222,7 +222,7 @@ class ComparisonOperationTest(unittest.TestCase):
               boolean f <- 0.0 >= 0.0;
               boolean g <- -1 >= 1;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -271,7 +271,7 @@ class ComparisonOperationTest(unittest.TestCase):
               boolean f <- 0.0 < 0.0;
               boolean g <- 1 < -1;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -320,7 +320,7 @@ class ComparisonOperationTest(unittest.TestCase):
               boolean f <- 0.0 <= 0.0;
               boolean g <- 1 <= -1;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -368,7 +368,7 @@ class ComparisonOperationTest(unittest.TestCase):
                   {} b;
                   boolean c <- a == b;
                 }}
-                """.format(type, type), st)
+                """.format(type, type), symbol_table=st)
             self.assertEqual(Expression(Type.boolean(), True, ident="c"), st.get_expression("c"))
 
         actual = SymbolTable()
@@ -387,7 +387,7 @@ class ComparisonOperationTest(unittest.TestCase):
               boolean k <- [5, 2] == [1, 2];
               boolean l <- [[5], [2]] == [[1], [2]];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         for i in "abcde":
             expected.store(i, Expression(Type.boolean(), True, ident=i))
@@ -426,7 +426,7 @@ class ComparisonOperationTest(unittest.TestCase):
                   {} b;
                   boolean c <- a =/= b;
                 }}
-                """.format(type, type), st)
+                """.format(type, type), symbol_table=st)
             self.assertEqual(Expression(Type.boolean(), False, ident="c"), st.get_expression("c"))
 
         actual = SymbolTable()
@@ -445,7 +445,7 @@ class ComparisonOperationTest(unittest.TestCase):
               boolean k <- [5, 2] =/= [1, 2];
               boolean l <- [[5], [2]] =/= [[1], [2]];
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         for i in "abcde":
             expected.store(i, Expression(Type.boolean(), False, ident=i))
@@ -484,7 +484,7 @@ class ArithmeticOperationTest(unittest.TestCase):
               decimal c <- 1.0 + 1;
               decimal d <- 1.0 + 1.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 2, ident="a"))
         expected.store("b", Expression(Type.decimal(), 2.0, ident="b"))
@@ -527,7 +527,7 @@ class ArithmeticOperationTest(unittest.TestCase):
               decimal c <- 3.0 - 1;
               decimal d <- 3.0 - 1.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 2, ident="a"))
         expected.store("b", Expression(Type.decimal(), 2.0, ident="b"))
@@ -570,7 +570,7 @@ class ArithmeticOperationTest(unittest.TestCase):
               decimal c <- 2.0 * 1;
               decimal d <- 2.0 * 1.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 2, ident="a"))
         expected.store("b", Expression(Type.decimal(), 2.0, ident="b"))
@@ -617,7 +617,7 @@ class ArithmeticOperationTest(unittest.TestCase):
               decimal g <- 1.0 / 2;
               decimal h <- 1.0 / 2.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 2, ident="a"))
         expected.store("b", Expression(Type.decimal(), 2.0, ident="b"))
@@ -679,7 +679,7 @@ class ArithmeticOperationTest(unittest.TestCase):
               int a <- + 1;
               decimal b <- + 1.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 1, ident="a"))
         expected.store("b", Expression(Type.decimal(), 1.0, ident="b"))
@@ -707,7 +707,7 @@ class ArithmeticOperationTest(unittest.TestCase):
               int a <- - 1;
               decimal b <- - 1.0;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), -1, ident="a"))
         expected.store("b", Expression(Type.decimal(), -1.0, ident="b"))
@@ -741,7 +741,7 @@ class OtherOperationTest(unittest.TestCase):
               int e <- [[], [], []].size;
               int f <- [[[], []], [[], []]].size;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.list_of(Type.int()), [1, 2], ident="a"))
         expected.store("b", Expression(Type.int(), 2, ident="b"))
@@ -775,7 +775,7 @@ class OtherOperationTest(unittest.TestCase):
               string d <- "" & "abcd";
               string e <- "" & "";
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.string(), "a", ident="a"))
         expected.store("b", Expression(Type.string(), "ab", ident="b"))
@@ -821,7 +821,7 @@ class OtherOperationTest(unittest.TestCase):
               vector e <- ((1.0, 2.0, (3.0)));
               list[int] f <- ([(1), 2]);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 1, ident="a"))
         expected.store("b", Expression(Type.decimal(), 1.2, ident="b"))
@@ -843,7 +843,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean d <- not (true and false);
               boolean e <- not (false or true);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 20, ident="a"))
         expected.store("b", Expression(Type.int(), 1, ident="b"))
@@ -859,7 +859,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               int a <- - 2 + 3;
               int b <- - 2 - 3;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 1, ident="a"))
         expected.store("b", Expression(Type.int(), -5, ident="b"))
@@ -872,7 +872,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               int a <- 2 * 2 / 3;
               int b <- 2 / 2 * 3;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 1, ident="a"))
         expected.store("b", Expression(Type.int(), 3, ident="b"))
@@ -886,7 +886,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               int b <- 1 + 2 - 3;
               int c <- 1 - 2 - 3;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 2, ident="a"))
         expected.store("b", Expression(Type.int(), 0, ident="b"))
@@ -904,7 +904,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               int e <- 3 * 4 + 2;
               int f <- 3 * 4 - 2;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 14, ident="a"))
         expected.store("b", Expression(Type.int(), -10, ident="b"))
@@ -931,7 +931,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean k <- 5 >= 2 / 3;
               boolean l <- 5 > 2 / 3;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -960,7 +960,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean g <- 6 > 5 =/= true;
               boolean h <- 6 >= 5 =/= true;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -979,7 +979,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean a <- 2 + 3 == 5 == true;
               boolean b <- 2 * 3 =/= 5 =/= false;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -998,7 +998,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean g <- 1 > 1 and true;
               boolean h <- 1 < 1 or false;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -1017,7 +1017,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean a <- "a" & "b" == "ab";
               boolean b <- "ab" == "a" & "b";
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), True, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -1030,7 +1030,7 @@ class OperationPrecedenceTest(unittest.TestCase):
               boolean a <- not true and false;
               boolean b <- not false or true;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.boolean(), False, ident="a"))
         expected.store("b", Expression(Type.boolean(), True, ident="b"))
@@ -1047,7 +1047,7 @@ class OperationConfusionTest(unittest.TestCase):
               int c <- +2;
               int d <- 1++2;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 3, ident="a"))
         expected.store("b", Expression(Type.int(), 3, ident="b"))
@@ -1065,7 +1065,7 @@ class OperationConfusionTest(unittest.TestCase):
               int d <- 1--2;
               int e <- 1---2;
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), -1, ident="a"))
         expected.store("b", Expression(Type.int(), -1, ident="b"))

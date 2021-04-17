@@ -17,7 +17,7 @@ class IfTest(unittest.TestCase):
                 forward(1);
               }
             }
-            """, actual_st)
+            """, symbol_table=actual_st)
         expected_st = SymbolTable()
         expected_st.store("a", Expression(Type.int(), 1, ident="a"))
         self.assertEqual(expected_st, actual_st)
@@ -36,7 +36,7 @@ class IfTest(unittest.TestCase):
                 forward(2);
               }
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 1, ident="a"))
         self.assertEqual(expected, actual)
@@ -51,7 +51,7 @@ class IfTest(unittest.TestCase):
                 int a <- 1;
               }
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         self.assertEqual(expected, actual)
         expected_commands = []
@@ -70,7 +70,7 @@ class IfTest(unittest.TestCase):
                 forward(3);
               }
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 2, ident="a"))
         expected.store("b", Expression(Type.int(), 3, ident="b"))
@@ -122,7 +122,7 @@ class WhileTest(unittest.TestCase):
                 forward(a);
               }
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 5, ident="a"))
         self.assertEqual(expected, actual)
@@ -139,7 +139,7 @@ class WhileTest(unittest.TestCase):
                 forward(a);
               }
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("a", Expression(Type.int(), 10, ident="a"))
         self.assertEqual(expected, actual)
@@ -189,7 +189,7 @@ class ForTest(unittest.TestCase):
                 forward(i);
               }
             }
-            """, actual_st)
+            """, symbol_table=actual_st)
         expected_st = SymbolTable()
         expected_st.store("i", Expression(Type.int(), 5, ident="i"))
         expected_st.store("a", Expression(Type.int(), 6, ident="a"))
@@ -208,7 +208,7 @@ class ForTest(unittest.TestCase):
                 forward(i);
               }
             }
-            """, actual_st)
+            """, symbol_table=actual_st)
         expected_st = SymbolTable()
         expected_st.store("i", Expression(Type.int(), 8, ident="i"))
         expected_st.store("a", Expression(Type.int(), 5, ident="a"))
@@ -227,7 +227,7 @@ class ForTest(unittest.TestCase):
                 forward(i);
               }
             }
-            """, actual_st)
+            """, symbol_table=actual_st)
         expected_st = SymbolTable()
         expected_st.store("i", Expression(Type.int(), 0, ident="i"))
         expected_st.store("a", Expression(Type.int(), 0, ident="a"))

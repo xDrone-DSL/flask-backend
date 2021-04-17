@@ -5,11 +5,13 @@ from antlr.xDroneParser import xDroneParser
 from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import XDroneSyntaxError
 from xdrone.visitors.compiler_utils.error_listener import ParserErrorListener
+from xdrone.visitors.compiler_utils.functions import FunctionTable
+from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type_hints import NestedCommands
 from xdrone.visitors.fly import Fly
 from xdrone.visitors.interpreter import Interpreter
-from xdrone.visitors.state_safety_checker.safety_checker import SafetyChecker
 from xdrone.visitors.state_safety_checker.drone_config import DroneConfig, DefaultDroneConfig
+from xdrone.visitors.state_safety_checker.safety_checker import SafetyChecker
 from xdrone.visitors.state_safety_checker.safety_config import SafetyConfig, DefaultSafetyConfig
 from xdrone.visitors.state_safety_checker.state_updater import StateUpdater
 from xdrone.visitors.validate import Validate
@@ -45,12 +47,31 @@ def validate(program, bounds):
     # return {"success": True}
 
 
-def generate_simulation_json(program):
-    commands = generate_commands(program)
+def generate_simulation_json(program, state_updater=None, safety_checker=None):
+    commands = generate_commands(program, state_updater, safety_checker)
     return [command.to_simulation_json() for command in commands]
 
 
-def generate_commands(program, symbol_table=None, function_table=None):
+def generate_commands(program, state_updater: StateUpdater = None, safety_checker: SafetyChecker = None,
+                      symbol_table: SymbolTable = None, function_table: FunctionTable = None):
+    if state_updater is None:
+        state_updater = StateUpdater(DefaultDroneConfig())
+    if symbol_table is None:
+        symbol_table = SymbolTable()
+    if function_table is None:
+        function_table = FunctionTable()
+
+    tree = _parse_program(program)
+
+    commands, states = Interpreter(state_updater, symbol_table, function_table).visit(tree)
+
+    if safety_checker is not None:
+        safety_checker.check(commands, states)
+
+    return commands
+
+
+def _parse_program(program):
     input_stream = antlr4.InputStream(program)
     # lexing
     lexer = xDroneLexer(input_stream)
@@ -63,25 +84,20 @@ def generate_commands(program, symbol_table=None, function_table=None):
     tree = parser.prog()
     if error_listener.syntax_errors:
         raise XDroneSyntaxError(error_listener.get_error_string())
-
-    state_updater = StateUpdater(DefaultDroneConfig())  # TODO: move to parameter
-    commands, states = Interpreter(state_updater, symbol_table, function_table).visit(tree)
-    check_safety = False  # TODO: move to parameter
-    if check_safety:
-        safety_checker = SafetyChecker(DefaultSafetyConfig())  # TODO: move to parameter
-        safety_checker.check(commands, states)
-
-    return commands
+    return tree
 
 
 if __name__ == '__main__':
-    commands = generate_commands(r"""
-    main () {
-        takeoff();
-        wait(100);
-    }
-    """)
-    for c in commands: print(c)
     drone_config = DroneConfig(speed_mps=0.5, rotate_speed_dps=45, takeoff_height_meters=1)
     safety_config = SafetyConfig(max_seconds=60, max_x_meters=2, max_y_meters=2, max_z_meters=2,
                                  min_x_meters=-2, min_y_meters=-2, min_z_meters=0)
+    state_updater = StateUpdater(drone_config)  # (DefaultDroneConfig())
+    safety_checker = SafetyChecker(safety_config)  # (DefaultSafetyConfig())
+
+    commands = generate_commands(r"""
+    main () {
+        takeoff();
+        wait(1);
+    }
+    """, state_updater=state_updater, safety_checker=safety_checker)
+    for c in commands: print(c)

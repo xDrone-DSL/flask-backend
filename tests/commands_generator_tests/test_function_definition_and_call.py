@@ -87,7 +87,7 @@ class ReturnTest(unittest.TestCase):
                 main () {{
                   {} a <- func();
                 }}
-                """.format(type, type, type), actual)
+                """.format(type, type, type), symbol_table=actual)
             expected = SymbolTable()
             expected.store("a", Expression(type, type.default_value, ident="a"))
             self.assertEqual(expected, actual)
@@ -448,7 +448,7 @@ class ComplexFunctionTest(unittest.TestCase):
               int i <- 1;
               forward(func(i));
             }
-            """, actual)
+            """, symbol_table=actual)
         self.assertEqual([Command.forward(10)], commands)
         expected = SymbolTable()
         expected.store("i", Expression(Type.int(), 1, ident="i"))
@@ -516,7 +516,7 @@ class ComplexProcedureTest(unittest.TestCase):
               int i <- 1;
               proc(i);
             }
-            """, actual)
+            """, symbol_table=actual)
         expected = SymbolTable()
         expected.store("i", Expression(Type.int(), 1, ident="i"))
         self.assertEqual(expected, actual)
