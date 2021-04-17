@@ -34,3 +34,8 @@ class DroneConfig:
             return other._speed_mps == self._speed_mps and other._rotate_speed_dps == self._rotate_speed_dps \
                    and other._takeoff_height_meters == self._takeoff_height_meters
         return False
+
+
+class DefaultDroneConfig(DroneConfig):
+    def __init__(self):
+        super().__init__(speed_mps=1, rotate_speed_dps=90, takeoff_height_meters=1)

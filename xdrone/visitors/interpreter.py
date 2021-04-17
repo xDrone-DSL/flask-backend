@@ -8,30 +8,41 @@ from xdrone.visitors.compiler_utils.expressions import Identifier, ListElem, Vec
 from xdrone.visitors.compiler_utils.functions import FunctionTable, Function, Parameter, FunctionIdentifier
 from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type import Type, ListType, EmptyList
+from xdrone.visitors.state_safety_checker.state import State
+from xdrone.visitors.state_safety_checker.state_updater import StateUpdater
 
 
 class Interpreter(xDroneParserVisitor):
 
-    def __init__(self, symbol_table, function_table):
+    def __init__(self, state_updater: StateUpdater, symbol_table: SymbolTable, function_table: FunctionTable):
         super().__init__()
+        self.state_updater = state_updater
         self.symbol_table = [SymbolTable() if symbol_table is None else symbol_table]
         self.function_table = FunctionTable() if function_table is None else function_table
+
         self.returned = [False]
         self.returned_value = []
         self.commands = []
+        self.states = [State.init_state()]
 
     def _get_latest_symbol_table(self):
         return self.symbol_table[-1]
 
+    def _update_commands_and_states(self, command: Command) -> None:
+        self.commands.append(command)
+        self.states.append(self.state_updater.update(command, self.states[-1]))
+
     ######## prog ########
 
-    def visitProg(self, ctx: xDroneParser.ProgContext) -> List[Command]:
+    def visitProg(self, ctx: xDroneParser.ProgContext) -> (List[Command], List[State]):
         for func in ctx.func():
             self.visit(func)
         self.visit(ctx.commands())
         commands = self.commands
+        states = self.states
         self.commands = []
-        return commands
+        self.states = [State.init_state()]
+        return commands, states
 
     ######## commands ########
 
@@ -44,64 +55,64 @@ class Interpreter(xDroneParserVisitor):
     ######## command ########
 
     def visitTakeoff(self, ctx: xDroneParser.TakeoffContext) -> None:
-        self.commands.append(Command.takeoff())
+        self._update_commands_and_states(Command.takeoff())
 
     def visitLand(self, ctx: xDroneParser.LandContext) -> None:
-        self.commands.append(Command.land())
+        self._update_commands_and_states(Command.land())
 
     def visitUp(self, ctx: xDroneParser.UpContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.up(expr.value))
+        self._update_commands_and_states(Command.up(expr.value))
 
     def visitDown(self, ctx: xDroneParser.DownContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.down(expr.value))
+        self._update_commands_and_states(Command.down(expr.value))
 
     def visitLeft(self, ctx: xDroneParser.LeftContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.left(expr.value))
+        self._update_commands_and_states(Command.left(expr.value))
 
     def visitRight(self, ctx: xDroneParser.RightContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.right(expr.value))
+        self._update_commands_and_states(Command.right(expr.value))
 
     def visitForward(self, ctx: xDroneParser.ForwardContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.forward(expr.value))
+        self._update_commands_and_states(Command.forward(expr.value))
 
     def visitBackward(self, ctx: xDroneParser.BackwardContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.backward(expr.value))
+        self._update_commands_and_states(Command.backward(expr.value))
 
     def visitRotateLeft(self, ctx: xDroneParser.RotateLeftContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.rotate_left(expr.value))
+        self._update_commands_and_states(Command.rotate_left(expr.value))
 
     def visitRotateRight(self, ctx: xDroneParser.RotateRightContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.rotate_right(expr.value))
+        self._update_commands_and_states(Command.rotate_right(expr.value))
 
     def visitWait(self, ctx: xDroneParser.WaitContext) -> None:
         expr = self.visit(ctx.expr())
         if expr.type != Type.int() and expr.type != Type.decimal():
             raise CompileError("Expression {} should have type int or decimal, but is {}".format(expr, expr.type))
-        self.commands.append(Command.wait(expr.value))
+        self._update_commands_and_states(Command.wait(expr.value))
 
     def visitDeclare(self, ctx: xDroneParser.DeclareContext) -> None:
         type, identifier = self.visit(ctx.type_()), self.visit(ctx.ident())

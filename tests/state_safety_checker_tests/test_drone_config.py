@@ -1,6 +1,6 @@
 import unittest
 
-from xdrone import DroneConfig
+from xdrone import DroneConfig, DefaultDroneConfig
 
 
 class DroneConfigTest(unittest.TestCase):
@@ -40,3 +40,11 @@ class DroneConfigTest(unittest.TestCase):
                             DroneConfig(speed_mps=0.5, rotate_speed_dps=45, takeoff_height_meters=2))
         self.assertNotEqual(None,
                             DroneConfig(speed_mps=0.5, rotate_speed_dps=45, takeoff_height_meters=2))
+
+
+class DefaultDroneConfigTest(unittest.TestCase):
+    def test_default_values(self):
+        drone_config = DefaultDroneConfig()
+        self.assertEqual(1, drone_config.speed_mps)
+        self.assertEqual(90, drone_config.rotate_speed_dps)
+        self.assertEqual(1, drone_config.takeoff_height_meters)

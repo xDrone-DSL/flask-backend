@@ -1,5 +1,5 @@
-from xdrone.visitors.safety_checker_utils.safety_check_error import SafetyCheckError
-from xdrone.visitors.safety_checker_utils.state import State
+from xdrone.visitors.state_safety_checker.safety_check_error import SafetyCheckError
+from xdrone.visitors.state_safety_checker.state import State
 
 
 class SafetyConfig:
@@ -57,3 +57,10 @@ class SafetyConfig:
         if state.time_used_seconds > self._max_seconds:
             raise SafetyCheckError("The time used {} seconds will go beyond the time limit {} seconds"
                                    .format(state.time_used_seconds, self._max_seconds))
+
+
+class DefaultSafetyConfig(SafetyConfig):
+    def __init__(self):
+        super().__init__(max_seconds=float("inf"),
+                         max_x_meters=float("inf"), max_y_meters=float("inf"), max_z_meters=float("inf"),
+                         min_x_meters=float("-inf"), min_y_meters=float("-inf"), min_z_meters=float("-inf"))
