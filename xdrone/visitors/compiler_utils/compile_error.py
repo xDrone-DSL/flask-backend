@@ -5,5 +5,4 @@ class CompileError(Exception):
 class XDroneSyntaxError(Exception):
     pass
 
-
 # TODO: use sub classes, not just different error code

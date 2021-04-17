@@ -1,5 +1,5 @@
 from xdrone.visitors.safety_checker_utils.safety_check_error import SafetyCheckError
-from xdrone.visitors.safety_checker_utils.status import Status
+from xdrone.visitors.safety_checker_utils.state import State
 
 
 class SafetyConfig:
@@ -35,25 +35,25 @@ class SafetyConfig:
                    and other._min_z_meters == self._min_z_meters
         return False
 
-    def check_status(self, status: Status):
-        if status.x_meters > self._max_x_meters:
+    def check_state(self, state: State):
+        if state.x_meters > self._max_x_meters:
             raise SafetyCheckError("The x coordinate {} will go beyond its upper limit {}"
-                                   .format(status.x_meters, self._max_x_meters))
-        if status.y_meters > self._max_y_meters:
+                                   .format(state.x_meters, self._max_x_meters))
+        if state.y_meters > self._max_y_meters:
             raise SafetyCheckError("The y coordinate {} will go beyond its upper limit {}"
-                                   .format(status.y_meters, self._max_y_meters))
-        if status.z_meters > self._max_z_meters:
+                                   .format(state.y_meters, self._max_y_meters))
+        if state.z_meters > self._max_z_meters:
             raise SafetyCheckError("The z coordinate {} will go beyond its upper limit {}"
-                                   .format(status.z_meters, self._max_z_meters))
-        if status.x_meters < self._min_x_meters:
+                                   .format(state.z_meters, self._max_z_meters))
+        if state.x_meters < self._min_x_meters:
             raise SafetyCheckError("The x coordinate {} will go beyond its lower limit {}"
-                                   .format(status.x_meters, self._min_x_meters))
-        if status.y_meters < self._min_y_meters:
+                                   .format(state.x_meters, self._min_x_meters))
+        if state.y_meters < self._min_y_meters:
             raise SafetyCheckError("The y coordinate {} will go beyond its lower limit {}"
-                                   .format(status.y_meters, self._min_y_meters))
-        if status.z_meters < self._min_z_meters:
+                                   .format(state.y_meters, self._min_y_meters))
+        if state.z_meters < self._min_z_meters:
             raise SafetyCheckError("The z coordinate {} will go beyond its lower limit {}"
-                                   .format(status.z_meters, self._min_z_meters))
-        if status.time_used_seconds > self._max_seconds:
+                                   .format(state.z_meters, self._min_z_meters))
+        if state.time_used_seconds > self._max_seconds:
             raise SafetyCheckError("The time used {} seconds will go beyond the time limit {} seconds"
-                                   .format(status.time_used_seconds, self._max_seconds))
+                                   .format(state.time_used_seconds, self._max_seconds))

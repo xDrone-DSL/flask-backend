@@ -1,7 +1,7 @@
 import unittest
 
-from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.expressions import Expression
+from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type import Type
 
 
@@ -28,9 +28,9 @@ class TestSymbolTable(unittest.TestCase):
         st.store("a", Expression(Type.int(), 0))
         st.store("b", Expression(Type.list_of(Type.boolean()), [True]))
         expected = "SymbolTable: {\n" + \
-            "  a -> Expression: { type: int, value: 0, ident: None }\n" + \
-            "  b -> Expression: { type: list[boolean], value: [True], ident: None }\n" + \
-            "}"
+                   "  a -> Expression: { type: int, value: 0, ident: None }\n" + \
+                   "  b -> Expression: { type: list[boolean], value: [True], ident: None }\n" + \
+                   "}"
         self.assertEqual(expected, str(st))
 
     def test_store(self):

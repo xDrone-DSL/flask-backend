@@ -2,7 +2,7 @@ import unittest
 
 from xdrone import SafetyConfig
 from xdrone.visitors.safety_checker_utils.safety_check_error import SafetyCheckError
-from xdrone.visitors.safety_checker_utils.status import Status
+from xdrone.visitors.safety_checker_utils.state import State
 
 
 class SafetyConfigTest(unittest.TestCase):
@@ -41,32 +41,32 @@ class SafetyConfigTest(unittest.TestCase):
         self.assertNotEqual(SafetyConfig(min_z_meters=0), SafetyConfig(min_z_meters=-1))
         self.assertNotEqual(None, SafetyConfig())
 
-    def test_check_status(self):
+    def test_check_state(self):
         safety_config = SafetyConfig()
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(x_meters=10))
+            safety_config.check_state(State(x_meters=10))
         self.assertTrue("The x coordinate 10 will go beyond its upper limit 0" in str(context.exception))
 
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(y_meters=10))
+            safety_config.check_state(State(y_meters=10))
         self.assertTrue("The y coordinate 10 will go beyond its upper limit 0" in str(context.exception))
 
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(z_meters=10))
+            safety_config.check_state(State(z_meters=10))
         self.assertTrue("The z coordinate 10 will go beyond its upper limit 0" in str(context.exception))
 
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(x_meters=-10))
+            safety_config.check_state(State(x_meters=-10))
         self.assertTrue("The x coordinate -10 will go beyond its lower limit 0" in str(context.exception))
 
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(y_meters=-10))
+            safety_config.check_state(State(y_meters=-10))
         self.assertTrue("The y coordinate -10 will go beyond its lower limit 0" in str(context.exception))
 
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(z_meters=-10))
+            safety_config.check_state(State(z_meters=-10))
         self.assertTrue("The z coordinate -10 will go beyond its lower limit 0" in str(context.exception))
 
         with self.assertRaises(SafetyCheckError) as context:
-            safety_config.check_status(Status(time_used_seconds=10))
+            safety_config.check_state(State(time_used_seconds=10))
         self.assertTrue("The time used 10 seconds will go beyond the time limit 0 seconds" in str(context.exception))

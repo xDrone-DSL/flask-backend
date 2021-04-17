@@ -70,3 +70,16 @@ def generate_commands(program, symbol_table=None, function_table=None):
 
 def check_for_safety(commands: List[Command], drone_config: DroneConfig, safety_config: SafetyConfig):
     SafetyChecker().check(commands, drone_config, safety_config)
+
+
+if __name__ == '__main__':
+    commands = generate_commands(r"""
+    main () {
+        takeoff();
+        wait(100);
+    }
+    """)
+    drone_config = DroneConfig(speed_mps=0.5, rotate_speed_dps=45, takeoff_height_meters=1)
+    safety_config = SafetyConfig(max_seconds=60, max_x_meters=2, max_y_meters=2, max_z_meters=2,
+                                 min_x_meters=-2, min_y_meters=-2, min_z_meters=0)
+    check_for_safety(commands, drone_config, safety_config)

@@ -2,8 +2,8 @@ import unittest
 
 from xdrone import generate_commands
 from xdrone.visitors.compiler_utils.compile_error import CompileError
-from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.expressions import Expression
+from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type import Type
 
 
@@ -448,7 +448,7 @@ class ListRemoveTest(unittest.TestCase):
                 }
                 """)
         self.assertTrue("List {} has length {}, but has been removed at out-of-range index {}"
-                        .format(Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"), 3, 3 )
+                        .format(Expression(Type.list_of(Type.int()), [1, 2, 3], ident="a"), 3, 3)
                         in str(context.exception))
 
 
@@ -543,4 +543,3 @@ class VectorTest(unittest.TestCase):
                 self.assertTrue("Expression {} should have type vector, but is {}"
                                 .format(Expression(type, type.default_value, ident="a"), type.type_name)
                                 in str(context.exception))
-

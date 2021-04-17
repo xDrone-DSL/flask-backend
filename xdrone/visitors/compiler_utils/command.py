@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 from typing import Union
 
+
 class Command:
     def __init__(self, opcode: str, operands: list):
         self._opcode = opcode

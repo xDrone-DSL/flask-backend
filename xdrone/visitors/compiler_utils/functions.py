@@ -50,6 +50,7 @@ class Function:
     e.g. in __eq__ the attribute `commands` will not be compared,
     in __str__ the attribute `commands` will not be printed
     """
+
     def __init__(self, ident: str, param_list: List[Parameter], return_type: Optional[Type], commands: list):
         self._ident = ident
         self._param_list = param_list
@@ -74,12 +75,12 @@ class Function:
 
     def __str__(self):
         param_list_str = "[" + ", ".join(map(str, self._param_list)) + "]"
-        return "Function: {{ ident: {}, param_list: {}, return_type: {} }}"\
+        return "Function: {{ ident: {}, param_list: {}, return_type: {} }}" \
             .format(self._ident, param_list_str, self._return_type)
 
     def __eq__(self, other):
         if isinstance(other, Function):
-            return other._ident == self._ident and other._param_list == self._param_list\
+            return other._ident == self._ident and other._param_list == self._param_list \
                    and other._return_type == self._return_type
         return False
 

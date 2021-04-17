@@ -2,8 +2,8 @@ import unittest
 
 from xdrone import generate_commands
 from xdrone.visitors.compiler_utils.compile_error import CompileError
-from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.expressions import Expression
+from xdrone.visitors.compiler_utils.symbol_table import SymbolTable
 from xdrone.visitors.compiler_utils.type import Type
 
 
