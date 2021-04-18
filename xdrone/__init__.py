@@ -2,6 +2,7 @@ import antlr4
 
 from antlr.xDroneLexer import xDroneLexer, CommonTokenStream
 from antlr.xDroneParser import xDroneParser
+from xdrone.config_parsers.config_parser import ConfigParser
 from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import XDroneSyntaxError
 from xdrone.visitors.compiler_utils.error_listener import ParserErrorListener
@@ -56,6 +57,8 @@ def generate_commands(program, state_updater: StateUpdater = None, safety_checke
                       symbol_table: SymbolTable = None, function_table: FunctionTable = None):
     if state_updater is None:
         state_updater = StateUpdater(DefaultDroneConfig())
+    if safety_checker is None:
+        safety_checker = SafetyChecker(DefaultSafetyConfig())
     if symbol_table is None:
         symbol_table = SymbolTable()
     if function_table is None:
@@ -65,8 +68,7 @@ def generate_commands(program, state_updater: StateUpdater = None, safety_checke
 
     commands, states = Interpreter(state_updater, symbol_table, function_table).visit(tree)
 
-    if safety_checker is not None:
-        safety_checker.check(commands, states)
+    safety_checker.check(commands, states)
 
     return commands
 

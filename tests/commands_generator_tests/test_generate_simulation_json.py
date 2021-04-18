@@ -140,12 +140,13 @@ class GenerateSimulationJsonTest(unittest.TestCase):
                                      safety_checker=SafetyChecker(SafetyConfig(max_seconds=10, max_z_meters=1)))
         self.assertTrue("The z coordinate 10 will go beyond its upper limit 1" in str(context.exception))
 
-    def test_if_not_given_safety_checker_should_not_check_safety(self):
-        commands = "main() {up(1);}"
+    def test_if_not_given_safety_checker_should_use_default_to_check_safety(self):
+        commands = "main() {takeoff(); wait(1000); up(1000); land();}"
         generate_simulation_json(commands)
 
     def test_if_given_safety_checker_should_use_it_to_check_safety(self):
-        commands = "main() {up(1);}"
+        commands = "main() {takeoff(); up(1000); land();}"
         with self.assertRaises(SafetyCheckError) as context:
-            generate_simulation_json(commands, safety_checker=SafetyChecker(DefaultSafetyConfig()))
-        self.assertTrue("'up' command used when the drone has not been taken off" in str(context.exception))
+            generate_simulation_json(commands,
+                                     safety_checker=SafetyChecker(SafetyConfig(max_seconds=10000, max_z_meters=1)))
+        self.assertTrue("The z coordinate 1001 will go beyond its upper limit 1" in str(context.exception))

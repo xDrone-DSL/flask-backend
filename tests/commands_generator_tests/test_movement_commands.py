@@ -9,30 +9,30 @@ from xdrone.visitors.compiler_utils.type import Type
 class MovementCommandsTest(unittest.TestCase):
     def test_takeoff_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { takeoff(); }
+            main() { takeoff(); land(); }
         """)
-        expected = [Command.takeoff()]
+        expected = [Command.takeoff(), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_land_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { land(); }
+            main() { takeoff(); land(); }
         """)
-        expected = [Command.land()]
+        expected = [Command.takeoff(), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_up_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { up(1); }
+            main() { takeoff(); up(1); land(); }
         """)
-        expected = [Command.up(1)]
+        expected = [Command.takeoff(), Command.up(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_up_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { up(1.0); }
+            main() { takeoff(); up(1.0); land(); }
         """)
-        expected = [Command.up(1.0)]
+        expected = [Command.takeoff(), Command.up(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_up_with_incorrect_parameter_should_give_error(self):
@@ -43,7 +43,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      up(a); 
+                      takeoff();
+                      up(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -53,16 +55,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_down_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { down(1); }
+            main() { takeoff(); down(1); land(); }
         """)
-        expected = [Command.down(1)]
+        expected = [Command.takeoff(), Command.down(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_down_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { down(1.0); }
+            main() { takeoff(); down(1.0); land(); }
         """)
-        expected = [Command.down(1.0)]
+        expected = [Command.takeoff(), Command.down(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_down_with_incorrect_parameter_should_give_error(self):
@@ -73,7 +75,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      down(a); 
+                      takeoff();
+                      down(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -83,16 +87,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_left_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { left(1); }
+            main() { takeoff(); left(1); land(); }
         """)
-        expected = [Command.left(1)]
+        expected = [Command.takeoff(), Command.left(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_left_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { left(1.0); }
+            main() { takeoff(); left(1.0); land(); }
         """)
-        expected = [Command.left(1.0)]
+        expected = [Command.takeoff(), Command.left(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_left_with_incorrect_parameter_should_give_error(self):
@@ -103,7 +107,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      left(a); 
+                      takeoff();
+                      left(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -113,16 +119,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_right_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { right(1); }
+            main() { takeoff(); right(1); land(); }
         """)
-        expected = [Command.right(1)]
+        expected = [Command.takeoff(), Command.right(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_right_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { right(1.0); }
+            main() { takeoff(); right(1.0); land(); }
         """)
-        expected = [Command.right(1.0)]
+        expected = [Command.takeoff(), Command.right(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_right_with_incorrect_parameter_should_give_error(self):
@@ -133,7 +139,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      right(a); 
+                      takeoff();
+                      right(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -143,16 +151,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_forward_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { forward(1); }
+            main() { takeoff(); forward(1); land(); }
         """)
-        expected = [Command.forward(1)]
+        expected = [Command.takeoff(), Command.forward(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_forward_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { forward(1.0); }
+            main() { takeoff(); forward(1.0); land(); }
         """)
-        expected = [Command.forward(1.0)]
+        expected = [Command.takeoff(), Command.forward(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_forward_with_incorrect_parameter_should_give_error(self):
@@ -163,7 +171,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      forward(a); 
+                      takeoff();
+                      forward(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -173,16 +183,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_backward_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { backward(1); }
+            main() { takeoff(); backward(1); land(); }
         """)
-        expected = [Command.backward(1)]
+        expected = [Command.takeoff(), Command.backward(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_backward_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { backward(1.0); }
+            main() { takeoff(); backward(1.0); land(); }
         """)
-        expected = [Command.backward(1.0)]
+        expected = [Command.takeoff(), Command.backward(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_backward_with_incorrect_parameter_should_give_error(self):
@@ -193,7 +203,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      backward(a); 
+                      takeoff();
+                      backward(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -203,16 +215,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_rotate_left_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { rotate_left(1); }
+            main() { takeoff(); rotate_left(1); land(); }
         """)
-        expected = [Command.rotate_left(1)]
+        expected = [Command.takeoff(), Command.rotate_left(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_rotate_left_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { rotate_left(1.0); }
+            main() { takeoff(); rotate_left(1.0); land(); }
         """)
-        expected = [Command.rotate_left(1.0)]
+        expected = [Command.takeoff(), Command.rotate_left(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_rotate_left_with_incorrect_parameter_should_give_error(self):
@@ -223,7 +235,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      rotate_left(a); 
+                      takeoff();
+                      rotate_left(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 
@@ -233,16 +247,16 @@ class MovementCommandsTest(unittest.TestCase):
 
     def test_rotate_right_with_int_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { rotate_right(1); }
+            main() { takeoff(); rotate_right(1); land(); }
         """)
-        expected = [Command.rotate_right(1)]
+        expected = [Command.takeoff(), Command.rotate_right(1), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_rotate_right_with_decimal_parameter_should_return_correct_command(self):
         actual = generate_commands("""
-            main() { rotate_right(1.0); }
+            main() { takeoff(); rotate_right(1.0); land(); }
         """)
-        expected = [Command.rotate_right(1.0)]
+        expected = [Command.takeoff(), Command.rotate_right(1.0), Command.land()]
         self.assertEqual(expected, actual)
 
     def test_rotate_right_with_incorrect_parameter_should_give_error(self):
@@ -253,7 +267,9 @@ class MovementCommandsTest(unittest.TestCase):
                 generate_commands("""
                     main() {{
                       {} a;
-                      rotate_right(a); 
+                      takeoff();
+                      rotate_right(a);
+                      land(); 
                     }}
                 """.format(type.type_name))
 

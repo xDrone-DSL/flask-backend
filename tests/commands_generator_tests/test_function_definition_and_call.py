@@ -229,10 +229,12 @@ class ProcedureCallTest(unittest.TestCase):
               down(i);
             }
             main () {
+              takeoff();
               proc(100, 200);
+              land();
             }
             """)
-        self.assertEqual([Command.up(300), Command.down(100)], commands)
+        self.assertEqual([Command.takeoff(), Command.up(300), Command.down(100), Command.land()], commands)
 
     def test_procedure_error_but_not_called_should_not_give_error(self):
         commands = generate_commands("""
@@ -261,7 +263,9 @@ class ProcedureCallTest(unittest.TestCase):
                   down(i);
                 }
                 main () {
+                  takeoff();
                   proc(100);
+                  land();
                 }
                 """)
         self.assertTrue("Arguments when calling function or procedure proc should have types {}, but is {}"
@@ -281,8 +285,10 @@ class ProcedureCallTest(unittest.TestCase):
                           down(i);
                         }}
                         main () {{
+                          takeoff();
                           {} a;
                           proc(a);
+                          land();
                         }}
                         """.format(t1, t2))
                 self.assertTrue("Arguments when calling function or procedure proc should have types ['{}'], "
@@ -313,10 +319,13 @@ class FunctionCallTest(unittest.TestCase):
               return i + j;
             }
             main () {
+              takeoff();
               forward(func(100, 200));
+              land();
             }
             """)
-        self.assertEqual([Command.up(300), Command.down(100), Command.forward(300)], commands)
+        self.assertEqual([Command.takeoff(), Command.up(300), Command.down(100), Command.forward(300), Command.land()],
+                         commands)
 
     def test_function_error_but_not_called_should_not_give_error(self):
         commands = generate_commands("""
@@ -344,7 +353,9 @@ class FunctionCallTest(unittest.TestCase):
                   return i + j;
                 }
                 main () {
+                  takeoff();
                   forward(func(100));
+                  land();
                 }
                 """)
         self.assertTrue("Arguments when calling function or procedure func should have types {}, but is {}"
@@ -394,10 +405,12 @@ class ComplexFunctionTest(unittest.TestCase):
               return func(i + 1);
             }
             main () {
+              takeoff();
               forward(func(1));
+              land();
             }
             """)
-        self.assertEqual([Command.forward(10)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(10), Command.land()], commands)
 
     def test_loops_in_function(self):
         commands = generate_commands("""
@@ -408,10 +421,12 @@ class ComplexFunctionTest(unittest.TestCase):
               return i;
             }
             main () {
+              takeoff();
               forward(func(1));
+              land();
             }
             """)
-        self.assertEqual([Command.forward(10)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(10), Command.land()], commands)
 
     def test_function_procedure_in_function(self):
         commands = generate_commands("""
@@ -429,10 +444,12 @@ class ComplexFunctionTest(unittest.TestCase):
               return func(i) * func(i);
             }
             main () {
+              takeoff();
               forward(func2(1));
+              land();
             }
             """)
-        self.assertEqual([Command.forward(100), Command.forward(100)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(100), Command.forward(100), Command.land()], commands)
 
     def test_scope(self):
         actual = SymbolTable()
@@ -445,11 +462,13 @@ class ComplexFunctionTest(unittest.TestCase):
               return i;
             }
             main () {
+              takeoff();
               int i <- 1;
               forward(func(i));
+              land();
             }
             """, symbol_table=actual)
-        self.assertEqual([Command.forward(10)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(10), Command.land()], commands)
         expected = SymbolTable()
         expected.store("i", Expression(Type.int(), 1, ident="i"))
         self.assertEqual(expected, actual)
@@ -466,10 +485,12 @@ class ComplexProcedureTest(unittest.TestCase):
               proc(i + 1);
             }
             main () {
+              takeoff();
               proc(1);
+              land();
             }
             """)
-        self.assertEqual([Command.forward(10)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(10), Command.land()], commands)
 
     def test_loops_in_function(self):
         commands = generate_commands("""
@@ -480,10 +501,12 @@ class ComplexProcedureTest(unittest.TestCase):
               forward(i);
             }
             main () {
+              takeoff();
               proc(1);
+              land();
             }
             """)
-        self.assertEqual([Command.forward(10)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(10), Command.land()], commands)
 
     def test_function_procedure_in_procedure(self):
         commands = generate_commands("""
@@ -494,14 +517,16 @@ class ComplexProcedureTest(unittest.TestCase):
               forward(i);
             }
             procedure proc2() {
+              takeoff();
               proc(func(10));
               proc(func(10));
+              land();
             }
             main () {
               proc2();
             }
             """)
-        self.assertEqual([Command.forward(100), Command.forward(100)], commands)
+        self.assertEqual([Command.takeoff(), Command.forward(100), Command.forward(100), Command.land()], commands)
 
     def test_scope(self):
         actual = SymbolTable()
