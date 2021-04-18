@@ -13,7 +13,7 @@ from xdrone.visitors.fly import Fly
 from xdrone.visitors.interpreter import Interpreter
 from xdrone.visitors.state_safety_checker.drone_config import DroneConfig, DefaultDroneConfig
 from xdrone.visitors.state_safety_checker.safety_checker import SafetyChecker
-from xdrone.visitors.state_safety_checker.safety_config import SafetyConfig, DefaultSafetyConfig
+from xdrone.visitors.state_safety_checker.safety_config import SafetyConfig
 from xdrone.visitors.state_safety_checker.state_updater import StateUpdater
 from xdrone.visitors.validate import Validate
 
@@ -58,7 +58,7 @@ def generate_commands(program, state_updater: StateUpdater = None, safety_checke
     if state_updater is None:
         state_updater = StateUpdater(DefaultDroneConfig())
     if safety_checker is None:
-        safety_checker = SafetyChecker(DefaultSafetyConfig())
+        safety_checker = SafetyChecker(SafetyConfig.no_limit())
     if symbol_table is None:
         symbol_table = SymbolTable()
     if function_table is None:

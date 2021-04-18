@@ -1,6 +1,6 @@
 import unittest
 
-from xdrone import generate_simulation_json, SafetyChecker, SafetyConfig, StateUpdater, DroneConfig, DefaultSafetyConfig
+from xdrone import generate_simulation_json, SafetyChecker, SafetyConfig, StateUpdater, DroneConfig
 from xdrone.visitors.state_safety_checker.safety_check_error import SafetyCheckError
 
 

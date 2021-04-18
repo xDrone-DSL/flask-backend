@@ -1,6 +1,6 @@
 import unittest
 
-from xdrone import generate_commands, SafetyChecker, DefaultSafetyConfig, SafetyConfig, DroneConfig, StateUpdater
+from xdrone import generate_commands, SafetyChecker, SafetyConfig, DroneConfig, StateUpdater
 from xdrone.visitors.compiler_utils.command import Command
 from xdrone.visitors.compiler_utils.compile_error import CompileError, XDroneSyntaxError
 from xdrone.visitors.state_safety_checker.safety_check_error import SafetyCheckError

@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 from xdrone.visitors.state_safety_checker.safety_check_error import SafetyCheckError
 from xdrone.visitors.state_safety_checker.state import State
 
 
 class SafetyConfig:
-    def __init__(self, max_seconds: float = 0,
-                 max_x_meters: float = 0, max_y_meters: float = 0, max_z_meters: float = 0,
-                 min_x_meters: float = 0, min_y_meters: float = 0, min_z_meters: float = 0):
+    def __init__(self, max_seconds: float = float('inf'),
+                 max_x_meters: float = float('inf'), max_y_meters: float = float('inf'),
+                 max_z_meters: float = float('inf'), min_x_meters: float = float('-inf'),
+                 min_y_meters: float = float('-inf'), min_z_meters: float = float('-inf')):
         if max_seconds < 0:
             raise ValueError("max_seconds should >= 0")
         if max_x_meters < min_x_meters:
@@ -22,6 +25,10 @@ class SafetyConfig:
         self._min_y_meters = min_y_meters
         self._min_z_meters = min_z_meters
 
+    @staticmethod
+    def no_limit() -> SafetyConfig:
+        return SafetyConfig()
+
     def __str__(self):
         return ("SafetyConfig: {{ max_seconds: {}, x_range_meters: {}, y_range_meters: {}, z_range_meters: {} }}"
                 .format(self._max_seconds, (self._min_x_meters, self._max_x_meters),
@@ -35,7 +42,7 @@ class SafetyConfig:
                    and other._min_z_meters == self._min_z_meters
         return False
 
-    def check_state(self, state: State):
+    def check_state(self, state: State) -> None:
         if state.x_meters > self._max_x_meters:
             raise SafetyCheckError("The x coordinate {} will go beyond its upper limit {}"
                                    .format(state.x_meters, self._max_x_meters))
@@ -57,10 +64,3 @@ class SafetyConfig:
         if state.time_used_seconds > self._max_seconds:
             raise SafetyCheckError("The time used {} seconds will go beyond the time limit {} seconds"
                                    .format(state.time_used_seconds, self._max_seconds))
-
-
-class DefaultSafetyConfig(SafetyConfig):
-    def __init__(self):
-        super().__init__(max_seconds=float("inf"),
-                         max_x_meters=float("inf"), max_y_meters=float("inf"), max_z_meters=float("inf"),
-                         min_x_meters=float("-inf"), min_y_meters=float("-inf"), min_z_meters=float("-inf"))
